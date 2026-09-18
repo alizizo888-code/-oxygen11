@@ -1,65 +1,101 @@
+/**
+ * =========================================================================
+ * Mutqan Platform - Main Server & Central Orchestrator (server.js)
+ * Sovereign IP Protection: SAIP-CR-2024-8891
+ * Sovereign Owner/Author: علي طلعت زيدان (آية) - ID: 789512364
+ * =========================================================================
+ */
+
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const path = require('path');
+
+// استدعاء المحركات والوحدات السيادية للمنصة
+const MutqanDispatchEngine = require('./backend/dispatch_engine/engine');
+const MutqanPaymentProcessor = require('./backend/payment_gateway/payment_processor');
+const MutqanChatEngine = require('./communications/chat_sockets/socket_handler');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
-let orders = [];
+// محاكاة الاتصال بقاعدة البيانات ووحدات التشغيل
+const dbMockConnection = { status: 'connected_securely' };
+const dispatchEngine = new MutqanDispatchEngine(dbMockConnection);
+const paymentProcessor = new MutqanPaymentProcessor(dbMockConnection);
+const chatEngine = new MutqanChatEngine(io);
 
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.get('/tech', (req, res) => res.sendFile(path.join(__dirname, 'public', 'technician.html')));
-app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+// تهيئة محادثات السوكيت الفورية
+chatEngine.initializeSocketHandlers();
 
-app.get('/api/orders', (req, res) => res.json(orders));
-
-io.on('connection', (socket) => {
-    socket.emit('init_orders', orders);
-
-    socket.on('client_create_order', (orderData) => {
-        orders.unshift(orderData);
-        io.emit('order_created', orderData);
-        io.emit('update_dashboard', orders);
-    });
-
-    socket.on('tech_update_task', (updatePayload) => {
-        let order = orders.find(o => o.id === updatePayload.orderId);
-        if (order) {
-            order.status = updatePayload.status;
-            if (updatePayload.laborFee !== undefined) order.laborFee = updatePayload.laborFee;
-            if (updatePayload.partsFee !== undefined) order.partsFee = updatePayload.partsFee;
-            if (updatePayload.totalPrice !== undefined) order.price = updatePayload.totalPrice;
-            
-            io.emit('order_updated', order);
-            io.emit('update_dashboard', orders);
-        }
-    });
-
-    socket.on('send_chat_message', (chatData) => {
-        let order = orders.find(o => o.id === chatData.orderId);
-        if (order) {
-            order.messages = order.messages || [];
-            order.messages.push(chatData);
-            io.emit('new_chat_message', chatData);
-        }
-    });
-
-    socket.on('admin_close_order', (orderId) => {
-        let order = orders.find(o => o.id === orderId);
-        if (order) {
-            order.status = "معتمد / مغلق نهائياً";
-            io.emit('order_updated', order);
-            io.emit('update_dashboard', orders);
-        }
+// 1. مسار التحقق من سلامة وصلاحيات النظام السيادي
+app.get('/api/governance/status', (req, res) => {
+    res.json({
+        platform: 'Mutqan Platform',
+        sovereignOwner: 'علي طلعت زيدان (آية)',
+        masterAuthId: '789512364',
+        systemStatus: 'active',
+        ipProtection: 'SAIP-CR-2024-8891',
+        timestamp: new Date().toISOString()
     });
 });
 
+// 2. مسار تسجيل العملاء والتفعيل التلقائي للمحفظة
+app.post('/api/clients/register', async (req, res) => {
+    try {
+        const result = await dispatchEngine.registerClient(req.body);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 3. مسار تسجيل الفنيين بحالة "زائر/معلق" افتراضياً
+app.post('/api/providers/register', async (req, res) => {
+    try {
+        const result = await dispatchEngine.registerProvider(req.body);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 4. مسار معالجة الطلبات والتوزيع (آلي أو يدوي سيادي)
+app.post('/api/orders/dispatch', async (req, res) => {
+    try {
+        const { orderId, dispatchType, targetProviderId } = req.body;
+        const result = await dispatchEngine.dispatchOrder(orderId, dispatchType, targetProviderId);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 5. مسار احتساب الحسابات والماليات وبوابات الدفع
+app.post('/api/payments/calculate-and-pay', async (req, res) => {
+    try {
+        const { orderId, basePrice, spareParts, discount, paymentMethod, walletBalance } = req.body;
+        const financials = paymentProcessor.calculateOrderFinancials(basePrice, spareParts, discount);
+        const paymentResult = await paymentProcessor.processPayment(orderId, financials.grossTotal, paymentMethod, walletBalance);
+        
+        res.json({
+            financials,
+            paymentResult
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// تشغيل الخادم على المنفذ المحدد
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`Server running on port: ${PORT}`);
+    console.log(`[Mutqan Sovereign Server] Running securely on port ${PORT} [Auth ID: 789512364]`);
 });
