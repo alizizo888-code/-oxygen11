@@ -1,101 +1,40 @@
-/**
- * =========================================================================
- * Mutqan Platform - Main Server & Central Orchestrator (server.js)
- * Sovereign IP Protection: SAIP-CR-2024-8891
- * Sovereign Owner/Author: علي طلعت زيدان (آية) - ID: 789512364
- * =========================================================================
- */
+// تخزين مؤقت لرموز التحقق (للإنتاج يُفضل استخدام Redis أو قاعدة البيانات)
+const otpStorage = new Map();
 
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-
-// استدعاء المحركات والوحدات السيادية للمنصة
-const MutqanDispatchEngine = require('./backend/dispatch_engine/engine');
-const MutqanPaymentProcessor = require('./backend/payment_gateway/payment_processor');
-const MutqanChatEngine = require('./communications/chat_sockets/socket_handler');
-
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
-});
-
-app.use(express.json());
-
-// محاكاة الاتصال بقاعدة البيانات ووحدات التشغيل
-const dbMockConnection = { status: 'connected_securely' };
-const dispatchEngine = new MutqanDispatchEngine(dbMockConnection);
-const paymentProcessor = new MutqanPaymentProcessor(dbMockConnection);
-const chatEngine = new MutqanChatEngine(io);
-
-// تهيئة محادثات السوكيت الفورية
-chatEngine.initializeSocketHandlers();
-
-// 1. مسار التحقق من سلامة وصلاحيات النظام السيادي
-app.get('/api/governance/status', (req, res) => {
-    res.json({
-        platform: 'Mutqan Platform',
-        sovereignOwner: 'علي طلعت زيدان (آية)',
-        masterAuthId: '789512364',
-        systemStatus: 'active',
-        ipProtection: 'SAIP-CR-2024-8891',
-        timestamp: new Date().toISOString()
+// 1. طلب إرسال رمز OTP
+app.post('/api/auth/send-otp', (req, res) => {
+    const { phone } = req.body;
+    const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString(); // رمز من 4 أرقام
+    
+    otpStorage.set(phone, {
+        otp: generatedOtp,
+        expiresAt: Date.now() + 5 * 60 * 1000 // صالح لمدة 5 دقائق
     });
+
+    console.log(`[OTP Secure Gateway] Code for ${phone}: ${generatedOtp}`);
+    
+    // هنا يتم ربط بوابة الرسائل النصية (SMS Gateway) مستقبلاً
+    res.json({ status: 'success', message: 'تم إرسال رمز التحقق بنجاح (راجع السيرفر للاختبار)', debugOtp: generatedOtp });
 });
 
-// 2. مسار تسجيل العملاء والتفعيل التلقائي للمحفظة
-app.post('/api/clients/register', async (req, res) => {
-    try {
-        const result = await dispatchEngine.registerClient(req.body);
-        res.json(result);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+// 2. التحقق من الرمز وتسجيل الدخول
+app.post('/api/auth/verify-otp', (req, res) => {
+    const { phone, otp } = req.body;
+    const record = otpStorage.get(phone);
+
+    if (!record) {
+        return res.status(400).json({ status: 'failed', message: 'انتهت صلاحية الرمز أو لم يتم طلبه.' });
     }
-});
 
-// 3. مسار تسجيل الفنيين بحالة "زائر/معلق" افتراضياً
-app.post('/api/providers/register', async (req, res) => {
-    try {
-        const result = await dispatchEngine.registerProvider(req.body);
-        res.json(result);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    if (Date.now() > record.expiresAt) {
+        otpStorage.delete(phone);
+        return res.status(400).json({ status: 'failed', message: 'انتهت صلاحية رمز التحقق.' });
     }
-});
 
-// 4. مسار معالجة الطلبات والتوزيع (آلي أو يدوي سيادي)
-app.post('/api/orders/dispatch', async (req, res) => {
-    try {
-        const { orderId, dispatchType, targetProviderId } = req.body;
-        const result = await dispatchEngine.dispatchOrder(orderId, dispatchType, targetProviderId);
-        res.json(result);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    if (record.otp === otp) {
+        otpStorage.delete(phone);
+        res.json({ status: 'success', message: 'تم تسجيل الدخول بنجاح وتوثيق الهوية.' });
+    } else {
+        res.status(400).json({ status: 'failed', message: 'رمز التحقق غير صحيح.' });
     }
-});
-
-// 5. مسار احتساب الحسابات والماليات وبوابات الدفع
-app.post('/api/payments/calculate-and-pay', async (req, res) => {
-    try {
-        const { orderId, basePrice, spareParts, discount, paymentMethod, walletBalance } = req.body;
-        const financials = paymentProcessor.calculateOrderFinancials(basePrice, spareParts, discount);
-        const paymentResult = await paymentProcessor.processPayment(orderId, financials.grossTotal, paymentMethod, walletBalance);
-        
-        res.json({
-            financials,
-            paymentResult
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// تشغيل الخادم على المنفذ المحدد
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`[Mutqan Sovereign Server] Running securely on port ${PORT} [Auth ID: 789512364]`);
 });
