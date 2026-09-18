@@ -2,315 +2,429 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>مُتقن OXYGEN - تطبيق العميل</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مُتقن OXYGEN | صيانة التكييف والتبريد الفورية</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/socket.io/socket.io.js"></script>
     <style>
         :root {
-            --primary: #0056b3;
-            --accent: #fbbf24;
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --accent: #f59e0b;
+            --success: #10b981;
             --danger: #ef4444;
-            --success: #16a34a;
+            --dark: #0f172a;
             --bg: #f8fafc;
             --card: #ffffff;
-            --text: #1e293b;
-            --muted: #64748b;
             --border: #e2e8f0;
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Tajawal', sans-serif; background: var(--bg); color: var(--text); padding-bottom: calc(75px + var(--safe-bottom)); direction: rtl; }
-        .app-shell { width: 100%; max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text-main); padding-bottom: 80px; direction: rtl; }
+        .container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: #fff; position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.05); }
 
-        /* الهيدر العلوي */
-        .app-header {
-            background: #fff; padding: 12px 16px; display: flex; justify-content: space-between;
-            align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
-        }
-        .user-loc { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 800; }
-        .wallet-pill { background: #f1f5f9; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        /* شريط العنوان العلوي وتحديد الموقع */
+        .top-nav { background: #fff; padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .location-selector { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .location-selector i { color: var(--primary); font-size: 1.1rem; }
+        .location-info span { font-size: 0.7rem; color: var(--text-muted); display: block; }
+        .location-info strong { font-size: 0.85rem; font-weight: 800; color: var(--text-main); }
+        .user-balance { background: #f0fdf4; border: 1px solid #bbf7d0; color: var(--success); padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; }
+
+        /* تبويبات التنقل السفلية */
+        .bottom-tabs { position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; height: 65px; background: #fff; border-top: 1px solid var(--border); display: flex; z-index: 200; }
+        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-decoration: none; cursor: pointer; font-size: 0.75rem; font-weight: 800; gap: 3px; }
+        .tab-item.active { color: var(--primary); }
+        .tab-item i { font-size: 1.25rem; }
+
+        /* الشاشات */
+        .page-screen { display: none; padding: 16px; }
+        .page-screen.active { display: block; }
 
         /* البانر الإعلاني */
-        .promo-slider { margin: 12px 16px; background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 20px; color: #fff; padding: 18px; position: relative; overflow: hidden; }
-        .promo-slider h3 { font-size: 1.1rem; font-weight: 900; color: var(--accent); }
-        .promo-slider p { font-size: 0.8rem; margin-top: 4px; opacity: 0.9; }
+        .hero-banner { background: linear-gradient(135deg, #0284c7, #0f172a); border-radius: 20px; color: #fff; padding: 20px; margin-bottom: 20px; position: relative; overflow: hidden; }
+        .hero-banner h2 { font-size: 1.25rem; font-weight: 900; margin-bottom: 6px; }
+        .hero-banner p { font-size: 0.8rem; opacity: 0.9; }
 
-        /* التبويبات والشاشات */
-        .view-section { display: none; padding: 0 16px; }
-        .view-section.active { display: block; animation: fadeIn 0.25s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        /* أقسام الخدمات والشبكة */
+        .section-heading { font-size: 0.95rem; font-weight: 900; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .grid-service-btn { background: #f8fafc; border: 1px solid var(--border); border-radius: 16px; padding: 12px 6px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .grid-service-btn:active { background: #e0f2fe; border-color: var(--primary); transform: scale(0.96); }
+        .grid-service-btn i { font-size: 1.4rem; color: var(--primary); margin-bottom: 6px; display: block; }
+        .grid-service-btn span { font-size: 0.75rem; font-weight: 800; }
 
-        /* شبكة الخدمات */
-        .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 15px 0; }
-        .service-box { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 12px 6px; text-align: center; cursor: pointer; transition: transform 0.1s; }
-        .service-box:active { transform: scale(0.94); background: #f8fafc; }
-        .service-box i { font-size: 1.5rem; color: var(--primary); margin-bottom: 6px; display: block; }
-        .service-box span { font-size: 0.75rem; font-weight: 800; }
+        /* بنود الصيانة المعتمدة */
+        .service-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .service-meta h4 { font-size: 0.9rem; font-weight: 800; margin-bottom: 4px; }
+        .service-meta p { font-size: 0.75rem; color: var(--text-muted); }
+        .service-price { font-size: 1rem; font-weight: 900; color: var(--danger); margin-top: 4px; }
+        .btn-order-trigger { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; cursor: pointer; }
 
-        /* كروت التسعير والبنود */
-        .item-row { background: #fff; border: 1px solid var(--border); padding: 12px; border-radius: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .price-badge { font-weight: 900; color: var(--danger); font-size: 0.95rem; }
-        .btn-add { background: #dcfce7; color: var(--success); border: none; width: 32px; height: 32px; border-radius: 8px; font-weight: 900; cursor: pointer; }
+        /* نموذج إكمال وحجز الطلب النافذ */
+        .order-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
+        .order-modal-sheet { background: #fff; width: 100%; max-width: 480px; border-radius: 24px 24px 0 0; padding: 20px; max-height: 90vh; overflow-y: auto; }
+        .form-label { display: block; font-size: 0.8rem; font-weight: 800; margin-bottom: 6px; color: var(--text-main); }
+        .form-control { width: 100%; height: 44px; border: 1.5px solid var(--border); border-radius: 10px; padding: 0 12px; font-family: inherit; font-size: 0.85rem; margin-bottom: 14px; outline: none; }
+        .form-control:focus { border-color: var(--primary); }
+        .location-pick-btn { background: #eff6ff; border: 1.5px dashed var(--primary); color: var(--primary); width: 100%; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; cursor: pointer; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        .pay-options-group { display: flex; gap: 10px; margin-bottom: 16px; }
+        .pay-opt { flex: 1; border: 1.5px solid var(--border); border-radius: 12px; padding: 10px; text-align: center; cursor: pointer; font-size: 0.8rem; font-weight: 800; }
+        .pay-opt.selected { border-color: var(--primary); background: #f0f9ff; color: var(--primary); }
 
-        /* شريط الملاحة السفلي */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--border);
-            height: calc(65px + var(--safe-bottom)); display: flex; z-index: 200; max-width: 480px; margin: 0 auto;
-        }
-        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); font-size: 0.7rem; font-weight: 800; text-decoration: none; cursor: pointer; }
-        .nav-link.active { color: var(--primary); }
-        .nav-link i { font-size: 1.25rem; margin-bottom: 3px; }
+        .btn-confirm-order { width: 100%; background: var(--success); color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 0.95rem; font-weight: 900; cursor: pointer; }
 
-        /* النوافذ المنبثقة */
-        .modal-wrap { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
-        .modal-sheet { background: #fff; width: 100%; max-width: 480px; border-radius: 24px 24px 0 0; padding: 20px; max-height: 85vh; overflow-y: auto; }
-        .btn-main { width: 100%; background: var(--primary); color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 0.95rem; cursor: pointer; margin-top: 10px; }
+        /* كارت متابعة الطلب النشط */
+        .live-order-card { border: 2px solid var(--primary); border-radius: 18px; padding: 16px; margin-bottom: 14px; background: #fff; }
+        .status-timeline { display: flex; justify-content: space-between; margin: 15px 0; position: relative; }
+        .status-step { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-align: center; flex: 1; }
+        .status-step.active { color: var(--primary); }
+        .chat-action-btn { width: 100%; background: #eff6ff; border: 1px solid var(--primary); color: var(--primary); border-radius: 10px; padding: 10px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="app-shell">
-    
-    <!-- الهيدر -->
-    <header class="app-header">
-        <div class="user-loc">
-            <i class="fas fa-location-dot" style="color:var(--primary)"></i>
-            <span id="header-address">مكة المكرمة، حي العوالي</span>
+<div class="container">
+
+    <!-- شريط العنوان العلوي -->
+    <header class="top-nav">
+        <div class="location-selector" onclick="detectGPSLocation()">
+            <i class="fas fa-map-marker-alt"></i>
+            <div class="location-info">
+                <span>الموقع المعتمد للتنفيذ</span>
+                <strong id="display-client-location">مكة المكرمة، حي العوالي</strong>
+            </div>
         </div>
-        <div class="wallet-pill" onclick="switchTab('wallet')">
-            <i class="fas fa-wallet" style="color:var(--success)"></i>
-            <span id="client-balance">0.00</span> ر.س
+        <div class="user-balance">
+            <i class="fas fa-wallet"></i> <span id="client-wallet-val">0.00</span> ر.س
         </div>
     </header>
 
-    <!-- شاشة الرئيسية -->
-    <section id="tab-home" class="view-section active">
-        <div class="promo-slider">
-            <h3>مُتقن OXYGEN</h3>
-            <p>صيانة معتمدة بمكة المكرمة وجدة - تتبع مباشر للفني</p>
+    <!-- شاشة الخدمات والطلب (الرئيسية) -->
+    <main id="screen-home" class="page-screen active">
+        <div class="hero-banner">
+            <h2>مُتقن OXYGEN للصيانة</h2>
+            <p>حلول التكييف والتبريد الاحترافية بمكة وجدة مع ضمان الفحص المعتمد.</p>
         </div>
 
-        <h4 style="font-weight:900; font-size:0.9rem; margin-bottom:10px;">أهم الخدمات المتاحة</h4>
+        <div class="section-heading">
+            <span>الأقسام المتوفرة</span>
+        </div>
+
         <div class="services-grid">
-            <div class="service-box" onclick="openServiceCatalog('تكييف')"><i class="fas fa-snowflake"></i><span>تكييف</span></div>
-            <div class="service-box" onclick="openServiceCatalog('كهرباء')"><i class="fas fa-bolt"></i><span>كهرباء</span></div>
-            <div class="service-box" onclick="openServiceCatalog('سباكة')"><i class="fas fa-faucet-drip"></i><span>سباكة</span></div>
-            <div class="service-box" onclick="openServiceCatalog('نجارة')"><i class="fas fa-hammer"></i><span>نجارة</span></div>
-            <div class="service-box" onclick="openServiceCatalog('أجهزة منزلية')"><i class="fas fa-tv"></i><span>أجهزة</span></div>
-            <div class="service-box" onclick="openServiceCatalog('ستالايت')"><i class="fas fa-satellite-dish"></i><span>ستالايت</span></div>
-            <div class="service-box" onclick="openServiceCatalog('تنظيف')"><i class="fas fa-broom"></i><span>تنظيف</span></div>
-            <div class="service-box" onclick="openServiceCatalog('أمن وسلامة')"><i class="fas fa-shield-halved"></i><span>أمان</span></div>
+            <div class="grid-service-btn"><i class="fas fa-snowflake"></i><span>تكييف</span></div>
+            <div class="grid-service-btn"><i class="fas fa-box-archive"></i><span>غرف تبريد</span></div>
+            <div class="grid-service-btn"><i class="fas fa-bolt"></i><span>كهرباء</span></div>
+            <div class="grid-service-btn"><i class="fas fa-wrench"></i><span>سباكة</span></div>
         </div>
 
-        <div id="service-items-container" style="display:none; margin-top:15px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <h4 id="catalog-title" style="font-weight:900;">قائمة الأعطال والخدمات</h4>
-                <button onclick="document.getElementById('service-items-container').style.display='none'" style="border:none; background:none; color:var(--danger); font-weight:800; cursor:pointer;">إغلاق</button>
+        <div class="section-heading">
+            <span>قائمة صيانة التكييف المعتمدة</span>
+        </div>
+
+        <!-- بنود الصيانة -->
+        <div class="service-card">
+            <div class="service-meta">
+                <h4>غسيل مكيف سبليت (داخلي وخارجي)</h4>
+                <p>تنظيف كيميائي، فحص تسريب الحوض، وتعقيم المبخر</p>
+                <div class="service-price">127 ر.س</div>
             </div>
-            <div id="catalog-list"></div>
+            <button class="btn-order-trigger" onclick="startBooking('غسيل مكيف سبليت (داخلي وخارجي)', 127)">طلب فوري</button>
+        </div>
+
+        <div class="service-card">
+            <div class="service-meta">
+                <h4>شحن فريون وفحص الدائرة</h4>
+                <p>فحص الضغوط وكشف تسريبات النحاس وتعبئة الغاز الأصلي</p>
+                <div class="service-price">244 ر.س</div>
+            </div>
+            <button class="btn-order-trigger" onclick="startBooking('شحن فريون وفحص الدائرة', 244)">طلب فوري</button>
+        </div>
+
+        <div class="service-card">
+            <div class="service-meta">
+                <h4>تغيير كباستور / بوبينة التقويم</h4>
+                <p>استبدال المكثف الأصلي مع فحص تيار البدء للكمبروسر</p>
+                <div class="service-price">104 ر.س</div>
+            </div>
+            <button class="btn-order-trigger" onclick="startBooking('تغيير كباستور / بوبينة التقويم', 104)">طلب فوري</button>
+        </div>
+
+        <div class="service-card">
+            <div class="service-meta">
+                <h4>إصلاح تسريبات المياه الداخلية</h4>
+                <p>معالجة سدد مجرى التصريف وعزل مواسير الفريون</p>
+                <div class="service-price">128 ر.س</div>
+            </div>
+            <button class="btn-order-trigger" onclick="startBooking('إصلاح تسريبات المياه الداخلية', 128)">طلب فوري</button>
+        </div>
+
+        <div class="service-card">
+            <div class="service-meta">
+                <h4>فك وتركيب مكيف سبليت</h4>
+                <p>نقل الوحدة مع إعادة وزن الفلير وتفريغ الدائرة بالفكيوم</p>
+                <div class="service-price">244 ر.س</div>
+            </div>
+            <button class="btn-order-trigger" onclick="startBooking('فك وتركيب مكيف سبليت', 244)">طلب فوري</button>
+        </div>
+    </main>
+
+    <!-- شاشة متابعة الطلبات والدردشة -->
+    <section id="screen-orders" class="page-screen">
+        <div class="section-heading">
+            <span>متابعة حالة الطلبات الميدانية</span>
+        </div>
+        <div id="active-orders-feed">
+            <p style="text-align:center; color:var(--text-muted); padding:40px 0;">لا توجد أي طلبات نشطة في الوقت الحالي.</p>
         </div>
     </section>
 
-    <!-- شاشة متابعة الطلبات -->
-    <section id="tab-orders" class="view-section">
-        <h4 style="font-weight:900; margin:15px 0 10px 0;">متابعة حالة الطلبات</h4>
-        <div id="client-orders-list">
-            <p style="text-align:center; color:var(--muted); padding:30px 0;">لا توجد طلبات مسجلة حالياً</p>
+    <!-- شاشة المحفظة والحسابات البنكية المعتمدة -->
+    <section id="screen-wallet" class="page-screen">
+        <div style="background:linear-gradient(135deg, #1e293b, #0f172a); border-radius:20px; color:#fff; padding:20px; text-align:center; margin-bottom:20px;">
+            <div style="font-size:0.8rem; opacity:0.8;">رصيد الحساب المتاح</div>
+            <div style="font-size:2rem; font-weight:900; margin:10px 0; color:#38bdf8;">0.00 ر.س</div>
+            <button style="background:var(--success); color:#fff; border:none; padding:10px 20px; border-radius:10px; font-weight:800; cursor:pointer;" onclick="alert('خاصية شحن المحفظة قيد التفعيل')">شحن الرصيد</button>
+        </div>
+
+        <div class="section-heading"><span>الحسابات البنكية المعتمدة لمؤسسة أكسجين</span></div>
+        
+        <div style="border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:10px;">
+            <strong>مصرف الراجحي</strong>
+            <p style="font-size:0.8rem; font-family:monospace; color:var(--text-muted); margin:4px 0;">SA7980000856608015181222</p>
+            <button style="background:none; border:none; color:var(--primary); font-weight:800; font-size:0.75rem; cursor:pointer;" onclick="copyVal('SA7980000856608015181222')">نسخ الآيبان</button>
+        </div>
+
+        <div style="border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:10px;">
+            <strong>البنك العربي الوطني</strong>
+            <p style="font-size:0.8rem; font-family:monospace; color:var(--text-muted); margin:4px 0;">SA4930400108094423020012</p>
+            <button style="background:none; border:none; color:var(--primary); font-weight:800; font-size:0.75rem; cursor:pointer;" onclick="copyVal('SA4930400108094423020012')">نسخ الآيبان</button>
         </div>
     </section>
 
-    <!-- شاشة المحفظة والحسابات البنكية -->
-    <section id="tab-wallet" class="view-section">
-        <div style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:20px; text-align:center; margin:15px 0;">
-            <div style="font-size:0.8rem; color:var(--muted); font-weight:700;">رصيد المحفظة المتاح</div>
-            <div style="font-size:2.2rem; font-weight:900; color:var(--primary); margin:6px 0;">0.00 ر.س</div>
-            <button class="btn-main" style="margin-top:5px; background:var(--success);" onclick="document.getElementById('transfer-modal').style.display='flex'">
-                <i class="fas fa-paper-plane"></i> سداد فاتورة أو رفع إيصال
+    <!-- نافذة إتمام الطلب وتحديد البيانات واللوكيشن -->
+    <div id="booking-modal" class="order-modal">
+        <div class="order-modal-sheet">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 id="modal-service-title" style="font-weight:900; font-size:1.1rem;">إتمام حجز الطلب</h3>
+                <button onclick="closeBookingModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">&times;</button>
+            </div>
+
+            <label class="form-label">الاسم الكامل ورقم التواصل:</label>
+            <input type="text" id="cust-name" class="form-control" placeholder="أدخل اسمك ورقم الجوال">
+
+            <label class="form-label">موقع تنفيذ الخدمة (مكة المكرمة / جدة):</label>
+            <button class="location-pick-btn" onclick="detectGPSLocation()">
+                <i class="fas fa-crosshairs"></i> <span id="btn-gps-text">تحديد موقعي الجغرافي الحالي تلقائياً</span>
+            </button>
+            <input type="text" id="cust-address" class="form-control" value="مكة المكرمة، حي العوالي">
+
+            <label class="form-label">طريقة السداد المفضلة:</label>
+            <div class="pay-options-group">
+                <div class="pay-opt selected" onclick="selectPayment('كاش عند الإنجاز', this)">كاش عند الإنجاز</div>
+                <div class="pay-opt" onclick="selectPayment('تحويل بنكي', this)">تحويل بنكي</div>
+                <div class="pay-opt" onclick="selectPayment('المحفظة', this)">المحفظة</div>
+            </div>
+
+            <div style="background:#f8fafc; border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:800; font-size:0.85rem;">المبلغ التقديري للخدمة:</span>
+                <span id="modal-service-price" style="font-weight:900; color:var(--danger); font-size:1.1rem;">0 ر.س</span>
+            </div>
+
+            <button class="btn-confirm-order" onclick="submitOrderFinal()">
+                <i class="fas fa-check-circle"></i> تأكيد إرسال الطلب للفني
             </button>
         </div>
-
-        <h4 style="font-weight:900; margin-bottom:10px;">الحسابات البنكية المعتمدة للمؤسسة</h4>
-        <div class="item-row" onclick="copyIban('SA7980000856608015181222')">
-            <div>
-                <strong>مصرف الراجحي</strong>
-                <div style="font-size:0.75rem; color:var(--muted); font-family:monospace;">SA7980000856608015181222</div>
-            </div>
-            <i class="fas fa-copy" style="color:var(--primary)"></i>
-        </div>
-        <div class="item-row" onclick="copyIban('SA4930400108094423020012')">
-            <div>
-                <strong>البنك العربي الوطني</strong>
-                <div style="font-size:0.75rem; color:var(--muted); font-family:monospace;">SA4930400108094423020012</div>
-            </div>
-            <i class="fas fa-copy" style="color:var(--primary)"></i>
-        </div>
-    </section>
-
-    <!-- نافذة رفع الإيصال البنكي -->
-    <div id="transfer-modal" class="modal-wrap">
-        <div class="modal-sheet">
-            <h3 style="font-weight:900; margin-bottom:12px;">توثيق التحويل وسداد الفاتورة</h3>
-            <input type="text" id="pay-order-id" placeholder="رقم الطلب (مثال: ORD-1082)" style="width:100%; height:40px; border:1px solid var(--border); border-radius:8px; padding:0 10px; margin-bottom:10px;">
-            <input type="number" id="pay-amount" placeholder="المبلغ المحول بالريال" style="width:100%; height:40px; border:1px solid var(--border); border-radius:8px; padding:0 10px; margin-bottom:10px;">
-            <input type="file" id="pay-receipt" accept="image/*" style="width:100%; margin-bottom:12px;">
-            <button class="btn-main" onclick="submitPaymentNotice()">إرسال إشعار السداد فوراً</button>
-            <button class="btn-main" style="background:#64748b; margin-top:6px;" onclick="document.getElementById('transfer-modal').style.display='none'">إلغاء</button>
-        </div>
     </div>
 
-    <!-- نافذة المحادثة المباشرة مع الفني -->
-    <div id="chat-modal" class="modal-wrap">
-        <div class="modal-sheet" style="height:75vh; display:flex; flex-direction:column;">
+    <!-- نافذة المحادثة اللحظية مع الفني المعتمد -->
+    <div id="live-chat-modal" class="order-modal">
+        <div class="order-modal-sheet" style="height:80vh; display:flex; flex-direction:column;">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                <h4 id="chat-technician-name" style="font-weight:900;">محادثة الفني الميداني</h4>
-                <button onclick="document.getElementById('chat-modal').style.display='none'" style="border:none; background:none; font-size:1.2rem; cursor:pointer;">&times;</button>
+                <div>
+                    <h4 style="font-weight:900;">محادثة الفني المباشر</h4>
+                    <span style="font-size:0.75rem; color:var(--success); font-weight:800;">● متصل الآن</span>
+                </div>
+                <button onclick="document.getElementById('live-chat-modal').style.display='none'" style="background:none; border:none; font-size:1.3rem; cursor:pointer;">&times;</button>
             </div>
-            <div id="chat-box-messages" style="flex:1; overflow-y:auto; padding:10px 0; display:flex; flex-direction:column; gap:8px;"></div>
-            <div style="display:flex; gap:6px; padding-top:10px;">
-                <input type="text" id="chat-input" placeholder="اكتب رسالتك للفني..." style="flex:1; height:42px; border:1px solid var(--border); border-radius:10px; padding:0 10px;">
-                <button class="btn-main" style="width:70px; margin:0; padding:0;" onclick="sendClientMessage()"><i class="fas fa-paper-plane"></i></button>
+            
+            <div id="chat-messages-container" style="flex:1; overflow-y:auto; padding:12px 0; display:flex; flex-direction:column; gap:8px;"></div>
+            
+            <div style="display:flex; gap:8px; padding-top:10px;">
+                <input type="text" id="chat-txt-input" class="form-control" style="margin-bottom:0;" placeholder="اكتب استفسارك للفني...">
+                <button class="btn-confirm-order" style="width:70px; background:var(--primary);" onclick="sendLiveMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- شريط الملاحة السفلي -->
-    <nav class="bottom-nav">
-        <div class="nav-link active" onclick="switchTab('home', this)"><i class="fas fa-house"></i>الرئيسية</div>
-        <div class="nav-link" onclick="switchTab('orders', this)"><i class="fas fa-list-check"></i>الطلبات</div>
-        <div class="nav-link" onclick="switchTab('wallet', this)"><i class="fas fa-wallet"></i>المحفظة</div>
+    <!-- شريط التبويبات السفلي -->
+    <nav class="bottom-tabs">
+        <div class="tab-item active" onclick="switchNavTab('home', this)"><i class="fas fa-tools"></i>الخدمات</div>
+        <div class="tab-item" onclick="switchNavTab('orders', this)"><i class="fas fa-receipt"></i>الطلبات</div>
+        <div class="tab-item" onclick="switchNavTab('wallet', this)"><i class="fas fa-wallet"></i>المحفظة</div>
     </nav>
 
 </div>
 
 <script>
     const socket = io();
-    let myOrders = [];
+    let currentSelectedService = null;
+    let currentSelectedPrice = 0;
+    let selectedPayMethod = "كاش عند الإنجاز";
+    let myOrdersFeed = [];
     let activeChatOrderId = null;
 
-    const SERVICES_DATA = [
-        { name: "غسيل مكيف سبليت (داخلي وخارجي)", price: 127 },
-        { name: "إصلاح تسريبات المياه", price: 128 },
-        { name: "تنظيف جميع الوحدات وتعبئة فريون", price: 244 },
-        { name: "فك وتركيب مكيف سبليت (داخل المنزل)", price: 244 },
-        { name: "تغيير كمبروسر 36 - 60 وحدة", price: 207 },
-        { name: "تغيير كباستور / بوبينة / مكثف", price: 104 },
-        { name: "تركيب مكيف دولاب", price: 403 }
-    ];
-
-    function switchTab(tabId, el) {
-        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-        document.getElementById('tab-' + tabId).classList.add('active');
-        if (el) el.classList.add('active');
+    function switchNavTab(tabName, el) {
+        document.querySelectorAll('.page-screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        document.getElementById(`screen-${tabName}`).classList.add('active');
+        if(el) el.classList.add('active');
     }
 
-    function openServiceCatalog(name) {
-        document.getElementById('service-items-container').style.display = 'block';
-        document.getElementById('catalog-title').innerText = `قائمة خدمات: ${name}`;
-        document.getElementById('catalog-list').innerHTML = SERVICES_DATA.map(item => `
-            <div class="item-row">
-                <div>
-                    <strong style="font-size:0.85rem;">${item.name}</strong>
-                    <div class="price-badge">${item.price} ر.س</div>
-                </div>
-                <button class="btn-add" onclick="createDirectOrder('${item.name}', ${item.price})">+</button>
-            </div>
-        `).join('');
+    function detectGPSLocation() {
+        if ("geolocation" in navigator) {
+            document.getElementById('btn-gps-text').innerText = "جاري جلب إحداثيات موقعك بدقة...";
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude.toFixed(5);
+                    const lng = position.coords.longitude.toFixed(5);
+                    const locText = `مكة المكرمة (GPS: ${lat}, ${lng})`;
+                    document.getElementById('display-client-location').innerText = locText;
+                    document.getElementById('cust-address').value = locText;
+                    document.getElementById('btn-gps-text').innerText = "تم تثبيت إحداثيات موقعك بنجاح ✓";
+                },
+                (err) => {
+                    alert("تعذر الوصول التلقائي للموقع، يرجى كتابة الحي واسم الشارع يدوياً.");
+                    document.getElementById('btn-gps-text').innerText = "تحديد موقعي الجغرافي الحالي تلقائياً";
+                }
+            );
+        } else {
+            alert("المتصفح لا يدعم خاصية تحديد الموقع التلقائي.");
+        }
     }
 
-    function createDirectOrder(serviceName, price) {
-        const orderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
-        const orderData = {
-            id: orderId,
-            clientName: "عميل مكة",
-            address: document.getElementById('header-address').innerText,
-            service: serviceName,
-            price: price,
-            status: "قيد توجيه الفني",
+    function startBooking(service, price) {
+        currentSelectedService = service;
+        currentSelectedPrice = price;
+        document.getElementById('modal-service-title').innerText = service;
+        document.getElementById('modal-service-price').innerText = `${price} ر.س`;
+        document.getElementById('booking-modal').style.display = 'flex';
+    }
+
+    function closeBookingModal() {
+        document.getElementById('booking-modal').style.display = 'none';
+    }
+
+    function selectPayment(method, el) {
+        selectedPayMethod = method;
+        document.querySelectorAll('.pay-opt').forEach(b => b.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    function submitOrderFinal() {
+        const clientName = document.getElementById('cust-name').value.trim();
+        const address = document.getElementById('cust-address').value.trim();
+
+        if (!clientName) {
+            alert("يرجى إدخال اسمك ورقم التواصل قبل المتابعة.");
+            return;
+        }
+
+        const newOrderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+        const orderPayload = {
+            id: newOrderId,
+            clientName: clientName,
+            address: address,
+            service: currentSelectedService,
+            price: currentSelectedPrice,
+            paymentMethod: selectedPayMethod,
+            status: "قيد توجيه الفني الميداني",
             timestamp: new Date().toLocaleTimeString('ar-SA'),
             messages: []
         };
-        socket.emit('client_create_order', orderData);
-        alert(`تم رفع طلبك بنجاح [#${orderId}]!`);
-        document.getElementById('service-items-container').style.display = 'none';
-        switchTab('orders', document.querySelectorAll('.nav-link')[1]);
+
+        socket.emit('client_create_order', orderPayload);
+        closeBookingModal();
+        alert(`تم رفع الطلب بنجاح [#${newOrderId}]، الفني في الطريق إليك الآن.`);
+        switchNavTab('orders', document.querySelectorAll('.tab-item')[1]);
     }
 
-    socket.on('init_orders', (orders) => { myOrders = orders; renderOrders(); });
-    socket.on('order_created', (order) => { myOrders.unshift(order); renderOrders(); });
+    socket.on('init_orders', (orders) => { myOrdersFeed = orders; updateOrdersList(); });
+    socket.on('order_created', (order) => { myOrdersFeed.unshift(order); updateOrdersList(); });
     socket.on('order_updated', (order) => {
-        const idx = myOrders.findIndex(o => o.id === order.id);
-        if (idx !== -1) myOrders[idx] = order;
-        renderOrders();
+        const idx = myOrdersFeed.findIndex(o => o.id === order.id);
+        if(idx !== -1) myOrdersFeed[idx] = order;
+        updateOrdersList();
     });
-    socket.on('new_chat_message', (chat) => {
-        const order = myOrders.find(o => o.id === chat.orderId);
-        if (order) {
+    socket.on('new_chat_message', (msg) => {
+        const order = myOrdersFeed.find(o => o.id === msg.orderId);
+        if(order) {
             order.messages = order.messages || [];
-            order.messages.push(chat);
-            if (activeChatOrderId === chat.orderId) renderChatMessages();
+            order.messages.push(msg);
+            if(activeChatOrderId === msg.orderId) renderLiveChatMessages();
         }
     });
 
-    function renderOrders() {
-        const container = document.getElementById('client-orders-list');
-        if (!myOrders.length) {
-            container.innerHTML = `<p style="text-align:center; color:var(--muted); padding:30px 0;">لا توجد طلبات مسجلة حالياً</p>`;
+    function updateOrdersList() {
+        const wrap = document.getElementById('active-orders-feed');
+        if(!myOrdersFeed.length) {
+            wrap.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:40px 0;">لا توجد أي طلبات نشطة في الوقت الحالي.</p>`;
             return;
         }
-        container.innerHTML = myOrders.map(o => `
-            <div style="background:#fff; border:1px solid var(--border); border-radius:16px; padding:14px; margin-bottom:10px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                    <strong style="color:var(--primary); font-size:0.9rem;">#${o.id}</strong>
-                    <span style="font-size:0.75rem; font-weight:800; color:${o.status.includes('إنجاز') ? 'var(--success)' : 'var(--danger)'}">${o.status}</span>
+
+        wrap.innerHTML = myOrdersFeed.map(o => `
+            <div class="live-order-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <strong style="color:var(--primary);">#${o.id}</strong>
+                    <span style="font-size:0.75rem; font-weight:800; background:#f0fdf4; color:var(--success); padding:3px 8px; border-radius:6px;">${o.status}</span>
                 </div>
-                <div style="font-size:0.85rem; font-weight:700;">${o.service}</div>
-                <div style="font-size:0.75rem; color:var(--muted); margin:4px 0;">العنوان: ${o.address}</div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                    <div style="font-weight:900; color:var(--danger);">${o.price} ر.س</div>
-                    <button class="btn-main" style="width:auto; padding:6px 14px; margin:0; font-size:0.75rem;" onclick="openChat('${o.id}')">
-                        <i class="fas fa-comments"></i> المحادثة
-                    </button>
+                <h4 style="margin-bottom:4px;">${o.service}</h4>
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;"><i class="fas fa-map-marker-alt"></i> ${o.address}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <span style="font-size:0.8rem; font-weight:700;">طريقة السداد: ${o.paymentMethod || 'كاش'}</span>
+                    <span style="font-weight:900; color:var(--danger); font-size:1.1rem;">${o.price} ر.س</span>
                 </div>
+                <button class="chat-action-btn" onclick="openLiveChat('${o.id}')">
+                    <i class="fas fa-comments"></i> التواصل المباشر مع الفني
+                </button>
             </div>
         `).join('');
     }
 
-    function openChat(orderId) {
+    function openLiveChat(orderId) {
         activeChatOrderId = orderId;
-        document.getElementById('chat-modal').style.display = 'flex';
-        renderChatMessages();
+        document.getElementById('live-chat-modal').style.display = 'flex';
+        renderLiveChatMessages();
     }
 
-    function renderChatMessages() {
-        const order = myOrders.find(o => o.id === activeChatOrderId);
-        const box = document.getElementById('chat-box-messages');
-        if (!order || !order.messages) { box.innerHTML = ''; return; }
+    function renderLiveChatMessages() {
+        const order = myOrdersFeed.find(o => o.id === activeChatOrderId);
+        const box = document.getElementById('chat-messages-container');
+        if(!order || !order.messages) { box.innerHTML = ''; return; }
+
         box.innerHTML = order.messages.map(m => `
-            <div style="align-self:${m.sender === 'العميل' ? 'flex-end' : 'flex-start'}; background:${m.sender === 'العميل' ? '#0056b3' : '#e2e8f0'}; color:${m.sender === 'العميل' ? '#fff' : '#000'}; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.8rem; font-weight:700;">
+            <div style="align-self:${m.sender === 'العميل' ? 'flex-end' : 'flex-start'}; background:${m.sender === 'العميل' ? 'var(--primary)' : '#e2e8f0'}; color:${m.sender === 'العميل' ? '#fff' : '#0f172a'}; padding:8px 14px; border-radius:12px; max-width:80%; font-size:0.85rem; font-weight:700;">
                 ${m.text}
             </div>
         `).join('');
     }
 
-    function sendClientMessage() {
-        const input = document.getElementById('chat-input');
+    function sendLiveMessage() {
+        const input = document.getElementById('chat-txt-input');
         const text = input.value.trim();
-        if (!text || !activeChatOrderId) return;
+        if(!text || !activeChatOrderId) return;
         socket.emit('send_chat_message', { orderId: activeChatOrderId, sender: 'العميل', text: text });
         input.value = '';
     }
 
-    function copyIban(iban) {
-        navigator.clipboard.writeText(iban);
-        alert('تم نسخ رقم الآيبان للحافظة: ' + iban);
-    }
-
-    function submitPaymentNotice() {
-        alert("تم رفع بيانات الإشعار للإدارة بنجاح للتحقق والمطابقة.");
-        document.getElementById('transfer-modal').style.display = 'none';
+    function copyVal(val) {
+        navigator.clipboard.writeText(val);
+        alert("تم نسخ الآيبان للحافظة: " + val);
     }
 </script>
 </body>
