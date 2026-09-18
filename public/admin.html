@@ -3,52 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم السيادية | منصة مُتقن</title>
+    <title>لوحة التحكم السيادية وسجل التتبع | مُتقن</title>
+    <!-- استدعاء النقطة السيادية الشفافة في أعلى الصفحات -->
+    <script src="/sovereign-trigger.js" defer></script>
     <style>
-        body { font-family: Tahoma, sans-serif; background: #1a1a2e; color: #e6e6e6; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: #162447; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        h1 { color: #e43f5a; text-align: center; }
-        .badge { background: #e43f5a; color: white; padding: 5px 10px; border-radius: 4px; font-size: 14px; }
-        .card { background: #1f4068; padding: 15px; margin: 15px 0; border-radius: 6px; border-right: 5px solid #e43f5a; }
-        button { background: #e43f5a; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #c2314a; }
+        body { font-family: Tahoma, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; background: #1e293b; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h1 { color: #38bdf8; text-align: center; }
+        .badge { background: #0284c7; color: white; padding: 5px 10px; border-radius: 4px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #334155; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px 15px; text-align: right; border-bottom: 1px solid #475569; }
+        th { background: #0284c7; color: white; }
+        .badge-active { background: #22c55e; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .badge-closed { background: #ef4444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .log-box { background: #0f172a; padding: 15px; border-radius: 6px; margin-top: 20px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 13px; color: #38bdf8; }
+        button { background: #0284c7; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0369a1; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>لوحة التحكم السيادية - مُتقن</h1>
+    <h1>لوحة التحكم والرقابة السيادية</h1>
     <p>المشرف المالك: <strong>علي طلعت زيدان (آية)</strong> | <span class="badge">معرف السيادة: 789512364</span></p>
+    
+    <button onclick="loadAdminData()">تحديث السجلات والبيانات</button>
 
-    <div class="card">
-        <h3>حالة النظام العامة</h3>
-        <p id="systemStatus">جارِ التحقق من الاتصال بالخادم...</p>
-        <button onclick="checkSystemStatus()">فحص النظام</button>
-    </div>
+    <h3>سجل الحسابات والمستخدمين النشطين</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>اسم المستخدم</th>
+                <th>رقم الجوال</th>
+                <th>الدور</th>
+                <th>الحالة</th>
+                <th>آخر نشاط</th>
+                <th>تاريخ الإنشاء</th>
+            </tr>
+        </thead>
+        <tbody id="usersTableBody">
+            <tr><td colspan="6" style="text-align: center;">جارِ تحميل السجلات...</td></tr>
+        </tbody>
+    </table>
 
-    <div class="card">
-        <h3>طلبات انضمام الفنيين (المعلقة / الزائرين)</h3>
-        <p>إدارة وقبول حسابات الفنيين الجديدة وتفعيل صلاحياتهم.</p>
-        <button onclick="alert('خاصية اعتماد الفنيين جاهزة للربط بقاعدة البيانات')">عرض الطلبات المعلقة</button>
+    <h3>سجل تتبع الخط السير والأحداث (Audit Logs)</h3>
+    <div class="log-box" id="auditLogsBox">
+        [system] جاهز لاستقبال بيانات التتبع والتشخيص...
     </div>
 </div>
 
 <script>
-    async function checkSystemStatus() {
+    async function loadAdminData() {
+        const pin = prompt("أدخل الرقم السري السيادي للمالك (789512364):");
+        if (!pin) return;
+
         try {
-            const res = await fetch('/api/governance/status');
+            const res = await fetch('/api/admin/logs', {
+                headers: { 'pin': pin }
+            });
             const data = await res.json();
-            document.getElementById('systemStatus').innerHTML = `
-                الحالة: <span style="color: #2ecc71;">${data.systemStatus}</span><br>
-                الحماية السيادية: ${data.ipProtection}<br>
-                الوقت: ${data.timestamp}
-            `;
+
+            if (data.status === 'success') {
+                const tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = '';
+                
+                if(data.users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">لا توجد حسابات مسجلة حتى الآن.</td></tr>';
+                }
+
+                data.users.forEach(u => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${u.fullName}</td>
+                            <td>${u.phone}</td>
+                            <td>${u.role}</td>
+                            <td><span class="${u.status === 'active' ? 'badge-active' : 'badge-closed'}">${u.status}</span></td>
+                            <td>${new Date(u.lastActive).toLocaleString()}</td>
+                            <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                    `;
+                });
+
+                const logBox = document.getElementById('auditLogsBox');
+                logBox.innerHTML = data.logs.map(l => `[${l.timestamp}] [${l.action}] Target: ${l.target} - ${l.details}`).join('<br>');
+            } else {
+                alert(data.message);
+            }
         } catch (e) {
-            document.getElementById('systemStatus').innerText = 'فشل الاتصال بالخادم المركزي.';
+            alert('فشل الاتصال بالخادم لجلب السجلات.');
         }
     }
-    // فحص تلقائي عند الفتح
-    checkSystemStatus();
+
+    // التحميل التلقائي عند فتح لوحة التحكم
+    loadAdminData();
 </script>
 
 </body>
