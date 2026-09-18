@@ -1,53 +1,65 @@
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const path = require('path');
+
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
 
-const PORT = process.env.PORT || 3000;
-
-// تقديم جميع الملفات الثابتة من مجلد public
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+let orders = [];
 
-// الصفحة الرئيسية
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/tech', (req, res) => res.sendFile(path.join(__dirname, 'public', 'technician.html')));
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 
-// API للاختبار
-app.get('/api/status', (req, res) => {
-    res.json({
-        status: 'online',
-        message: '✅ Oxygen11 يعمل بنجاح!',
-        version: '1.0.0',
-        timestamp: new Date().toISOString()
+app.get('/api/orders', (req, res) => res.json(orders));
+
+io.on('connection', (socket) => {
+    socket.emit('init_orders', orders);
+
+    socket.on('client_create_order', (orderData) => {
+        orders.unshift(orderData);
+        io.emit('order_created', orderData);
+        io.emit('update_dashboard', orders);
     });
-});
 
-// التعامل مع جميع الملفات في public folder
-app.get('/:filename', (req, res) => {
-    const filePath = path.join(__dirname, 'public', req.params.filename);
-    res.sendFile(filePath, (err) => {
-        if (err) {
-            res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    socket.on('tech_update_task', (updatePayload) => {
+        let order = orders.find(o => o.id === updatePayload.orderId);
+        if (order) {
+            order.status = updatePayload.status;
+            if (updatePayload.laborFee !== undefined) order.laborFee = updatePayload.laborFee;
+            if (updatePayload.partsFee !== undefined) order.partsFee = updatePayload.partsFee;
+            if (updatePayload.totalPrice !== undefined) order.price = updatePayload.totalPrice;
+            
+            io.emit('order_updated', order);
+            io.emit('update_dashboard', orders);
+        }
+    });
+
+    socket.on('send_chat_message', (chatData) => {
+        let order = orders.find(o => o.id === chatData.orderId);
+        if (order) {
+            order.messages = order.messages || [];
+            order.messages.push(chatData);
+            io.emit('new_chat_message', chatData);
+        }
+    });
+
+    socket.on('admin_close_order', (orderId) => {
+        let order = orders.find(o => o.id === orderId);
+        if (order) {
+            order.status = "معتمد / مغلق نهائياً";
+            io.emit('order_updated', order);
+            io.emit('update_dashboard', orders);
         }
     });
 });
 
-// معالجة 404 - إعادة توجيه للصفحة الرئيسية
-app.use((req, res) => {
-    res.status(404).sendFile(path.join(__dirname, 'public', 'index.html'));
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`Server running on port: ${PORT}`);
 });
-
-// بدء الخادم
-app.listen(PORT, () => {
-    console.log(`\n🚀 ==========================================`);
-    console.log(`✅ Oxygen11 يعمل الآن!`);
-    console.log(`🌐 المنفذ: ${PORT}`);
-    console.log(`📍 الرابط: http://localhost:${PORT}`);
-    console.log(`==========================================\n`);
-});
-
-module.exports = app;
