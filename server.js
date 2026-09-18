@@ -1,6 +1,6 @@
 /**
  * =========================================================================
- * Mutqan Platform - Advanced Sovereign Server & Audit Engine (server.js)
+ * Mutqan Platform - Master Server & Complete Routing Engine (server.js)
  * Sovereign ID: 789512364
  * =========================================================================
  */
@@ -18,34 +18,79 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// قاعدة بيانات مؤقتة لتتبع المستخدمين والحسابات والأنشطة
+// قواعد بيانات الذاكرة المؤقتة لتشغيل المنصة فوراً
 const usersDatabase = new Map();
 const activityLogs = [];
 const otpCodes = new Map();
-
 const SOVEREIGN_MASTER_PIN = "789512364";
 
-// 1. مسار إرسال رمز التحقق OTP
+// 1. مسار تسجيل العملاء
+app.post('/api/clients/register', (req, res) => {
+    const { fullName, phone, email } = req.body;
+    if (!fullName || !phone) {
+        return res.status(400).json({ status: 'error', message: 'الاسم ورقم الجوال مطلوبان.' });
+    }
+
+    usersDatabase.set(phone, {
+        fullName,
+        phone,
+        email: email || '',
+        role: 'client',
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        lastActive: new Date().toISOString()
+    });
+
+    activityLogs.push({
+        action: 'REGISTER_CLIENT',
+        target: phone,
+        timestamp: new Date().toISOString(),
+        details: `تم تسجيل العميل: ${fullName}`
+    });
+
+    res.json({ status: 'success', message: 'تم تسجيل العميل وتفعيل المحفظة بنجاح!' });
+});
+
+// 2. مسار تسجيل مزودي الخدمة / الفنيين
+app.post('/api/providers/register', (req, res) => {
+    const { fullName, phone, serviceType, entityType } = req.body;
+    if (!fullName || !phone) {
+        return res.status(400).json({ status: 'error', message: 'اسم الفني ورقم الجوال مطلوبان.' });
+    }
+
+    usersDatabase.set(phone, {
+        fullName,
+        phone,
+        serviceType: serviceType || 'general',
+        role: 'provider',
+        status: 'pending', // معلق للمراجعة افتراضياً
+        createdAt: new Date().toISOString(),
+        lastActive: new Date().toISOString()
+    });
+
+    activityLogs.push({
+        action: 'REGISTER_PROVIDER',
+        target: phone,
+        timestamp: new Date().toISOString(),
+        details: `طلب انضمام فني: ${fullName} (${serviceType})`
+    });
+
+    res.json({ status: 'success', message: 'تم تقديم طلب انضمام الفني بنجاح وهو بانتظار موافقة المالك.' });
+});
+
+// 3. مسار إرسال رمز التحقق OTP
 app.post('/api/auth/send-otp', (req, res) => {
     const { phone } = req.body;
     if (!phone) return res.status(400).json({ status: 'error', message: 'رقم الجوال مطلوب' });
 
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
-    otpCodes.set(phone, { otp, expires: Date.now() + 300000 }); // صالح لـ 5 دقائق
-
-    // تسجيل النشاط في السجل السيادي
-    activityLogs.push({
-        action: 'SEND_OTP',
-        target: phone,
-        timestamp: new Date().toISOString(),
-        details: `تم إرسال رمز التحقق بنجاح`
-    });
+    otpCodes.set(phone, { otp, expires: Date.now() + 300000 });
 
     console.log(`[OTP Engine] Code for ${phone}: ${otp}`);
     res.json({ status: 'success', message: 'تم إرسال رمز التحقق', debugOtp: otp });
 });
 
-// 2. مسار التحقق من OTP وتفعيل/تحديث حالة الحساب
+// 4. مسار التحقق من OTP
 app.post('/api/auth/verify-otp', (req, res) => {
     const { phone, otp, role, fullName } = req.body;
     const record = otpCodes.get(phone);
@@ -54,12 +99,11 @@ app.post('/api/auth/verify-otp', (req, res) => {
         return res.status(400).json({ status: 'error', message: 'رمز التحقق غير صحيح أو انتهت صلاحيته' });
     }
 
-    // تحديث بيانات المستخدم في السجل
     let user = usersDatabase.get(phone) || {
         phone,
-        fullName: fullName || 'مستخدم جديد',
+        fullName: fullName || 'مستخدم',
         role: role || 'client',
-        status: 'active', // active / closed
+        status: 'active',
         createdAt: new Date().toISOString()
     };
 
@@ -67,34 +111,25 @@ app.post('/api/auth/verify-otp', (req, res) => {
     user.status = 'active';
     usersDatabase.set(phone, user);
 
-    activityLogs.push({
-        action: 'LOGIN_SUCCESS',
-        target: phone,
-        role: user.role,
-        timestamp: user.lastActive,
-        details: 'تم تسجيل الدخول وتوثيق الحساب بنجاح'
-    });
-
     otpCodes.delete(phone);
     res.json({ status: 'success', message: 'تم الدخول بنجاح', user });
 });
 
-// 3. مسار جلب سجلات المستخدمين والنشاطات (خاص بالمالك والمشرفين)
+// 5. مسار جلب السجلات للوحة التحكم السيادية
 app.get('/api/admin/logs', (req, res) => {
-    const { pin } = req.headers;
+    const pin = req.headers['pin'];
     if (pin !== SOVEREIGN_MASTER_PIN) {
-        return res.status(403).json({ status: 'unauthorized', message: 'صلاحيات مرفوضة. رقم المالك مطلوب.' });
+        return res.status(403).json({ status: 'unauthorized', message: 'صلاحيات مرفوضة. رقم المالك غير صحيح.' });
     }
 
-    const usersList = Array.from(usersDatabase.values());
     res.json({
         status: 'success',
-        users: usersList,
+        users: Array.from(usersDatabase.values()),
         logs: activityLogs
     });
 });
 
-// مسار حالة النظام
+// 6. حالة النظام
 app.get('/api/governance/status', (req, res) => {
     res.json({
         platform: 'Mutqan Platform',
@@ -107,5 +142,5 @@ app.get('/api/governance/status', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`[Mutqan Secure Engine] Running on port ${PORT}`);
+    console.log(`[Mutqan Server] Running perfectly on port ${PORT}`);
 });
