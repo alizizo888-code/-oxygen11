@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>تسجيل الدخول الآمن | منصة مُتقن</title>
+</head>
+<body>
+    <div class="container" style="max-width: 400px; margin-top: 50px;">
+        <h2 style="color: var(--mutqan-primary); text-align: center;">تسجيل الدخول - مُتقن</h2>
+        
+        <div id="step-phone">
+            <label>رقم الجوال:</label>
+            <input type="text" id="phone" placeholder="05xxxxxxxx">
+            <button onclick="sendOtpRequest()">إرسال رمز التحقق (OTP)</button>
+        </div>
+
+        <div id="step-otp" style="display: none; margin-top: 20px;">
+            <label>أدخل رمز التحقق المرسل:</label>
+            <input type="text" id="otpCode" placeholder="xxxx">
+            <button onclick="verifyOtpCode()">تحكيد والدخول</button>
+        </div>
+        
+        <p id="msg" style="text-align: center; margin-top: 15px; font-weight: bold;"></p>
+    </div>
+
+    <script>
+        async function sendOtpRequest() {
+            const phone = document.getElementById('phone').value;
+            const res = await fetch('/api/auth/send-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone })
+            });
+            const data = await res.json();
+            if(data.status === 'success') {
+                document.getElementById('step-phone').style.display = 'none';
+                document.getElementById('step-otp').style.display = 'block';
+                document.getElementById('msg').style.color = 'green';
+                document.getElementById('msg').innerText = `تم الإرسال بنجاح. (تجريبي: ${data.debugOtp})`;
+            } else {
+                document.getElementById('msg').style.color = 'red';
+                document.getElementById('msg').innerText = data.message;
+            }
+        }
+
+        async function verifyOtpCode() {
+            const phone = document.getElementById('phone').value;
+            const otp = document.getElementById('otpCode').value;
+            const res = await fetch('/api/auth/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone, otp })
+            });
+            const data = await res.json();
+            if(data.status === 'success') {
+                alert('تم تسجيل الدخول بنجاح!');
+                window.location.href = '/index.html';
+            } else {
+                alert(data.message);
+            }
+        }
+    </script>
+</body>
+</html>
