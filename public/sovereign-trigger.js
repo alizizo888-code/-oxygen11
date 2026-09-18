@@ -1,26 +1,24 @@
 /**
- * Mutqan Platform - Global Sovereign Trigger Injection
+ * Mutqan Platform - Sovereign Trigger & Lock System
  * Sovereign ID: 789512364
  */
 (function() {
-    // 1. إنشاء عنصر النقطة الشفافة برمجياً وحقنه في أعلى الصفحة فوراً
-    const triggerPoint = document.createElement('div');
-    triggerPoint.id = 'sovereign-trigger-point';
-    triggerPoint.style.cssText = 'position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 80px; height: 20px; background: transparent; z-index: 999999; cursor: pointer;';
+    const trigger = document.createElement('div');
+    trigger.id = 'sovereign-lock-trigger';
+    trigger.title = 'منطقة التحكم السيادي للمالك';
+    trigger.style.cssText = 'position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 70px; height: 18px; background: rgba(0, 180, 216, 0.15); border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; z-index: 999999; cursor: pointer; border: 1px dashed #00b4d8;';
     
-    // 2. ربط حدث الضغط بطلب الرقم السري السيادي
-    triggerPoint.onclick = function() {
-        const masterPin = prompt("أدخل الرقم السري السيادي للمالك:");
-        if (masterPin === "789512364") {
-            alert("تم التحقق من الهوية السيادية بنجاح. جاري توجيهك إلى لوحة الإعدادات الشاملة...");
-            window.location.href = "/admin.html";
-        } else if (masterPin !== null) {
-            alert("الرمز السري غير صحيح! تم رفض الصلاحية.");
+    trigger.onclick = function() {
+        const pin = prompt("🔐 أدخل الرقم السري السيادي للمالك والمشرفين:");
+        if (pin === "789512364") {
+            alert("✅ تم التحقق بنجاح. جاري فتح لوحة التحكم السيادية...");
+            window.location.href = '/admin.html';
+        } else if (pin !== null) {
+            alert("❌ رمز خاطئ! تم رفض الوصول.");
         }
     };
 
-    // 3. الحقن التلقائي في جسم الصفحة عند اكتمال التحميل
     document.addEventListener('DOMContentLoaded', () => {
-        document.body.appendChild(triggerPoint);
+        document.body.appendChild(trigger);
     });
 })();
