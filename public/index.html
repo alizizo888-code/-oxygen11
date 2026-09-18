@@ -1,45 +1,317 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oxygen11 - مرحباً بك</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>مُتقن OXYGEN - تطبيق العميل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root {
+            --primary: #0056b3;
+            --accent: #fbbf24;
+            --danger: #ef4444;
+            --success: #16a34a;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Tajawal', sans-serif; background: var(--bg); color: var(--text); padding-bottom: calc(75px + var(--safe-bottom)); direction: rtl; }
+        .app-shell { width: 100%; max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; }
+
+        /* الهيدر العلوي */
+        .app-header {
+            background: #fff; padding: 12px 16px; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+        }
+        .user-loc { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 800; }
+        .wallet-pill { background: #f1f5f9; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+
+        /* البانر الإعلاني */
+        .promo-slider { margin: 12px 16px; background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 20px; color: #fff; padding: 18px; position: relative; overflow: hidden; }
+        .promo-slider h3 { font-size: 1.1rem; font-weight: 900; color: var(--accent); }
+        .promo-slider p { font-size: 0.8rem; margin-top: 4px; opacity: 0.9; }
+
+        /* التبويبات والشاشات */
+        .view-section { display: none; padding: 0 16px; }
+        .view-section.active { display: block; animation: fadeIn 0.25s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* شبكة الخدمات */
+        .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 15px 0; }
+        .service-box { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 12px 6px; text-align: center; cursor: pointer; transition: transform 0.1s; }
+        .service-box:active { transform: scale(0.94); background: #f8fafc; }
+        .service-box i { font-size: 1.5rem; color: var(--primary); margin-bottom: 6px; display: block; }
+        .service-box span { font-size: 0.75rem; font-weight: 800; }
+
+        /* كروت التسعير والبنود */
+        .item-row { background: #fff; border: 1px solid var(--border); padding: 12px; border-radius: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .price-badge { font-weight: 900; color: var(--danger); font-size: 0.95rem; }
+        .btn-add { background: #dcfce7; color: var(--success); border: none; width: 32px; height: 32px; border-radius: 8px; font-weight: 900; cursor: pointer; }
+
+        /* شريط الملاحة السفلي */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--border);
+            height: calc(65px + var(--safe-bottom)); display: flex; z-index: 200; max-width: 480px; margin: 0 auto;
+        }
+        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); font-size: 0.7rem; font-weight: 800; text-decoration: none; cursor: pointer; }
+        .nav-link.active { color: var(--primary); }
+        .nav-link i { font-size: 1.25rem; margin-bottom: 3px; }
+
+        /* النوافذ المنبثقة */
+        .modal-wrap { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
+        .modal-sheet { background: #fff; width: 100%; max-width: 480px; border-radius: 24px 24px 0 0; padding: 20px; max-height: 85vh; overflow-y: auto; }
+        .btn-main { width: 100%; background: var(--primary); color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 0.95rem; cursor: pointer; margin-top: 10px; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🚀 Oxygen11</h1>
-            <p>مشروعك الأول على الإنترنت</p>
-        </header>
-        
-        <main>
-            <section class="welcome">
-                <h2>مرحباً بك!</h2>
-                <p>هذا الموقع يعمل مباشرة على Hostinger</p>
-                <p>تم نشره من GitHub بنجاح ✅</p>
-            </section>
-            
-            <section class="info">
-                <h3>معلومات المشروع</h3>
-                <ul>
-                    <li>📦 المستودع: alizizo888-code/-oxygen11</li>
-                    <li>🌐 الهوست: Hostinger</li>
-                    <li>⚡ التحديثات: تلقائية من GitHub</li>
-                </ul>
-            </section>
-            
-            <section class="button-section">
-                <button id="testBtn" class="btn">اضغط هنا لاختبار</button>
-                <p id="result"></p>
-            </section>
-        </main>
-        
-        <footer>
-            <p>&copy; 2026 Oxygen11 - جميع الحقوق محفوظة</p>
-        </footer>
-    </div>
+
+<div class="app-shell">
     
-    <script src="script.js"></script>
+    <!-- الهيدر -->
+    <header class="app-header">
+        <div class="user-loc">
+            <i class="fas fa-location-dot" style="color:var(--primary)"></i>
+            <span id="header-address">مكة المكرمة، حي العوالي</span>
+        </div>
+        <div class="wallet-pill" onclick="switchTab('wallet')">
+            <i class="fas fa-wallet" style="color:var(--success)"></i>
+            <span id="client-balance">0.00</span> ر.س
+        </div>
+    </header>
+
+    <!-- شاشة الرئيسية -->
+    <section id="tab-home" class="view-section active">
+        <div class="promo-slider">
+            <h3>مُتقن OXYGEN</h3>
+            <p>صيانة معتمدة بمكة المكرمة وجدة - تتبع مباشر للفني</p>
+        </div>
+
+        <h4 style="font-weight:900; font-size:0.9rem; margin-bottom:10px;">أهم الخدمات المتاحة</h4>
+        <div class="services-grid">
+            <div class="service-box" onclick="openServiceCatalog('تكييف')"><i class="fas fa-snowflake"></i><span>تكييف</span></div>
+            <div class="service-box" onclick="openServiceCatalog('كهرباء')"><i class="fas fa-bolt"></i><span>كهرباء</span></div>
+            <div class="service-box" onclick="openServiceCatalog('سباكة')"><i class="fas fa-faucet-drip"></i><span>سباكة</span></div>
+            <div class="service-box" onclick="openServiceCatalog('نجارة')"><i class="fas fa-hammer"></i><span>نجارة</span></div>
+            <div class="service-box" onclick="openServiceCatalog('أجهزة منزلية')"><i class="fas fa-tv"></i><span>أجهزة</span></div>
+            <div class="service-box" onclick="openServiceCatalog('ستالايت')"><i class="fas fa-satellite-dish"></i><span>ستالايت</span></div>
+            <div class="service-box" onclick="openServiceCatalog('تنظيف')"><i class="fas fa-broom"></i><span>تنظيف</span></div>
+            <div class="service-box" onclick="openServiceCatalog('أمن وسلامة')"><i class="fas fa-shield-halved"></i><span>أمان</span></div>
+        </div>
+
+        <div id="service-items-container" style="display:none; margin-top:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h4 id="catalog-title" style="font-weight:900;">قائمة الأعطال والخدمات</h4>
+                <button onclick="document.getElementById('service-items-container').style.display='none'" style="border:none; background:none; color:var(--danger); font-weight:800; cursor:pointer;">إغلاق</button>
+            </div>
+            <div id="catalog-list"></div>
+        </div>
+    </section>
+
+    <!-- شاشة متابعة الطلبات -->
+    <section id="tab-orders" class="view-section">
+        <h4 style="font-weight:900; margin:15px 0 10px 0;">متابعة حالة الطلبات</h4>
+        <div id="client-orders-list">
+            <p style="text-align:center; color:var(--muted); padding:30px 0;">لا توجد طلبات مسجلة حالياً</p>
+        </div>
+    </section>
+
+    <!-- شاشة المحفظة والحسابات البنكية -->
+    <section id="tab-wallet" class="view-section">
+        <div style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:20px; text-align:center; margin:15px 0;">
+            <div style="font-size:0.8rem; color:var(--muted); font-weight:700;">رصيد المحفظة المتاح</div>
+            <div style="font-size:2.2rem; font-weight:900; color:var(--primary); margin:6px 0;">0.00 ر.س</div>
+            <button class="btn-main" style="margin-top:5px; background:var(--success);" onclick="document.getElementById('transfer-modal').style.display='flex'">
+                <i class="fas fa-paper-plane"></i> سداد فاتورة أو رفع إيصال
+            </button>
+        </div>
+
+        <h4 style="font-weight:900; margin-bottom:10px;">الحسابات البنكية المعتمدة للمؤسسة</h4>
+        <div class="item-row" onclick="copyIban('SA7980000856608015181222')">
+            <div>
+                <strong>مصرف الراجحي</strong>
+                <div style="font-size:0.75rem; color:var(--muted); font-family:monospace;">SA7980000856608015181222</div>
+            </div>
+            <i class="fas fa-copy" style="color:var(--primary)"></i>
+        </div>
+        <div class="item-row" onclick="copyIban('SA4930400108094423020012')">
+            <div>
+                <strong>البنك العربي الوطني</strong>
+                <div style="font-size:0.75rem; color:var(--muted); font-family:monospace;">SA4930400108094423020012</div>
+            </div>
+            <i class="fas fa-copy" style="color:var(--primary)"></i>
+        </div>
+    </section>
+
+    <!-- نافذة رفع الإيصال البنكي -->
+    <div id="transfer-modal" class="modal-wrap">
+        <div class="modal-sheet">
+            <h3 style="font-weight:900; margin-bottom:12px;">توثيق التحويل وسداد الفاتورة</h3>
+            <input type="text" id="pay-order-id" placeholder="رقم الطلب (مثال: ORD-1082)" style="width:100%; height:40px; border:1px solid var(--border); border-radius:8px; padding:0 10px; margin-bottom:10px;">
+            <input type="number" id="pay-amount" placeholder="المبلغ المحول بالريال" style="width:100%; height:40px; border:1px solid var(--border); border-radius:8px; padding:0 10px; margin-bottom:10px;">
+            <input type="file" id="pay-receipt" accept="image/*" style="width:100%; margin-bottom:12px;">
+            <button class="btn-main" onclick="submitPaymentNotice()">إرسال إشعار السداد فوراً</button>
+            <button class="btn-main" style="background:#64748b; margin-top:6px;" onclick="document.getElementById('transfer-modal').style.display='none'">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- نافذة المحادثة المباشرة مع الفني -->
+    <div id="chat-modal" class="modal-wrap">
+        <div class="modal-sheet" style="height:75vh; display:flex; flex-direction:column;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                <h4 id="chat-technician-name" style="font-weight:900;">محادثة الفني الميداني</h4>
+                <button onclick="document.getElementById('chat-modal').style.display='none'" style="border:none; background:none; font-size:1.2rem; cursor:pointer;">&times;</button>
+            </div>
+            <div id="chat-box-messages" style="flex:1; overflow-y:auto; padding:10px 0; display:flex; flex-direction:column; gap:8px;"></div>
+            <div style="display:flex; gap:6px; padding-top:10px;">
+                <input type="text" id="chat-input" placeholder="اكتب رسالتك للفني..." style="flex:1; height:42px; border:1px solid var(--border); border-radius:10px; padding:0 10px;">
+                <button class="btn-main" style="width:70px; margin:0; padding:0;" onclick="sendClientMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- شريط الملاحة السفلي -->
+    <nav class="bottom-nav">
+        <div class="nav-link active" onclick="switchTab('home', this)"><i class="fas fa-house"></i>الرئيسية</div>
+        <div class="nav-link" onclick="switchTab('orders', this)"><i class="fas fa-list-check"></i>الطلبات</div>
+        <div class="nav-link" onclick="switchTab('wallet', this)"><i class="fas fa-wallet"></i>المحفظة</div>
+    </nav>
+
+</div>
+
+<script>
+    const socket = io();
+    let myOrders = [];
+    let activeChatOrderId = null;
+
+    const SERVICES_DATA = [
+        { name: "غسيل مكيف سبليت (داخلي وخارجي)", price: 127 },
+        { name: "إصلاح تسريبات المياه", price: 128 },
+        { name: "تنظيف جميع الوحدات وتعبئة فريون", price: 244 },
+        { name: "فك وتركيب مكيف سبليت (داخل المنزل)", price: 244 },
+        { name: "تغيير كمبروسر 36 - 60 وحدة", price: 207 },
+        { name: "تغيير كباستور / بوبينة / مكثف", price: 104 },
+        { name: "تركيب مكيف دولاب", price: 403 }
+    ];
+
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+        if (el) el.classList.add('active');
+    }
+
+    function openServiceCatalog(name) {
+        document.getElementById('service-items-container').style.display = 'block';
+        document.getElementById('catalog-title').innerText = `قائمة خدمات: ${name}`;
+        document.getElementById('catalog-list').innerHTML = SERVICES_DATA.map(item => `
+            <div class="item-row">
+                <div>
+                    <strong style="font-size:0.85rem;">${item.name}</strong>
+                    <div class="price-badge">${item.price} ر.س</div>
+                </div>
+                <button class="btn-add" onclick="createDirectOrder('${item.name}', ${item.price})">+</button>
+            </div>
+        `).join('');
+    }
+
+    function createDirectOrder(serviceName, price) {
+        const orderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+        const orderData = {
+            id: orderId,
+            clientName: "عميل مكة",
+            address: document.getElementById('header-address').innerText,
+            service: serviceName,
+            price: price,
+            status: "قيد توجيه الفني",
+            timestamp: new Date().toLocaleTimeString('ar-SA'),
+            messages: []
+        };
+        socket.emit('client_create_order', orderData);
+        alert(`تم رفع طلبك بنجاح [#${orderId}]!`);
+        document.getElementById('service-items-container').style.display = 'none';
+        switchTab('orders', document.querySelectorAll('.nav-link')[1]);
+    }
+
+    socket.on('init_orders', (orders) => { myOrders = orders; renderOrders(); });
+    socket.on('order_created', (order) => { myOrders.unshift(order); renderOrders(); });
+    socket.on('order_updated', (order) => {
+        const idx = myOrders.findIndex(o => o.id === order.id);
+        if (idx !== -1) myOrders[idx] = order;
+        renderOrders();
+    });
+    socket.on('new_chat_message', (chat) => {
+        const order = myOrders.find(o => o.id === chat.orderId);
+        if (order) {
+            order.messages = order.messages || [];
+            order.messages.push(chat);
+            if (activeChatOrderId === chat.orderId) renderChatMessages();
+        }
+    });
+
+    function renderOrders() {
+        const container = document.getElementById('client-orders-list');
+        if (!myOrders.length) {
+            container.innerHTML = `<p style="text-align:center; color:var(--muted); padding:30px 0;">لا توجد طلبات مسجلة حالياً</p>`;
+            return;
+        }
+        container.innerHTML = myOrders.map(o => `
+            <div style="background:#fff; border:1px solid var(--border); border-radius:16px; padding:14px; margin-bottom:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <strong style="color:var(--primary); font-size:0.9rem;">#${o.id}</strong>
+                    <span style="font-size:0.75rem; font-weight:800; color:${o.status.includes('إنجاز') ? 'var(--success)' : 'var(--danger)'}">${o.status}</span>
+                </div>
+                <div style="font-size:0.85rem; font-weight:700;">${o.service}</div>
+                <div style="font-size:0.75rem; color:var(--muted); margin:4px 0;">العنوان: ${o.address}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <div style="font-weight:900; color:var(--danger);">${o.price} ر.س</div>
+                    <button class="btn-main" style="width:auto; padding:6px 14px; margin:0; font-size:0.75rem;" onclick="openChat('${o.id}')">
+                        <i class="fas fa-comments"></i> المحادثة
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function openChat(orderId) {
+        activeChatOrderId = orderId;
+        document.getElementById('chat-modal').style.display = 'flex';
+        renderChatMessages();
+    }
+
+    function renderChatMessages() {
+        const order = myOrders.find(o => o.id === activeChatOrderId);
+        const box = document.getElementById('chat-box-messages');
+        if (!order || !order.messages) { box.innerHTML = ''; return; }
+        box.innerHTML = order.messages.map(m => `
+            <div style="align-self:${m.sender === 'العميل' ? 'flex-end' : 'flex-start'}; background:${m.sender === 'العميل' ? '#0056b3' : '#e2e8f0'}; color:${m.sender === 'العميل' ? '#fff' : '#000'}; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.8rem; font-weight:700;">
+                ${m.text}
+            </div>
+        `).join('');
+    }
+
+    function sendClientMessage() {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if (!text || !activeChatOrderId) return;
+        socket.emit('send_chat_message', { orderId: activeChatOrderId, sender: 'العميل', text: text });
+        input.value = '';
+    }
+
+    function copyIban(iban) {
+        navigator.clipboard.writeText(iban);
+        alert('تم نسخ رقم الآيبان للحافظة: ' + iban);
+    }
+
+    function submitPaymentNotice() {
+        alert("تم رفع بيانات الإشعار للإدارة بنجاح للتحقق والمطابقة.");
+        document.getElementById('transfer-modal').style.display = 'none';
+    }
+</script>
 </body>
 </html>
