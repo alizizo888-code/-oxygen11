@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مُتقن OXYGEN - لوحة تحكم المالك والإشراف</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root {
+            --adm-main: #0f172a;
+            --adm-side: #1e293b;
+            --adm-blue: #2563eb;
+            --adm-green: #16a34a;
+            --adm-border: #334155;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Tajawal', sans-serif; background: #0b0f19; color: #f8fafc; direction: rtl; }
+
+        /* شاشة قفل المالك */
+        #owner-lock-view { position: fixed; inset: 0; background: #0b0f19; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .lock-card { background: #1e293b; border: 1px solid var(--adm-border); border-radius: 20px; padding: 30px; width: 100%; max-width: 380px; text-align: center; }
+        .pass-input { width: 100%; height: 46px; background: #0f172a; border: 1.5px solid var(--adm-border); border-radius: 12px; color: #fff; text-align: center; font-size: 1.2rem; margin: 16px 0; outline: none; }
+
+        /* اللوحة الرئيسية */
+        .admin-layout { display: flex; min-height: 100vh; }
+        .side-menu { width: 240px; background: var(--adm-side); border-left: 1px solid var(--adm-border); padding: 20px 10px; display: flex; flex-direction: column; gap: 8px; }
+        .side-btn { background: none; border: none; color: #94a3b8; padding: 12px; text-align: right; border-radius: 10px; font-family: inherit; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .side-btn.active { background: var(--adm-blue); color: #fff; }
+
+        .content-area { flex: 1; padding: 24px; overflow-y: auto; }
+        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .kpi-card { background: var(--adm-side); border: 1px solid var(--adm-border); border-radius: 16px; padding: 16px; }
+        
+        .adm-table { width: 100%; border-collapse: collapse; background: var(--adm-side); border-radius: 16px; overflow: hidden; }
+        .adm-table th, .adm-table td { padding: 12px 16px; text-align: right; border-bottom: 1px solid var(--adm-border); font-size: 0.85rem; }
+        .adm-table th { background: #0f172a; color: #94a3b8; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; }
+    </style>
+</head>
+<body>
+
+<!-- شاشة حماية المالك بالرمز السري -->
+<div id="owner-lock-view">
+    <div class="lock-card">
+        <i class="fas fa-shield-halved" style="font-size:2.8rem; color:var(--adm-blue); margin-bottom:12px;"></i>
+        <h2 style="font-weight:900;">بوابة إدارة مجموعة أكسجين</h2>
+        <p style="font-size:0.75rem; color:#94a3b8; margin-top:4px;">يرجى إدخال الرمز السري المعتمد للمالك</p>
+        <input type="password" id="owner-pass-field" class="pass-input" placeholder="•••••••••">
+        <button onclick="authenticateOwner()" style="width:100%; background:var(--adm-blue); color:#fff; border:none; padding:12px; border-radius:12px; font-weight:900; cursor:pointer;">
+            تسجيل الدخول الآمن
+        </button>
+    </div>
+</div>
+
+<!-- اللوحة الإدارية المباشرة -->
+<div class="admin-layout" id="admin-main-panel" style="display:none;">
+    
+    <aside class="side-menu">
+        <div style="font-weight:900; color:#fff; font-size:1.1rem; padding-bottom:15px; border-bottom:1px solid var(--adm-border); margin-bottom:10px;">
+            <i class="fas fa-toolbox" style="color:var(--adm-blue)"></i> مُتقن OXYGEN
+        </div>
+        <button class="side-btn active"><i class="fas fa-chart-pie"></i> نظرة عامة والطلبات</button>
+        <button class="side-btn" onclick="lockAdminSession()"><i class="fas fa-lock"></i> قفل الجلسة</button>
+    </aside>
+
+    <main class="content-area">
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div style="color:#94a3b8; font-size:0.8rem; font-weight:700;">إجمالي الطلبات المسجلة</div>
+                <div style="font-size:2rem; font-weight:900; margin-top:6px;" id="kpi-total-orders">0</div>
+            </div>
+            <div class="kpi-card">
+                <div style="color:#94a3b8; font-size:0.8rem; font-weight:700;">الإيراد الكلي المتوقع (ريال)</div>
+                <div style="font-size:2rem; font-weight:900; margin-top:6px; color:var(--adm-green);" id="kpi-revenue">0.00</div>
+            </div>
+            <div class="kpi-card">
+                <div style="color:#94a3b8; font-size:0.8rem; font-weight:700;">حالة الاتصال والربط</div>
+                <div style="font-size:1.1rem; font-weight:900; margin-top:10px; color:#38bdf8;">
+                    <i class="fas fa-circle-nodes"></i> مزامنة لحظية فورية
+                </div>
+            </div>
+        </div>
+
+        <h3 style="font-weight:900; margin-bottom:12px;">جدول مراقبة الطلبات الميدانية</h3>
+        <table class="adm-table">
+            <thead>
+                <tr>
+                    <th>رقم الطلب</th>
+                    <th>العميل</th>
+                    <th>الخدمة</th>
+                    <th>العنوان</th>
+                    <th>المبلغ</th>
+                    <th>الحالة</th>
+                    <th>الإجراء الإداري</th>
+                </tr>
+            </thead>
+            <tbody id="admin-orders-table-body">
+                <tr><td colspan="7" style="text-align:center; color:#94a3b8;">جاري جلب البيانات...</td></tr>
+            </tbody>
+        </table>
+    </main>
+
+</div>
+
+<script>
+    const socket = io();
+    const OWNER_SECRET_CODE = "789512364"; // الرمز السري الحصري للإدارة والمالك
+    let adminOrdersList = [];
+
+    function authenticateOwner() {
+        const pass = document.getElementById('owner-pass-field').value;
+        if(pass === OWNER_SECRET_CODE) {
+            document.getElementById('owner-lock-view').style.display = 'none';
+            document.getElementById('admin-main-panel').style.display = 'flex';
+        } else {
+            alert("رمز الدخول غير صحيح، تم رفض الوصول.");
+        }
+    }
+
+    function lockAdminSession() {
+        document.getElementById('owner-pass-field').value = '';
+        document.getElementById('admin-main-panel').style.display = 'none';
+        document.getElementById('owner-lock-view').style.display = 'flex';
+    }
+
+    socket.on('init_orders', (orders) => {
+        adminOrdersList = orders;
+        renderAdminDashboard();
+    });
+
+    socket.on('update_dashboard', (orders) => {
+        adminOrdersList = orders;
+        renderAdminDashboard();
+    });
+
+    function renderAdminDashboard() {
+        document.getElementById('kpi-total-orders').innerText = adminOrdersList.length;
+
+        const totalRev = adminOrdersList.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0);
+        document.getElementById('kpi-revenue').innerText = totalRev.toFixed(2);
+
+        const tbody = document.getElementById('admin-orders-table-body');
+        if(!adminOrdersList.length) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94a3b8;">لا توجد أي بيانات مسجلة في النظام</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = adminOrdersList.map(o => `
+            <tr>
+                <td><strong>#${o.id}</strong></td>
+                <td>${o.clientName}</td>
+                <td>${o.service}</td>
+                <td>${o.address}</td>
+                <td style="font-weight:900; color:var(--adm-green);">${o.price} ر.س</td>
+                <td><span class="badge" style="background:#334155; color:#38bdf8;">${o.status}</span></td>
+                <td>
+                    <button onclick="adminApproveOrder('${o.id}')" style="background:var(--adm-green); color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:800; cursor:pointer;">
+                        اعتماد وإغلاق
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function adminApproveOrder(orderId) {
+        socket.emit('admin_close_order', orderId);
+        alert(`تم اعتماد الطلب #${orderId} وإغلاقه بنجاح.`);
+    }
+</script>
+</body>
+</html>
