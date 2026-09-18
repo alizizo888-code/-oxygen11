@@ -1,111 +1,86 @@
-/**
- * =========================================================================
- * Mutqan Platform - Advanced Sovereign Server & Audit Engine (server.js)
- * Sovereign ID: 789512364
- * =========================================================================
- */
+:root {
+    --primary: #162447;
+    --secondary: #0059b3;
+    --accent: #00b4d8;
+    --bg: #f4f7f6;
+    --card: #ffffff;
+    --text: #333333;
+}
 
-const express = require('express');
-const http = require('http');
-const path = require('path');
-const { Server } = require('socket.io');
+body {
+    font-family: Tahoma, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+    direction: rtl;
+}
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*", methods: ["GET", "POST"] } });
+.container {
+    max-width: 650px;
+    margin: 30px auto;
+    background: var(--card);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
+}
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+h1 {
+    color: var(--primary);
+    text-align: center;
+}
 
-// قاعدة بيانات مؤقتة لتتبع المستخدمين والحسابات والأنشطة
-const usersDatabase = new Map();
-const activityLogs = [];
-const otpCodes = new Map();
+.section {
+    margin-bottom: 25px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fafafa;
+}
 
-const SOVEREIGN_MASTER_PIN = "789512364";
+h3 {
+    margin-top: 0;
+    color: var(--secondary);
+}
 
-// 1. مسار إرسال رمز التحقق OTP
-app.post('/api/auth/send-otp', (req, res) => {
-    const { phone } = req.body;
-    if (!phone) return res.status(400).json({ status: 'error', message: 'رقم الجوال مطلوب' });
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 16px 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+    background-color: #fff;
+}
 
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
-    otpCodes.set(phone, { otp, expires: Date.now() + 300000 }); // صالح لـ 5 دقائق
+input:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.15);
+}
 
-    // تسجيل النشاط في السجل السيادي
-    activityLogs.push({
-        action: 'SEND_OTP',
-        target: phone,
-        timestamp: new Date().toISOString(),
-        details: `تم إرسال رمز التحقق بنجاح`
-    });
+button {
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 89, 179, 0.2);
+}
 
-    console.log(`[OTP Engine] Code for ${phone}: ${otp}`);
-    res.json({ status: 'success', message: 'تم إرسال رمز التحقق', debugOtp: otp });
-});
+button:hover {
+    opacity: 0.95;
+}
 
-// 2. مسار التحقق من OTP وتفعيل/تحديث حالة الحساب
-app.post('/api/auth/verify-otp', (req, res) => {
-    const { phone, otp, role, fullName } = req.body;
-    const record = otpCodes.get(phone);
-
-    if (!record || record.otp !== otp) {
-        return res.status(400).json({ status: 'error', message: 'رمز التحقق غير صحيح أو انتهت صلاحيته' });
-    }
-
-    // تحديث بيانات المستخدم في السجل
-    let user = usersDatabase.get(phone) || {
-        phone,
-        fullName: fullName || 'مستخدم جديد',
-        role: role || 'client',
-        status: 'active', // active / closed
-        createdAt: new Date().toISOString()
-    };
-
-    user.lastActive = new Date().toISOString();
-    user.status = 'active';
-    usersDatabase.set(phone, user);
-
-    activityLogs.push({
-        action: 'LOGIN_SUCCESS',
-        target: phone,
-        role: user.role,
-        timestamp: user.lastActive,
-        details: 'تم تسجيل الدخول وتوثيق الحساب بنجاح'
-    });
-
-    otpCodes.delete(phone);
-    res.json({ status: 'success', message: 'تم الدخول بنجاح', user });
-});
-
-// 3. مسار جلب سجلات المستخدمين والنشاطات (خاص بالمالك والمشرفين)
-app.get('/api/admin/logs', (req, res) => {
-    const { pin } = req.headers;
-    if (pin !== SOVEREIGN_MASTER_PIN) {
-        return res.status(403).json({ status: 'unauthorized', message: 'صلاحيات مرفوضة. رقم المالك مطلوب.' });
-    }
-
-    const usersList = Array.from(usersDatabase.values());
-    res.json({
-        status: 'success',
-        users: usersList,
-        logs: activityLogs
-    });
-});
-
-// مسار حالة النظام
-app.get('/api/governance/status', (req, res) => {
-    res.json({
-        platform: 'Mutqan Platform',
-        sovereignOwner: 'علي طلعت زيدان (آية)',
-        masterAuthId: SOVEREIGN_MASTER_PIN,
-        systemStatus: 'active',
-        timestamp: new Date().toISOString()
-    });
-});
-
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`[Mutqan Secure Engine] Running on port ${PORT}`);
-});
+.note {
+    font-size: 12px;
+    color: #64748b;
+    text-align: center;
+    margin-top: 10px;
+}
