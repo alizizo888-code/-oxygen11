@@ -3,100 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم السيادية وسجل التتبع | مُتقن</title>
-    <!-- استدعاء النقطة السيادية الشفافة في أعلى الصفحات -->
-    <script src="/sovereign-trigger.js" defer></script>
+    <title>لوحة تحكم الأدمن والتحكم السيادي - Oxygen11</title>
     <style>
-        body { font-family: Tahoma, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
-        .container { max-width: 1100px; margin: auto; background: #1e293b; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        h1 { color: #38bdf8; text-align: center; }
-        .badge { background: #0284c7; color: white; padding: 5px 10px; border-radius: 4px; font-size: 14px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #334155; border-radius: 8px; overflow: hidden; }
-        th, td { padding: 12px 15px; text-align: right; border-bottom: 1px solid #475569; }
-        th { background: #0284c7; color: white; }
-        .badge-active { background: #22c55e; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
-        .badge-closed { background: #ef4444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
-        .log-box { background: #0f172a; padding: 15px; border-radius: 6px; margin-top: 20px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 13px; color: #38bdf8; }
-        button { background: #0284c7; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #0369a1; }
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; text-align: center; }
+        .container { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #8e44ad; }
+        p { color: #555; }
+        .btn-lock { background-color: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 15px; }
+        .btn-lock:hover { background-color: #c0392b; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h1>لوحة التحكم والرقابة السيادية</h1>
-    <p>المشرف المالك: <strong>علي طلعت زيدان (آية)</strong> | <span class="badge">معرف السيادة: 789512364</span></p>
-    
-    <button onclick="loadAdminData()">تحديث السجلات والبيانات</button>
-
-    <h3>سجل الحسابات والمستخدمين النشطين</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>اسم المستخدم</th>
-                <th>رقم الجوال</th>
-                <th>الدور</th>
-                <th>الحالة</th>
-                <th>آخر نشاط</th>
-                <th>تاريخ الإنشاء</th>
-            </tr>
-        </thead>
-        <tbody id="usersTableBody">
-            <tr><td colspan="6" style="text-align: center;">جارِ تحميل السجلات...</td></tr>
-        </tbody>
-    </table>
-
-    <h3>سجل تتبع الخط السير والأحداث (Audit Logs)</h3>
-    <div class="log-box" id="auditLogsBox">
-        [system] جاهز لاستقبال بيانات التتبع والتشخيص...
+    <div class="container">
+        <h1>لوحة تحكم الأدمن والتحكم السيادي</h1>
+        <p>مرحباً بك، هذه اللوحة مخصصة لإدارة العمليات والصلاحيات والتحكم الكامل بالمنصة.</p>
+        <button class="btn-lock">تفعيل زر القفل السيادي</button>
     </div>
-</div>
-
-<script>
-    async function loadAdminData() {
-        const pin = prompt("أدخل الرقم السري السيادي للمالك (789512364):");
-        if (!pin) return;
-
-        try {
-            const res = await fetch('/api/admin/logs', {
-                headers: { 'pin': pin }
-            });
-            const data = await res.json();
-
-            if (data.status === 'success') {
-                const tbody = document.getElementById('usersTableBody');
-                tbody.innerHTML = '';
-                
-                if(data.users.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">لا توجد حسابات مسجلة حتى الآن.</td></tr>';
-                }
-
-                data.users.forEach(u => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${u.fullName}</td>
-                            <td>${u.phone}</td>
-                            <td>${u.role}</td>
-                            <td><span class="${u.status === 'active' ? 'badge-active' : 'badge-closed'}">${u.status}</span></td>
-                            <td>${new Date(u.lastActive).toLocaleString()}</td>
-                            <td>${new Date(u.createdAt).toLocaleDateString()}</td>
-                        </tr>
-                    `;
-                });
-
-                const logBox = document.getElementById('auditLogsBox');
-                logBox.innerHTML = data.logs.map(l => `[${l.timestamp}] [${l.action}] Target: ${l.target} - ${l.details}`).join('<br>');
-            } else {
-                alert(data.message);
-            }
-        } catch (e) {
-            alert('فشل الاتصال بالخادم لجلب السجلات.');
-        }
-    }
-
-    // التحميل التلقائي عند فتح لوحة التحكم
-    loadAdminData();
-</script>
-
 </body>
 </html>
