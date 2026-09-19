@@ -6,85 +6,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة مُتقن | الخدمات المهنية المتكاملة</title>
     <style>
-        body { font-family: Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { color: #004080; text-align: center; }
-        .section { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 6px; background: #fafafa; }
-        h3 { margin-top: 0; color: #0059b3; }
-        input, select { width: 100%; padding: 10px; margin: 8px 0 15px 0; display: inline-block; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background-color: #004080; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
-        button:hover { background-color: #003366; }
-        .sovereign-footer { text-align: center; font-size: 12px; color: #778899; margin-bottom: 20px; }
+        body { 
+            font-family: Tahoma, sans-serif; 
+            background-color: #f4f7f6; 
+            margin: 0; 
+            padding: 40px; 
+            color: #333; 
+        }
+        .container { 
+            max-width: 800px; 
+            margin: auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+            text-align: center;
+        }
+        h1 { 
+            color: #162447; 
+            margin-bottom: 10px;
+        }
+        p { 
+            color: #64748b; 
+            font-size: 15px; 
+        }
+        .welcome-box {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        .sovereign-footer { 
+            font-size: 12px; 
+            color: #94a3b8; 
+            margin-top: 30px; 
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>منصة مُتقن (Mutqan Platform)</h1>
-    <p class="sovereign-footer">تحت الإدارة السيادية والتحكم الكامل | مرخصة برقم: SAIP-CR-2024-8891</p>
+    <p>بوابة الخدمات المهنية وصيانة التكييفات وغرف التبريد</p>
 
-    <!-- قسم تسجيل العملاء -->
-    <div class="section">
-        <h3>تسجيل عميل جديد (تفعيل آلي للمحفظة)</h3>
-        <input type="text" id="clientName" placeholder="الاسم الكامل">
-        <input type="text" id="clientPhone" placeholder="رقم الجوال">
-        <input type="email" id="clientEmail" placeholder="البريد الإلكتروني (اختياري)">
-        <button onclick="registerClient()">تسجيل العميل</button>
+    <div class="welcome-box">
+        <h2>أهلاً بك في الصفحة الرئيسية المباشرة</h2>
+        <p>تم إزالة شاشات التسجيل المعقدة بنجاح لتتمكن من تصفح النظام واختباره بسلاسة.</p>
     </div>
 
-    <!-- قسم تسجيل الفنيين -->
-    <div class="section">
-        <h3>انضم كفني / مزود خدمة (حالة زائر/معلق افتراضياً)</h3>
-        <input type="text" id="providerName" placeholder="اسم الفني أو المؤسسة">
-        <input type="text" id="providerPhone" placeholder="رقم الجوال">
-        <select id="serviceType">
-            <option value="ac_maintenance">صيانة مكيفات</option>
-            <option value="refrigeration">غرف تبريد وتجميد</option>
-            <option value="electrical">أعمال كهربائية</option>
-        </select>
-        <button onclick="registerProvider()">طلب انضمام (معلق للمراجعة)</button>
+    <div class="sovereign-footer">
+        تحت الإدارة السيادية والتحكم الكامل | مرخصة برقم: SAIP-CR-2024-8891
     </div>
 </div>
-
-<script>
-    async function registerClient() {
-        const name = document.getElementById('clientName').value;
-        const phone = document.getElementById('clientPhone').value;
-        const email = document.getElementById('clientEmail').value;
-
-        if(!name || !phone) {
-            alert('الرجاء إدخال الاسم ورقم الجوال على الأقل.');
-            return;
-        }
-
-        const response = await fetch('/api/clients/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fullName: name, phone, email })
-        });
-        const result = await response.json();
-        alert(result.message || 'تم التسجيل بنجاح');
-    }
-
-    async function registerProvider() {
-        const name = document.getElementById('providerName').value;
-        const phone = document.getElementById('providerPhone').value;
-        const serviceType = document.getElementById('serviceType').value;
-
-        if(!name || !phone) {
-            alert('الرجاء إدخال اسم الفني ورقم الجوال.');
-            return;
-        }
-
-        const response = await fetch('/api/providers/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fullName: name, phone, serviceType, entityType: 'individual_technician' })
-        });
-        const result = await response.json();
-        alert(result.message || 'تم تقديم الطلب وهو بانتظار موافقة المالك');
-    }
-</script>
 
 </body>
 </html>
