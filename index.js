@@ -1,6 +1,6 @@
 const http = require("http");
 const fs = require("fs");
-const path = require("path");
+const path = path || require("path");
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, "public");
