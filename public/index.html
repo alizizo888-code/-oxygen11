@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
   <title>مُتقن | أكسجين للصيانة والمقاولات</title>
   
-  <!-- Google Fonts: Cairo & Be Vietnam Pro -->
+  <!-- Google Fonts: Cairo & Tajawal -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   
   <!-- Tailwind CSS CDN -->
@@ -28,10 +28,6 @@
               700: '#047857',
               800: '#065f46',
               900: '#064e3b',
-            },
-            slate: {
-              850: '#151f32',
-              950: '#0b1320',
             }
           },
           fontFamily: {
@@ -45,9 +41,9 @@
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      -webkit-tap-highlight-color: transparent;
+      -webkit-tap-highlight-color: rgba(16, 185, 129, 0.15);
       user-select: none;
-      background-color: #0f172a;
+      background-color: #0b1320;
     }
     
     .no-scrollbar::-webkit-scrollbar {
@@ -58,46 +54,90 @@
       scrollbar-width: none;
     }
 
+    .active-scale {
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
+                  box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
+                  background-color 0.15s ease, 
+                  border-color 0.15s ease,
+                  filter 0.15s ease;
+    }
     .active-scale:active {
-      transform: scale(0.97);
+      transform: scale(0.96);
+      box-shadow: 0 4px 14px -2px rgba(16, 185, 129, 0.28), 
+                  0 0 0 3px rgba(16, 185, 129, 0.18) !important;
+      filter: brightness(0.97);
     }
 
-    .caret-blink {
-      animation: blink 1s step-start infinite;
-    }
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
-
-    .slide-fade-in {
-      animation: slideFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    @keyframes slideFadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* General subtle press shadow & background tint for all clickable buttons */
+    button:active:not(:disabled),
+    [role="button"]:active {
+      box-shadow: 0 3px 10px -1px rgba(16, 185, 129, 0.2), 
+                  inset 0 1px 2px rgba(0, 0, 0, 0.04);
+      background-color: rgba(236, 253, 245, 0.65);
     }
 
-    .pulse-glow {
-      animation: pulseGlow 2.5s infinite;
+    /* Special smooth tint and elevated shadow for bottom navigation icons */
+    .nav-tab {
+      border-radius: 16px;
+      padding: 4px 6px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-      50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    .nav-tab:active {
+      transform: scale(0.92);
+      background-color: rgba(16, 185, 129, 0.12) !important;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+    }
+
+    /* Soft shadow on category cards & domain pills */
+    .domain-pill:active {
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25) !important;
+    }
+
+    /* Date and time slot button press feedback */
+    .date-btn:active, .time-btn:active {
+      transform: scale(0.95);
+      background-color: #ecfdf5 !important;
+      border-color: #34d399 !important;
+      box-shadow: 0 3px 10px rgba(16, 185, 129, 0.18) !important;
+    }
+
+    /* Service card tap highlight effect */
+    article.active-scale:active, .role-card:active {
+      background-color: #f0fdf4 !important;
+      border-color: #10b981 !important;
+      box-shadow: 0 6px 18px -4px rgba(16, 185, 129, 0.22) !important;
+    }
+
+    .carousel-slide {
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    }
+    .carousel-slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+      position: relative;
+    }
+    .carousel-slide.inactive {
+      opacity: 0;
+      transform: translateX(20px);
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
     }
   </style>
 </head>
 
-<body class="bg-slate-900 min-h-screen flex justify-center items-start text-slate-800 antialiased p-0 sm:py-6">
+<body class="bg-slate-950 min-h-screen flex justify-center items-start text-slate-800 antialiased p-0 sm:py-6">
 
   <!-- Mobile Viewport Container (Max 440px) -->
-  <div class="w-full max-w-[440px] bg-[#F8FAFC] min-h-screen sm:min-h-[860px] relative shadow-2xl flex flex-col sm:rounded-[36px] overflow-hidden border border-slate-200/60">
+  <div class="w-full max-w-[440px] bg-[#F8FAFC] min-h-screen sm:min-h-[880px] relative shadow-2xl flex flex-col sm:rounded-[36px] overflow-hidden border border-slate-200/60 pb-20">
 
     <!-- Top Universal Header Bar with Lock on Far Left for Owner & Admin -->
-    <header class="bg-white border-b border-slate-100 px-4 py-2.5 sticky top-0 z-40 flex items-center justify-between shadow-2xs">
+    <header class="bg-white border-b border-slate-150 px-4 py-2.5 sticky top-0 z-40 flex items-center justify-between shadow-2xs">
       
-      <!-- Right Side: Platform Identity / Back Button if nested -->
+      <!-- Right Side: Platform Identity / Back Navigation -->
       <div class="flex items-center gap-2">
-        <button id="global-back-btn" onclick="goBackOrHome()" class="hidden w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-100 transition active-scale">
+        <button id="global-back-btn" onclick="navigateTo('view-home')" class="hidden w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-100 transition active-scale">
           <span class="material-symbols-outlined text-lg">arrow_forward</span>
         </button>
 
@@ -120,17 +160,30 @@
         </div>
       </div>
 
-      <!-- Center / Left Actions: User Profile & Locked Admin Entry -->
+      <!-- Center & Left: User Status & Far Left Lock Icon for Owner/Admin -->
       <div class="flex items-center gap-1.5">
         
-        <!-- User Quick Switch (Client / Tech / Guest) -->
-        <button onclick="navigateTo('view-auth')" class="h-9 px-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-700 flex items-center gap-1.5 transition active-scale text-xs font-bold">
+        <!-- AI Consultant Trigger in Header -->
+        <button onclick="openAiConsultantModal()" title="مستشار الصيانة الذكي" class="h-9 px-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 flex items-center gap-1.5 transition active-scale text-xs font-bold shadow-2xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="material-symbols-outlined text-[16px] text-emerald-600">smart_toy</span>
+          <span class="hidden sm:inline">فني الاستشارات</span>
+        </button>
+
+        <!-- Offers Quick Trigger -->
+        <button onclick="navigateTo('view-offers')" title="العروض والخصومات" class="h-9 px-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 flex items-center gap-1 transition active-scale text-xs font-bold shadow-2xs">
+          <span class="material-symbols-outlined text-[16px] text-amber-600">local_offer</span>
+          <span class="hidden sm:inline">عروض</span>
+        </button>
+
+        <!-- User Quick Status / Register Indicator -->
+        <button onclick="handleUserPillClick()" class="h-9 px-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-700 flex items-center gap-1.5 transition active-scale text-xs font-bold">
           <span class="material-symbols-outlined text-[17px] text-emerald-600">person</span>
           <span id="user-status-pill">دخول</span>
         </button>
 
-        <!-- FAR LEFT: Lock Button for Owner & Admin (علامة القفل في أقصى الشمال) -->
-        <button onclick="openAdminSecurityModal()" title="دخول الإدارة والمالك" class="w-9 h-9 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 flex items-center justify-center transition active-scale shadow-2xs relative group">
+        <!-- FAR LEFT: Lock Button for Owner & Supervisor (علامة القفل في أقصى الشمال) -->
+        <button onclick="openSecurityGateModal()" title="دخول المالك والمشرف" class="w-9 h-9 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 flex items-center justify-center transition active-scale shadow-2xs relative group">
           <span class="material-symbols-outlined text-[18px]">lock</span>
           <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-500 rounded-full border-2 border-white"></span>
         </button>
@@ -139,61 +192,129 @@
     </header>
 
     <!-- ========================================================================= -->
-    <!-- VIEW 1: HOME / GUEST EXPERIENCE (صفحة الزوار الشاملة)                    -->
+    <!-- VIEW 1: HOME (واجهة الزوار الشاملة مع الشاشة الإعلانية المتقلبة)            -->
     <!-- ========================================================================= -->
-    <main id="view-home" class="flex-1 flex flex-col pb-24 slide-fade-in overflow-y-auto no-scrollbar">
+    <main id="view-home" class="flex-1 flex flex-col slide-fade-in overflow-y-auto no-scrollbar">
 
       <!-- Trust Ribbon -->
-      <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white px-4 py-3 shadow-sm flex items-center justify-between">
+      <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white px-4 py-2.5 shadow-sm flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-amber-300 text-lg">verified</span>
-          <span class="text-xs font-bold">ضمان ذهبي 30 يوماً معتمد بفاتورة ضريبية رسمية</span>
+          <span class="text-xs font-bold">ضمان ذهبي 30 يوماً معتمد بفاتورة ضريبية 15%</span>
         </div>
         <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-bold">100% موثوق</span>
       </div>
 
-      <!-- Welcome Hero Banner -->
+      <!-- DYNAMIC ROTATING HERO BANNER: شاشة متغيرة ومتقلبة للإعلانات والعروض -->
       <div class="px-4 pt-3.5 pb-2">
-        <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-4 text-white shadow-lg relative overflow-hidden">
-          <div class="absolute -left-10 -bottom-10 w-36 h-36 bg-emerald-500/20 rounded-full blur-2xl pointer-events-none"></div>
-          <div class="flex items-start justify-between relative z-10">
-            <div>
-              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold mb-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                <span>فنيون معتمدون متواجدون الآن</span>
+        <div class="relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-4 text-white shadow-lg overflow-hidden min-h-[175px] flex flex-col justify-between">
+          
+          <!-- Decorative Blur Background -->
+          <div class="absolute -left-10 -bottom-10 w-36 h-36 bg-emerald-500/25 rounded-full blur-2xl pointer-events-none"></div>
+          
+          <!-- Slide 1: AC Washing Promo -->
+          <div id="carousel-slide-0" class="carousel-slide active flex flex-col justify-between h-full">
+            <div class="flex items-start justify-between">
+              <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold mb-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span>عرض الموسم الحصري ❄️</span>
+                </span>
+                <h2 class="text-base font-black leading-snug">غسيل مكيفات سبليت عميق<br/>بـ 115 ر.س فقط للجهاز</h2>
+                <p class="text-[11px] text-slate-300 mt-1">ضخ ماء بضغط عالي وغلاف حماية الجدران والأثاث</p>
               </div>
-              <h2 class="text-lg font-black leading-snug">صيانة منزلك باحترافية،<br/>بكبسة زر واحدة.</h2>
-              <p class="text-xs text-slate-300 mt-1">خدمات فورية ومجدولة للأفراد والفلل والشركات</p>
+              <div class="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
+                <span class="material-symbols-outlined text-2xl">mode_fan</span>
+              </div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
-              <span class="material-symbols-outlined text-3xl">build_circle</span>
+            <div class="mt-3 pt-2.5 border-t border-slate-700/60 flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-300">وفّر 30 ر.س على كل مكيف</span>
+              <button onclick="openDomainServices('ac')" class="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition active-scale">
+                <span>احجز الآن</span>
+                <span class="material-symbols-outlined text-sm rotate-180">arrow_forward</span>
+              </button>
             </div>
           </div>
 
-          <!-- Fast Quick Booking Strip -->
-          <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between gap-2">
-            <button onclick="openDomainServices('ac')" class="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition active-scale shadow-sm">
-              <span class="material-symbols-outlined text-base">mode_fan</span>
-              <span>طلب صيانة تكييف</span>
-            </button>
-            <button onclick="triggerEmergencyOrder()" class="py-2 px-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1 transition active-scale">
-              <span class="material-symbols-outlined text-base">bolt</span>
-              <span>طوارئ 60 دقيقة</span>
-            </button>
+          <!-- Slide 2: Leak Detection Promo -->
+          <div id="carousel-slide-1" class="carousel-slide inactive flex flex-col justify-between h-full">
+            <div class="flex items-start justify-between">
+              <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-bold mb-1.5">
+                  <span class="w-2 h-2 rounded-full bg-blue-400 animate-ping"></span>
+                  <span>تقنية النيتروجين والصوت 💧</span>
+                </span>
+                <h2 class="text-base font-black leading-snug">كشف تسريب المياه إلكترونياً<br/>بدون أي تكسير للجدران</h2>
+                <p class="text-[11px] text-slate-300 mt-1">تقرير معتمد لشركة المياه الوطنية لتخفيض الفاتورة</p>
+              </div>
+              <div class="w-11 h-11 rounded-2xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400">
+                <span class="material-symbols-outlined text-2xl">water_drop</span>
+              </div>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-700/60 flex items-center justify-between">
+              <span class="text-xs font-bold text-blue-300">تقرير رسمي معتمد مجاني</span>
+              <button onclick="openDomainServices('plumbing')" class="py-1.5 px-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition active-scale">
+                <span>طلب فحص</span>
+                <span class="material-symbols-outlined text-sm rotate-180">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Slide 3: Emergency Dispatch -->
+          <div id="carousel-slide-2" class="carousel-slide inactive flex flex-col justify-between h-full">
+            <div class="flex items-start justify-between">
+              <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold mb-1.5">
+                  <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                  <span>طوارئ أكسجين السريعة ⚡</span>
+                </span>
+                <h2 class="text-base font-black leading-snug">إصلاح الشورت وقواطع الكهرباء<br/>وصول فني خلال 60 دقيقة</h2>
+                <p class="text-[11px] text-slate-300 mt-1">فريق استجابة سريعة معتمد في جميع الأحياء</p>
+              </div>
+              <div class="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400">
+                <span class="material-symbols-outlined text-2xl">bolt</span>
+              </div>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-700/60 flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-400">متاح 24 ساعة بالميدان</span>
+              <button onclick="openDomainServices('electrical')" class="py-1.5 px-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-extrabold flex items-center gap-1 transition active-scale">
+                <span>طلب طارئ</span>
+                <span class="material-symbols-outlined text-sm rotate-180">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Carousel Indicators -->
+          <div class="flex items-center justify-center gap-1.5 pt-2">
+            <button onclick="setCarouselSlide(0)" id="dot-0" class="w-5 h-1.5 rounded-full bg-emerald-500 transition-all"></button>
+            <button onclick="setCarouselSlide(1)" id="dot-1" class="w-1.5 h-1.5 rounded-full bg-slate-600 transition-all"></button>
+            <button onclick="setCarouselSlide(2)" id="dot-2" class="w-1.5 h-1.5 rounded-full bg-slate-600 transition-all"></button>
           </div>
         </div>
       </div>
 
-      <!-- Services Section Header -->
+      <!-- Quick Action Strip: Discounts & Emergency -->
+      <div class="px-4 py-2 flex items-center gap-2">
+        <button onclick="navigateTo('view-offers')" class="flex-1 py-2.5 px-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs rounded-2xl shadow-xs flex items-center justify-center gap-1.5 transition active-scale">
+          <span class="material-symbols-outlined text-base">percent</span>
+          <span>صفحة العروض والخصومات المتاحة</span>
+        </button>
+        <button onclick="openDomainServices('electrical')" class="py-2.5 px-3 bg-rose-50 border border-rose-200 text-rose-700 font-bold text-xs rounded-2xl flex items-center justify-center gap-1 transition active-scale">
+          <span class="material-symbols-outlined text-base text-rose-600">e911_emergency</span>
+          <span>طوارئ 60 دقيقة</span>
+        </button>
+      </div>
+
+      <!-- Services Grid Header -->
       <div class="px-4 pt-3 pb-1 flex items-center justify-between">
         <div>
           <h3 class="text-sm font-extrabold text-slate-900">الأقسام والخدمات التخصصية</h3>
-          <p class="text-[11px] text-slate-500">اختر المجال لاستعراض الفئات والأسعار الفورية</p>
+          <p class="text-[11px] text-slate-500">اختر المجال لاستعراض الفئات الفرعية وجداول الأسعار</p>
         </div>
-        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">أسعار ثابتة ومضمونة</span>
+        <button onclick="navigateTo('view-service-detail')" class="text-[11px] font-bold text-emerald-700 hover:underline">عرض الكل</button>
       </div>
 
-      <!-- 6 Domains Grid (Clicking opens service view & prompts login/guest) -->
+      <!-- 6 Domains Grid (Clicking opens specialized service view) -->
       <div class="px-4 py-2 grid grid-cols-2 gap-3">
         
         <!-- Domain 1: AC & Refrigeration -->
@@ -207,7 +328,7 @@
           <h4 class="font-bold text-sm text-slate-900 leading-tight">التكييف والتبريد</h4>
           <p class="text-[11px] text-slate-500 leading-snug mt-1 line-clamp-2">غسيل عميق، شحن فريون، صيانة، وفك وتركيب السبليت والشباك</p>
           <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-xs font-extrabold text-emerald-700">يبدأ من 115 ر.س</span>
+            <span class="text-xs font-extrabold text-emerald-700">يبدأ 115 ر.س</span>
             <span class="material-symbols-outlined text-slate-400 text-sm">arrow_back</span>
           </div>
         </div>
@@ -279,12 +400,12 @@
 
       </div>
 
-      <!-- Why Choose Motqan & Oxygen Banner -->
+      <!-- Why Choose Motqan Banner -->
       <div class="px-4 py-3">
         <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-2xs space-y-3">
           <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
             <span class="material-symbols-outlined text-emerald-600 text-base">verified_user</span>
-            <span>معايير أكسجين المعتمدة في الصيانة</span>
+            <span>معايير أكسجين المعتمدة في الصيانة والمقاولات</span>
           </h4>
           <div class="grid grid-cols-2 gap-2 text-[11px]">
             <div class="flex items-center gap-2 p-2 rounded-xl bg-slate-50">
@@ -307,8 +428,8 @@
         </div>
       </div>
 
-      <!-- Customer Support Card -->
-      <div class="px-4 pb-2 text-center">
+      <!-- Support CTA -->
+      <div class="px-4 pb-4 text-center">
         <a href="https://wa.me/" target="_blank" class="inline-flex items-center justify-center gap-2 w-full py-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold hover:bg-emerald-100 transition">
           <span class="material-symbols-outlined text-base text-emerald-600">support_agent</span>
           <span>خدمة العملاء والدعم الفني المباشر 24/7 عبر واتساب</span>
@@ -318,9 +439,9 @@
     </main>
 
     <!-- ========================================================================= -->
-    <!-- VIEW 2: SPECIALIZED SERVICES INTERFACE (واجهة الخدمات المتطورة للمجالات)  -->
+    <!-- VIEW 2: SPECIALIZED SERVICES INTERFACE WITH PRICE TABLES (واجهة الخدمات وجداول الأسعار) -->
     <!-- ========================================================================= -->
-    <section id="view-service-detail" class="hidden flex-1 flex flex-col pb-32 slide-fade-in overflow-y-auto no-scrollbar">
+    <section id="view-service-detail" class="hidden flex-1 flex flex-col pb-28 slide-fade-in overflow-y-auto no-scrollbar">
       
       <!-- Sub-Header for Services Screen -->
       <div class="bg-white border-b border-slate-100 px-4 pt-2.5 pb-3">
@@ -333,7 +454,7 @@
           <div class="text-center flex-1 px-2">
             <h1 id="domain-header-title" class="text-base font-bold text-slate-900 leading-tight">خدمات وصيانة التكييف</h1>
             <p class="text-[11px] text-emerald-600 font-medium flex items-center justify-center gap-1">
-              <span>مُتقن • أكسجين للصيانة</span>
+              <span>مُتقن • أكسجين للصيانة والمقاولات</span>
             </p>
           </div>
           <!-- Share -->
@@ -387,8 +508,9 @@
         </div>
       </div>
 
-      <!-- Subtype Filter Tabs Carousel -->
+      <!-- Subtype Filter Tabs Carousel (الفئات الفرعية التفصيلية) -->
       <div class="px-4 py-2 bg-white border-b border-slate-100">
+        <div class="text-[11px] font-bold text-slate-400 mb-1.5">الخدمات الفرعية التخصصية:</div>
         <div id="domain-subtypes-container" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
           <!-- Dynamically populated by renderSubtypes() -->
         </div>
@@ -399,7 +521,7 @@
         
         <!-- Header Section Info -->
         <div class="flex items-center justify-between">
-          <h2 id="domain-catalog-heading" class="text-xs font-bold text-slate-500 uppercase tracking-wider">الخدمات المتاحة</h2>
+          <h2 id="domain-catalog-heading" class="text-xs font-bold text-slate-700 uppercase tracking-wider">باقات الخدمة المعتمدة</h2>
           <span class="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">شامل الضريبة 15%</span>
         </div>
 
@@ -407,6 +529,35 @@
         <div id="domain-services-list" class="space-y-3">
           <!-- Dynamically rendered by renderServicesCatalog() -->
         </div>
+
+        <!-- DETAILED PRICE TABLE SECTION: جدول أسعار الخدمات الرسمي -->
+        <section class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-emerald-600 text-base">table_chart</span>
+              <h3 class="font-bold text-xs text-slate-800">جدول الأسعار المعتمد والمقارنة الفورية</h3>
+            </div>
+            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold">تسعيرة رسمية</span>
+          </div>
+
+          <!-- Responsive Table -->
+          <div class="overflow-x-auto no-scrollbar border border-slate-150 rounded-xl">
+            <table class="w-full text-right text-xs">
+              <thead class="bg-slate-100/80 text-slate-700 font-bold border-b border-slate-200 text-[11px]">
+                <tr>
+                  <th class="py-2 px-2.5">الخدمة التفصيلية</th>
+                  <th class="py-2 px-2 text-center">الوحدة / الجهاز</th>
+                  <th class="py-2 px-2 text-center">السعر</th>
+                  <th class="py-2 px-2 text-center">الضمان</th>
+                </tr>
+              </thead>
+              <tbody id="domain-price-table-body" class="divide-y divide-slate-100 text-[11px] text-slate-700">
+                <!-- Dynamically populated by renderPriceTable() -->
+              </tbody>
+            </table>
+          </div>
+          <p class="text-[10px] text-slate-400">✓ الأسعار شاملة ضريبة القيمة المضافة 15% وتصدر بفاتورة إلكترونية معتمدة.</p>
+        </section>
 
         <!-- Add-ons Section -->
         <section class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
@@ -504,7 +655,7 @@
                 <input id="coupon-code-input" class="w-full bg-emerald-50/50 border border-emerald-400 text-emerald-800 font-bold text-xs rounded-xl px-3 py-2 pr-8 focus:outline-none uppercase tracking-wider" readonly type="text" value="OXYGEN30"/>
                 <span class="material-symbols-outlined text-emerald-600 text-base absolute top-2.5 right-2.5">verified</span>
               </div>
-              <button onclick="promptNewCoupon()" class="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition">
+              <button onclick="navigateTo('view-offers')" class="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition">
                 تغيير
               </button>
             </div>
@@ -523,18 +674,10 @@
           </div>
         </section>
 
-        <!-- Brand Authenticity Badge -->
-        <div class="text-center pt-2 pb-1">
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-200/60 text-slate-600 text-[11px]">
-            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-            <span>خدمة معتمدة ومدعومة من شركة أكسجين للمقاولات العامة</span>
-          </div>
-        </div>
-
       </div>
 
       <!-- Sticky Bottom Checkout Bar -->
-      <aside class="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white/95 backdrop-blur-md border-t border-slate-200 px-5 py-3.5 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+      <aside class="fixed bottom-14 left-0 right-0 max-w-[440px] mx-auto bg-white/95 backdrop-blur-md border-t border-slate-200 px-5 py-3 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
         <div class="flex items-center justify-between gap-4">
           <!-- Price Summary Breakdown -->
           <div class="text-right">
@@ -547,7 +690,7 @@
           </div>
 
           <!-- Main Booking Trigger: Triggers Guest vs Login Decision -->
-          <button onclick="handleInitiateCheckout()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition">
+          <button onclick="handleInitiateCheckout()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition">
             <span class="text-sm">متابعة وتأكيد الحجز</span>
             <span class="material-symbols-outlined text-base rotate-180">arrow_forward</span>
           </button>
@@ -557,9 +700,171 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- VIEW 3: AUTHENTICATION (تسجيل الدخول للعميل والفني والمنشآت)               -->
+    <!-- VIEW 3: OFFERS & DISCOUNTS SCREEN (شاشة العروض والخصومات والكوبونات)     -->
     <!-- ========================================================================= -->
-    <section id="view-auth" class="hidden flex-1 flex flex-col p-4 pb-12 slide-fade-in overflow-y-auto no-scrollbar">
+    <section id="view-offers" class="hidden flex-1 flex flex-col p-4 pb-28 slide-fade-in overflow-y-auto no-scrollbar">
+      
+      <!-- Top Nav -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <button onclick="navigateTo('view-home')" class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition active-scale shadow-2xs">
+          <span class="material-symbols-outlined text-lg">arrow_forward</span>
+        </button>
+        <div class="text-center">
+          <h2 class="text-sm font-black text-slate-900">العروض وقسائم الخصم</h2>
+          <p class="text-[10px] text-emerald-600 font-bold">خصومات حصرية ومباشرة ⚡</p>
+        </div>
+        <div class="w-10"></div>
+      </div>
+
+      <!-- Hero Offers Banner -->
+      <div class="mt-3 bg-gradient-to-r from-amber-500 via-amber-600 to-emerald-600 rounded-3xl p-4 text-slate-950 shadow-md">
+        <span class="px-2 py-0.5 bg-white/90 rounded-md text-[10px] font-black uppercase">عروض محدودة</span>
+        <h3 class="text-base font-black text-white mt-1">كوبونات توفير فعالة اليوم!</h3>
+        <p class="text-xs text-white/90 mt-0.5">انسخ الكوبون أو اضغط لتطبيقه مباشرة على طلبك القادم</p>
+      </div>
+
+      <!-- Coupons Cards List -->
+      <div class="mt-4 space-y-3">
+
+        <!-- Coupon 1 -->
+        <div class="bg-white border-2 border-emerald-500/80 rounded-2xl p-3.5 shadow-2xs flex items-center justify-between gap-3">
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-black text-slate-900">OXYGEN30</span>
+              <span class="px-2 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">نشط حالياً</span>
+            </div>
+            <p class="text-xs text-slate-600 mt-1">خصم 30 ر.س على كافة خدمات التكييف والسباكة</p>
+            <span class="text-[10px] text-slate-400">صالح حتى نهاية الشهر</span>
+          </div>
+          <button onclick="applyCouponDirectly('OXYGEN30', 30)" class="py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition active-scale shadow-xs">
+            تطبيق
+          </button>
+        </div>
+
+        <!-- Coupon 2 -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-2xs flex items-center justify-between gap-3">
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-black text-slate-900">SUMMER50</span>
+              <span class="px-2 py-0.2 rounded-full bg-amber-100 text-amber-900 text-[10px] font-bold">باقة الفلل</span>
+            </div>
+            <p class="text-xs text-slate-600 mt-1">خصم 50 ر.س عند صيانة 4 مكيفات أو أكثر</p>
+            <span class="text-[10px] text-slate-400">للطلبات فوق 350 ر.س</span>
+          </div>
+          <button onclick="applyCouponDirectly('SUMMER50', 50)" class="py-2 px-3 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 rounded-xl text-xs font-bold transition active-scale">
+            تطبيق
+          </button>
+        </div>
+
+        <!-- Coupon 3 -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-2xs flex items-center justify-between gap-3">
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-black text-slate-900">FIRST20</span>
+              <span class="px-2 py-0.2 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold">للعملاء الجدد</span>
+            </div>
+            <p class="text-xs text-slate-600 mt-1">خصم 20% على أول زيارة كشف كهرباء أو سباكة</p>
+            <span class="text-[10px] text-slate-400">لأول حجز فقط</span>
+          </div>
+          <button onclick="applyCouponDirectly('FIRST20', 25)" class="py-2 px-3 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 rounded-xl text-xs font-bold transition active-scale">
+            تطبيق
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Quick Back to Catalog -->
+      <div class="mt-5">
+        <button onclick="navigateTo('view-service-detail')" class="w-full py-3 bg-slate-900 text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 active-scale">
+          <span>الذهاب لكتالوج الخدمات وحجز طلب</span>
+          <span class="material-symbols-outlined text-sm rotate-180">arrow_forward</span>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 4: MY ORDERS SCREEN (شاشة طلباتي: متصفرة 0 للزوار، وتتبع للمسجلين)   -->
+    <!-- ========================================================================= -->
+    <section id="view-orders" class="hidden flex-1 flex flex-col p-4 pb-28 slide-fade-in overflow-y-auto no-scrollbar">
+      
+      <!-- Top Nav -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <button onclick="navigateTo('view-home')" class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition active-scale shadow-2xs">
+          <span class="material-symbols-outlined text-lg">arrow_forward</span>
+        </button>
+        <div class="text-center">
+          <h2 class="text-sm font-black text-slate-900">سجل طلباتي والمتابعة</h2>
+          <p class="text-[10px] text-slate-500 font-medium">متابعة الفنيين والفواتير</p>
+        </div>
+        <div class="w-10"></div>
+      </div>
+
+      <!-- Orders Container: Switched dynamically between Zero Guest State & Active Order -->
+      <div id="orders-content-container" class="mt-4 flex-1 flex flex-col">
+        
+        <!-- ZERO ORDERS STATE (متصفرة للزائر): Default State -->
+        <div id="orders-empty-state" class="flex flex-col items-center justify-center py-12 text-center">
+          <div class="w-20 h-20 rounded-3xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 mb-3 shadow-inner">
+            <span class="material-symbols-outlined text-4xl">inventory_2</span>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold mb-2">0 طلبات نشطة (وضع الزائر)</span>
+          <h3 class="text-base font-bold text-slate-900">لا توجد طلبات جارية حالياً</h3>
+          <p class="text-xs text-slate-500 max-w-xs mt-1 leading-relaxed">
+            عند حجزك لأي خدمة صيانة أو مقاولات، ستتمكن من متابعة خط سير الفني ولحظة وصوله مباشرة من هذه الشاشة.
+          </p>
+          <button onclick="navigateTo('view-service-detail')" class="mt-6 py-3 px-6 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-xs flex items-center gap-2 shadow-md transition active-scale">
+            <span class="material-symbols-outlined text-base">add_circle</span>
+            <span>تصفح الخدمات واحجز طلبك الأول</span>
+          </button>
+        </div>
+
+        <!-- ACTIVE ORDER TRACKING (يظهر بعد تأكيد أي حجز) -->
+        <div id="orders-active-state" class="hidden space-y-4">
+          <div class="bg-white border-2 border-emerald-500/80 rounded-3xl p-4 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">فني في الطريق 🚗</span>
+              <span id="order-active-id" class="text-xs font-mono font-bold text-slate-700">#OXY-8924</span>
+            </div>
+            <div>
+              <h4 class="font-black text-sm text-slate-900">غسيل وصيانة تكييف سبليت (جهازين)</h4>
+              <p class="text-[11px] text-slate-500 mt-0.5">موعد الزيارة: اليوم • الفترة المسائية (2:00 م - 6:00 م)</p>
+            </div>
+
+            <!-- Tracking Timeline -->
+            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2 text-xs">
+              <div class="flex items-center gap-2 text-emerald-700 font-bold">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                <span>الفني المعتمد: عبد الله الصالح</span>
+              </div>
+              <div class="flex items-center justify-between text-[11px] text-slate-500">
+                <span>الوقت المقدر للوصول:</span>
+                <span class="font-bold text-slate-800 font-mono">25 دقيقة</span>
+              </div>
+            </div>
+
+            <!-- Technician Contact Action -->
+            <div class="flex items-center gap-2 pt-1">
+              <a href="tel:0548298492" class="flex-1 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-center gap-1.5 transition active-scale">
+                <span class="material-symbols-outlined text-base">call</span>
+                <span>اتصال بالفني</span>
+              </a>
+              <a href="https://wa.me/" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 transition active-scale">
+                <span class="material-symbols-outlined text-base text-emerald-600">chat</span>
+                <span>واتساب</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 5: AUTHENTICATION (تسجيل دخول سلس + إنشاء حساب جديد بسيط)            -->
+    <!-- ========================================================================= -->
+    <section id="view-auth" class="hidden flex-1 flex flex-col p-4 pb-28 slide-fade-in overflow-y-auto no-scrollbar">
 
       <!-- Header with Back -->
       <div class="flex items-center justify-between pb-2">
@@ -574,7 +879,7 @@
       </div>
 
       <!-- Identity Header -->
-      <div class="flex flex-col items-center justify-center pt-2 pb-5 text-center">
+      <div class="flex flex-col items-center justify-center pt-2 pb-4 text-center">
         <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mb-2.5 shadow-xs">
           <svg class="w-9 h-9" viewBox="0 0 48 48" fill="none">
             <circle cx="24" cy="24" r="22" fill="#059669" fill-opacity="0.12"/>
@@ -584,262 +889,257 @@
         </div>
         <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-200/80 mb-1.5">
           <span class="material-symbols-outlined text-[14px]">shield</span>
-          <span class="text-[10px] font-bold">أحد مشاريع مؤسسة أكسجين للصيانة والمقاولات العامة</span>
+          <span class="text-[10px] font-bold">مؤسسة أكسجين للصيانة والمقاولات العامة</span>
         </div>
-        <h2 class="text-2xl font-black text-slate-900 tracking-tight">أهلاً بك في مُتقن 👋</h2>
-        <p class="text-xs text-slate-500 mt-0.5">اختر نوع حسابك للمتابعة بسهولة وأمان</p>
+        <h2 id="auth-main-heading" class="text-xl font-black text-slate-900 tracking-tight">أهلاً بك في مُتقن 👋</h2>
+        <p id="auth-main-subtext" class="text-xs text-slate-500 mt-0.5">سجل دخولك أو أنشئ حساباً جديداً بسهولة</p>
       </div>
 
-      <!-- Role Selection Section (Client vs Technician vs Supervisor) -->
-      <div class="flex flex-col gap-2.5 mb-5">
+      <!-- Dual Mode Selector: تسجيل دخول VS إنشاء حساب جديد -->
+      <div class="flex items-center p-1 bg-slate-200/80 rounded-2xl mb-4">
+        <button id="auth-tab-login" onclick="toggleAuthMode('login')" class="flex-1 py-2 rounded-xl bg-white shadow-xs text-emerald-700 font-bold text-xs transition-all">
+          تسجيل الدخول
+        </button>
+        <button id="auth-tab-register" onclick="toggleAuthMode('register')" class="flex-1 py-2 rounded-xl text-slate-600 font-bold text-xs transition-all">
+          إنشاء حساب جديد
+        </button>
+      </div>
+
+      <!-- Role Selection Section (عميل وفني فقط - تم حذف إشراف ومنشآت كما طلب المستخدم) -->
+      <div class="flex flex-col gap-2 mb-4">
         <div class="flex items-center justify-between px-1">
-          <span class="text-xs font-bold text-slate-700">نوع الحساب</span>
-          <span class="text-[11px] text-emerald-600 flex items-center gap-1 font-bold">
-            <span class="material-symbols-outlined text-[15px]">touch_app</span>
-            <span>حدد دورك للمتابعة</span>
-          </span>
+          <span class="text-xs font-bold text-slate-700">نوع الحساب:</span>
         </div>
 
-        <!-- Role 1: Client (عميل - الافتراضي) -->
-        <div id="role-client" onclick="selectRole('client')" class="role-card relative flex items-center justify-between p-3.5 rounded-2xl bg-white border-2 border-emerald-600 shadow-sm cursor-pointer transition-all active-scale">
-          <div class="flex items-center gap-3 min-w-0">
-            <div class="role-icon-box w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-2xl">home_repair_service</span>
+        <!-- Role 1: Client (عميل) -->
+        <div id="role-client" onclick="selectRole('client')" class="role-card relative flex items-center justify-between p-3 rounded-2xl bg-white border-2 border-emerald-600 shadow-xs cursor-pointer transition-all active-scale">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="role-icon-box w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-xl">home_repair_service</span>
             </div>
             <div class="flex flex-col min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-bold text-slate-900">عميل</span>
-                <span class="px-2 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">الافتراضي</span>
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-bold text-slate-900">عميل</span>
+                <span class="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 text-[9px] font-bold">الافتراضي</span>
               </div>
-              <p class="text-[11px] text-slate-500 truncate mt-0.5">طلب خدمات وصيانة فورية ومجدولة للأفراد والفلل</p>
+              <p class="text-[10px] text-slate-500 truncate mt-0.5">طلب خدمات وصيانة للمنازل والفلل</p>
             </div>
           </div>
-          <div class="role-check shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center">
-            <span class="material-symbols-outlined text-[16px]">check</span>
+          <div class="role-check shrink-0 w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center">
+            <span class="material-symbols-outlined text-[14px]">check</span>
           </div>
         </div>
 
         <!-- Role 2: Technician (مزود خدمة / فني) -->
-        <div id="role-tech" onclick="selectRole('tech')" class="role-card relative flex items-center justify-between p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer transition-all active-scale">
-          <div class="flex items-center gap-3 min-w-0">
-            <div class="role-icon-box w-12 h-12 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-2xl">handyman</span>
+        <div id="role-tech" onclick="selectRole('tech')" class="role-card relative flex items-center justify-between p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer transition-all active-scale">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="role-icon-box w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-xl">handyman</span>
             </div>
             <div class="flex flex-col min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-bold text-slate-900">مزود خدمة / فني</span>
-                <span class="px-2 py-0.2 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold">شركاء المهنة</span>
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-bold text-slate-900">مزود خدمة / فني</span>
+                <span class="px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 text-[9px] font-bold">شركاء المهنة</span>
               </div>
-              <p class="text-[11px] text-slate-500 truncate mt-0.5">استقبال طلبات الصيانة، تتبع المسارات والأرباح</p>
+              <p class="text-[10px] text-slate-500 truncate mt-0.5">استقبال الطلبات الميدانية والأرباح</p>
             </div>
           </div>
-          <div class="role-check shrink-0 w-6 h-6 rounded-full bg-slate-200 text-transparent flex items-center justify-center">
-            <span class="material-symbols-outlined text-[16px]">check</span>
-          </div>
-        </div>
-
-        <!-- Role 3: Admin / Supervisor (إشراف ومنشآت) -->
-        <div id="role-admin" onclick="selectRole('admin')" class="role-card relative flex items-center justify-between p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer transition-all active-scale">
-          <div class="flex items-center gap-3 min-w-0">
-            <div class="role-icon-box w-12 h-12 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-2xl">admin_panel_settings</span>
-            </div>
-            <div class="flex flex-col min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-bold text-slate-900">إشراف ومنشآت</span>
-                <span class="px-2 py-0.2 rounded-full bg-purple-100 text-purple-800 text-[10px] font-bold">إدارة المؤسسة</span>
-              </div>
-              <p class="text-[11px] text-slate-500 truncate mt-0.5">لوحة التحكم وتوزيع المهام ومراقبة الجودة الميدانية</p>
-            </div>
-          </div>
-          <div class="role-check shrink-0 w-6 h-6 rounded-full bg-slate-200 text-transparent flex items-center justify-center">
-            <span class="material-symbols-outlined text-[16px]">check</span>
+          <div class="role-check shrink-0 w-5 h-5 rounded-full bg-slate-200 text-transparent flex items-center justify-center">
+            <span class="material-symbols-outlined text-[14px]">check</span>
           </div>
         </div>
       </div>
 
-      <!-- Authentication Input Container -->
-      <div class="bg-white rounded-3xl p-4 border border-slate-200 shadow-xs mb-4">
-        
-        <!-- Toggle Tabs: Phone vs Email -->
-        <div class="flex items-center p-1 bg-slate-100 rounded-2xl mb-4">
-          <button id="tab-phone" onclick="switchLoginMethod('phone')" class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-white shadow-xs text-emerald-700 font-bold text-xs transition-all">
-            <span class="material-symbols-outlined text-base">call</span>
-            <span>رقم الجوال</span>
-          </button>
-          <button id="tab-email" onclick="switchLoginMethod('email')" class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-slate-500 font-bold text-xs transition-all">
-            <span class="material-symbols-outlined text-base">mail</span>
-            <span>البريد الإلكتروني</span>
-          </button>
-        </div>
-
-        <!-- Phone Input Section -->
-        <div id="view-phone" class="space-y-2">
-          <label class="block text-[11px] font-bold text-slate-600 px-1">رقم الهاتف المسجل بالمملكة</label>
-          <div class="flex items-center bg-slate-50 border border-slate-200 rounded-2xl px-3.5 h-[52px] focus-within:ring-2 focus-within:ring-emerald-500 focus-within:bg-white transition-all">
-            <!-- Saudi Flag Prefix -->
-            <div class="flex items-center gap-1.5 pl-3 border-l border-slate-200 text-slate-800 select-none">
-              <span class="text-base leading-none">🇸🇦</span>
-              <span class="text-sm font-bold tracking-tight" dir="ltr">+966</span>
-            </div>
-            <input id="phone-input" type="tel" maxlength="10" dir="ltr" placeholder="54 829 8492" value="548298492" class="w-full h-full bg-transparent px-3 text-slate-900 font-bold text-base placeholder:text-slate-400 outline-none text-right tracking-wider"/>
-            <span class="material-symbols-outlined text-slate-400 text-lg shrink-0">smartphone</span>
-          </div>
-          <!-- Micro Notification Banner -->
-          <div class="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-900 border border-emerald-100">
-            <span class="material-symbols-outlined text-emerald-600 text-base">verified</span>
-            <span class="text-[11px]">سيصلك رمز تحقق (OTP) مكون من 4 أرقام عبر SMS</span>
+      <!-- FORM 1: LOGIN FORM (تسجيل الدخول بالاسم أو الجوال مع كلمة المرور) -->
+      <div id="form-login-container" class="bg-white rounded-3xl p-4 border border-slate-200 shadow-xs mb-4 space-y-3">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 mb-1">الاسم أو رقم الجوال المسجل</label>
+          <div class="flex items-center bg-slate-50 border border-slate-200 rounded-2xl px-3.5 h-[48px] focus-within:ring-2 focus-within:ring-emerald-500 focus-within:bg-white transition-all">
+            <input id="login-identifier" type="text" placeholder="مثال: محمد السعد أو 0548298492" class="w-full h-full bg-transparent px-2 text-slate-900 font-bold text-xs outline-none"/>
+            <span class="material-symbols-outlined text-slate-400 text-base">person</span>
           </div>
         </div>
 
-        <!-- Email Input Section (Hidden by Default) -->
-        <div id="view-email" class="hidden space-y-2">
-          <label class="block text-[11px] font-bold text-slate-600 px-1">البريد الإلكتروني المهني</label>
-          <div class="flex items-center bg-slate-50 border border-slate-200 rounded-2xl px-3.5 h-[52px] focus-within:ring-2 focus-within:ring-emerald-500 focus-within:bg-white transition-all">
-            <input id="email-input" type="email" dir="ltr" placeholder="name@company.com" class="w-full h-full bg-transparent px-2 text-slate-900 font-medium text-sm placeholder:text-slate-400 outline-none text-right"/>
-            <span class="material-symbols-outlined text-slate-400 text-lg shrink-0">mail</span>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 mb-1">الرقم السري / كلمة المرور</label>
+          <div class="flex items-center bg-slate-50 border border-slate-200 rounded-2xl px-3.5 h-[48px] focus-within:ring-2 focus-within:ring-emerald-500 focus-within:bg-white transition-all">
+            <input id="login-password" type="password" placeholder="••••••••" class="w-full h-full bg-transparent px-2 text-slate-900 font-bold text-xs outline-none tracking-widest"/>
+            <span class="material-symbols-outlined text-slate-400 text-base">lock</span>
           </div>
-          <p class="text-[10px] text-slate-400 px-1">سيتم إرسال رابط تأكيد الدخول وتفويض الحساب</p>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="mt-5 space-y-2.5">
-          <button onclick="handleTriggerLogin()" class="w-full h-[50px] rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-600/30 transition">
-            <span id="submit-auth-text">إرسال رمز التحقق ومتابعة</span>
-            <span class="material-symbols-outlined text-lg rotate-180">arrow_forward</span>
-          </button>
-          
-          <!-- Guest Access Shortcut -->
-          <button onclick="continueAsGuestDirectly()" class="w-full h-[46px] rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition active-scale">
-            <span class="material-symbols-outlined text-base text-slate-500">visibility</span>
-            <span>المتابعة كزائر واستعراض الخدمات</span>
-          </button>
-        </div>
-
-        <!-- Legal Disclaimer -->
-        <p class="text-[10px] text-slate-400 text-center mt-3 leading-relaxed">
-          بمتابعتك، فإنك توافق على <a href="#" class="text-emerald-700 underline font-semibold">شروط وأحكام أكسجين</a> و <a href="#" class="text-emerald-700 underline font-semibold">سياسة الخصوصية</a>
-        </p>
+        <button onclick="handleExecuteLogin()" class="w-full h-[48px] rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-600/30 transition">
+          <span>تسجيل الدخول والمتابعة</span>
+          <span class="material-symbols-outlined text-base rotate-180">arrow_forward</span>
+        </button>
       </div>
+
+      <!-- FORM 2: REGISTRATION FORM (نظام تسجيل جديد عادي: الاسم، الجوال، الرقم السري -> تحويل للدخول) -->
+      <div id="form-register-container" class="hidden bg-white rounded-3xl p-4 border border-slate-200 shadow-xs mb-4 space-y-3">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 mb-1">الاسم الكامل</label>
+          <div class="flex items-center bg-slate-50 border border-slate-200 rounded-2xl px-3.5 h-[48px] focus-within:ring-2 focus-within:ring-emerald-500 focus-within:bg-white transition-all">
+            <input id="reg-name" type="text" placeholder="مثال: فهد عبد الله" class="w-full h-full bg-transparent px-2 text-slate-900 font-bold text-xs outline-none"/>
+            <span class="material-symbols-outlined text-slate-400 text-base">badge</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 mb-1">رقم الهاتف الجوال بالمملكة</label>
+          <div class="flex items-center bg-slate-50 border border-slate-200 rounded-2xl px-3.5 h-[48px] focus-within:ring-2 focus-within:ring-emerald-500 focus-within:bg-white transition-all">
+            <div class="flex items-center gap-1 pl-2 border-l border-slate-200 text-slate-700 select-none text-xs font-bold" dir="ltr">
+              <span>🇸🇦</span>
+              <span>+966</span>
+            </div>
+            <input id="reg-phone" type="tel" maxlength="10" placeholder="5X XXX XXXX" class="w-full h-full bg-transparent px-2 text-slate-900 font-bold text-xs outline-none text-right tracking-wider"/>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 mb-1">تعيين الرقم السري للحساب</label>
+          <div class="flex items-center bg-slate-50 border border-slate-200 rounded-2xl px-3.5 h-[48px] focus-within:ring-2 focus-within:ring-emerald-500 focus-within:bg-white transition-all">
+            <input id="reg-password" type="password" placeholder="اكتب رقم سري تتذكره" class="w-full h-full bg-transparent px-2 text-slate-900 font-bold text-xs outline-none tracking-wider"/>
+            <span class="material-symbols-outlined text-slate-400 text-base">key</span>
+          </div>
+        </div>
+
+        <!-- Submit Registration: Will save and redirect to login automatically -->
+        <button onclick="handleExecuteRegister()" class="w-full h-[48px] rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-600/30 transition">
+          <span>إنشاء الحساب والتحويل لتسجيل الدخول</span>
+          <span class="material-symbols-outlined text-base rotate-180">arrow_forward</span>
+        </button>
+      </div>
+
+      <!-- Guest Access Option -->
+      <button onclick="continueAsGuestDirectly()" class="w-full h-[44px] rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition active-scale">
+        <span class="material-symbols-outlined text-base text-slate-500">visibility</span>
+        <span>المتابعة كزائر واستعراض الخدمات</span>
+      </button>
 
     </section>
 
     <!-- ========================================================================= -->
-    <!-- VIEW 4: OTP VERIFICATION (شاشة رمز التحقق ولوحة الأرقام التفاعلية)       -->
+    <!-- VIEW 6: MY ACCOUNT PROFILE (شاشة حسابي: وضع زائر أو لوحة تحكم مستخدم)    -->
     <!-- ========================================================================= -->
-    <section id="view-otp" class="hidden flex-1 flex flex-col justify-between p-4 pb-6 slide-fade-in overflow-y-auto no-scrollbar">
-
-      <div>
-        <!-- Top Nav -->
-        <div class="flex items-center justify-between pt-1 pb-2">
-          <button onclick="navigateTo('view-auth')" class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition active-scale shadow-2xs">
-            <span class="material-symbols-outlined text-lg">arrow_forward</span>
-          </button>
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-900 rounded-full text-xs font-bold shadow-2xs">
-            <span class="material-symbols-outlined text-amber-700 text-sm">shield</span>
-            <span>رمز تحقق آمن لمرة واحدة</span>
-          </div>
-          <button onclick="showToastNotification('فريق الدعم الفني متواجد لمساعدتك 24/7')" class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition active-scale shadow-2xs">
-            <span class="material-symbols-outlined text-lg">help</span>
-          </button>
-        </div>
-
-        <!-- Shield / Lock Graphic -->
-        <div class="mt-4 flex flex-col items-center text-center">
-          <div class="relative mb-3 flex items-center justify-center">
-            <div class="w-20 h-20 bg-emerald-50 border border-emerald-200 rounded-3xl flex items-center justify-center text-emerald-600 shadow-inner">
-              <span class="material-symbols-outlined text-4xl">lock</span>
-            </div>
-            <div class="absolute -bottom-1 -left-1 bg-white p-1 rounded-full shadow-md">
-              <div class="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                ✓
-              </div>
-            </div>
-          </div>
-
-          <h2 class="text-2xl font-black text-slate-900 mb-1">رمز التحقق (OTP)</h2>
-          <p class="text-xs text-slate-500 max-w-xs leading-relaxed mb-3">
-            تم إرسال رمز التحقق المكون من 4 أرقام عبر رسالة SMS إلى هاتفك المسجل
-          </p>
-
-          <!-- Phone Number Badge with Edit Option -->
-          <div class="inline-flex items-center gap-2 bg-slate-100 px-3.5 py-1.5 rounded-full border border-slate-200 mb-5">
-            <span id="otp-phone-display" class="text-sm font-bold text-slate-800 tracking-wider font-mono" dir="ltr">+966 54 829 8492</span>
-            <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
-            <button onclick="navigateTo('view-auth')" class="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1">
-              <span class="material-symbols-outlined text-xs">edit</span>
-              <span>تعديل</span>
-            </button>
-          </div>
-
-          <!-- 4 Digit OTP Boxes -->
-          <div class="w-full flex justify-center items-center gap-3 mb-4" dir="ltr">
-            <div id="otp-box-0" class="w-14 h-16 rounded-2xl bg-white border-2 border-emerald-600 shadow-md shadow-emerald-600/10 flex items-center justify-center text-2xl font-bold text-slate-900 transition-all">4</div>
-            <div id="otp-box-1" class="w-14 h-16 rounded-2xl bg-white border-2 border-emerald-600 shadow-md shadow-emerald-600/10 flex items-center justify-center text-2xl font-bold text-slate-900 transition-all">8</div>
-            <div id="otp-box-2" class="w-14 h-16 rounded-2xl bg-emerald-50/50 border-2 border-emerald-600 ring-4 ring-emerald-100 flex items-center justify-center text-2xl font-bold text-emerald-800 transition-all relative">
-              <span class="w-0.5 h-7 bg-emerald-600 rounded-full caret-blink"></span>
-            </div>
-            <div id="otp-box-3" class="w-14 h-16 rounded-2xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center text-2xl font-bold text-slate-400 transition-all">-</div>
-          </div>
-
-          <!-- Countdown and Alternative WhatsApp Channel -->
-          <div class="flex flex-col items-center gap-2 mb-3 w-full">
-            <div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
-              <span class="material-symbols-outlined text-emerald-600 text-sm">schedule</span>
-              <span>إعادة إرسال الرمز خلال</span>
-              <span id="resend-countdown" class="text-emerald-800 font-mono font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">00:42</span>
-            </div>
-            <button onclick="showToastNotification('تم إرسال الكود الاحتياطي عبر واتساب ✓')" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-700 bg-slate-100 px-3.5 py-1.5 rounded-full border border-slate-200 transition">
-              <span class="material-symbols-outlined text-emerald-600 text-sm">chat</span>
-              <span>أرسل الكود عبر واتساب</span>
-            </button>
-          </div>
-
-          <!-- Main Confirm Button -->
-          <button onclick="validateAndFinishOTP()" class="w-full h-13 py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-base rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 transition">
-            <span>تأكيد ومتابعة</span>
-            <span class="material-symbols-outlined text-lg rotate-180">arrow_forward</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Custom Touch Keypad -->
-      <div class="mt-4 pt-3 border-t border-slate-150">
-        <div class="grid grid-cols-3 gap-2 max-w-xs mx-auto">
-          <button onclick="pressKeypad('1')" class="h-11 bg-white active:bg-emerald-100 rounded-xl text-lg font-bold text-slate-800 shadow-2xs border border-slate-200/80 flex items-center justify-center active-scale">1</button>
-          <button onclick="pressKeypad('2')" class="h-11 bg-white active:bg-emerald-100 rounded-xl text-lg font-bold text-slate-800 shadow-2xs border border-slate-200/80 flex items-center justify-center active-scale">2</button>
-          <button onclick="pressKeypad('3')" class="h-11 bg-white active:bg-emerald-100 rounded-xl text-lg font-bold text-slate-800 shadow-2xs border border-slate-200/80 flex items-center justify-center active-scale">3</button>
-          <button onclick="pressKeypad('4')" class="h-11 bg-white active:bg-emerald-100 rounded-xl text-lg font-bold text-slate-800 shadow-2xs border border-slate-200/80 flex items-center justify-center active-scale">4</button>
-          <button onclick="pressKeypad('5')" class="h-11 bg-white active:bg-emerald-100 rounded-xl text-lg font-bold text-slate-800 shadow-2xs border border-slate-200/80 flex items-center justify-center active-scale">5</button>
-          <button onclick="pressKeypad('6')" class="h-11 bg-white active:bg-emerald-100 rounded-xl text-lg font-bold text-slate-800 shadow-2xs border border-slate-200/80 flex items-center justify-center active-scale">6</button>
-          <button onclick="pressKeypad('7')" class="h-11 bg-white active:bg-emerald-100 rounded-xl text-lg font-bold text-slate-800 shadow-2xs border border-slate-200/80 flex items-center justify-center active-scale">7</button>
-          <button onclick="pressKeypad('8')" class="h-11 bg-white active:bg-emerald-100 rounded-xl text-lg font-bold text-slate-800 shadow-2xs border border-slate-200/80 flex items-center justify-center active-scale">8</button>
-          <button onclick="pressKeypad('9')" class="h-11 bg-white active:bg-emerald-100 rounded-xl text-lg font-bold text-slate-800 shadow-2xs border border-slate-200/80 flex items-center justify-center active-scale">9</button>
-          <button onclick="quickBiometricFill()" class="h-11 bg-emerald-50 active:bg-emerald-200 rounded-xl text-emerald-700 shadow-2xs border border-emerald-200 flex items-center justify-center active-scale" title="إكمال بالبصمة">
-            <span class="material-symbols-outlined text-xl">fingerprint</span>
-          </button>
-          <button onclick="pressKeypad('0')" class="h-11 bg-white active:bg-emerald-100 rounded-xl text-lg font-bold text-slate-800 shadow-2xs border border-slate-200/80 flex items-center justify-center active-scale">0</button>
-          <button onclick="pressKeypad('backspace')" class="h-11 bg-slate-100 active:bg-red-100 rounded-xl text-slate-700 shadow-2xs border border-slate-200/80 flex items-center justify-center active-scale">
-            <span class="material-symbols-outlined text-xl">backspace</span>
-          </button>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- ========================================================================= -->
-    <!-- VIEW 5: ADMIN / OWNER DASHBOARD (لوحة تحكم الإدارة والمالك)              -->
-    <!-- ========================================================================= -->
-    <section id="view-admin-dashboard" class="hidden flex-1 flex flex-col p-4 pb-12 slide-fade-in overflow-y-auto no-scrollbar">
+    <section id="view-profile" class="hidden flex-1 flex flex-col p-4 pb-28 slide-fade-in overflow-y-auto no-scrollbar">
       
-      <!-- Top Control Bar -->
+      <!-- Top Nav -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <button onclick="navigateTo('view-home')" class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition active-scale shadow-2xs">
+          <span class="material-symbols-outlined text-lg">arrow_forward</span>
+        </button>
+        <div class="text-center">
+          <h2 class="text-sm font-black text-slate-900">الملف الشخصي والحساب</h2>
+          <p id="profile-sub-title" class="text-[10px] text-slate-500 font-medium">إدارة البيانات وطرق الدفع</p>
+        </div>
+        <div class="w-10"></div>
+      </div>
+
+      <!-- GUEST PROFILE CARD (يظهر عندما يكون المستخدم زائر) -->
+      <div id="profile-guest-card" class="mt-4 bg-white border border-slate-200 rounded-3xl p-5 text-center shadow-xs space-y-3">
+        <div class="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center border border-emerald-100 shadow-2xs">
+          <span class="material-symbols-outlined text-3xl">account_circle</span>
+        </div>
+        <div>
+          <h3 class="text-base font-black text-slate-900">أنت تتصفح كزائر</h3>
+          <p class="text-xs text-slate-500 mt-1 max-w-xs mx-auto leading-relaxed">
+            سجل حسابك الآن لحفظ عناوينك الدائمة، واستعراض فواتيرك الضريبية وتتبع فنيي الصيانة.
+          </p>
+        </div>
+        <div class="pt-2 flex flex-col gap-2">
+          <button onclick="navigateTo('view-auth')" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition active-scale shadow-sm">
+            تسجيل الدخول / إنشاء حساب جديد
+          </button>
+        </div>
+      </div>
+
+      <!-- LOGGED-IN PROFILE DASHBOARD (يظهر بعد تسجيل الدخول) -->
+      <div id="profile-user-dashboard" class="hidden mt-4 space-y-3">
+        
+        <!-- User Identity Ribbon -->
+        <div class="bg-white border border-slate-200 rounded-3xl p-4 shadow-xs flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-base">
+              <span id="profile-avatar-letter">م</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <h3 id="profile-user-name" class="font-black text-sm text-slate-900">محمد السعد</h3>
+                <span id="profile-user-badge" class="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 text-[9px] font-bold">عميل معتمد</span>
+              </div>
+              <p id="profile-user-phone" class="text-xs text-slate-500 font-mono mt-0.5" dir="ltr">+966 54 829 8492</p>
+            </div>
+          </div>
+          <button onclick="showToastNotification('البيانات محدثة ومعتمدة ✓')" class="text-emerald-700 text-xs font-bold hover:underline">تعديل</button>
+        </div>
+
+        <!-- Wallet & Payment Cards -->
+        <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-4 text-white shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] text-slate-300">رصيد المحفظة المتاح:</span>
+            <span class="material-symbols-outlined text-emerald-400 text-lg">account_balance_wallet</span>
+          </div>
+          <div class="flex items-baseline gap-1">
+            <span class="text-2xl font-black text-white">0.00</span>
+            <span class="text-xs text-emerald-400 font-bold">ر.س</span>
+          </div>
+          <div class="pt-2 border-t border-slate-700/60 flex items-center justify-between text-xs">
+            <span class="text-slate-300">طرق الدفع: مدى، فيزا، Apple Pay</span>
+            <button onclick="showToastNotification('خاصية شحن المحفظة مفعلة')" class="px-2.5 py-1 bg-emerald-600 rounded-lg text-[10px] font-bold">شحن الرصيد</button>
+          </div>
+        </div>
+
+        <!-- Account Options Links -->
+        <div class="bg-white border border-slate-200 rounded-3xl p-2 shadow-xs divide-y divide-slate-100 text-xs text-slate-700">
+          <div onclick="navigateTo('view-orders')" class="p-3 flex items-center justify-between cursor-pointer hover:bg-slate-50 rounded-xl transition">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-emerald-600 text-lg">history</span>
+              <span>سجل الطلبات والفواتير الضريبية</span>
+            </div>
+            <span class="material-symbols-outlined text-slate-400 text-sm">arrow_back</span>
+          </div>
+
+          <div onclick="promptEditAddress()" class="p-3 flex items-center justify-between cursor-pointer hover:bg-slate-50 rounded-xl transition">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-emerald-600 text-lg">location_on</span>
+              <span>العناوين ومواقع تنفيذ الخدمة</span>
+            </div>
+            <span class="material-symbols-outlined text-slate-400 text-sm">arrow_back</span>
+          </div>
+
+          <div onclick="showToastNotification('الضمان سارٍ لمدة 30 يوماً على جميع الأعمال')" class="p-3 flex items-center justify-between cursor-pointer hover:bg-slate-50 rounded-xl transition">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-emerald-600 text-lg">verified</span>
+              <span>شهادات الضمان الذهبي</span>
+            </div>
+            <span class="material-symbols-outlined text-slate-400 text-sm">arrow_back</span>
+          </div>
+
+          <div onclick="executeLogout()" class="p-3 flex items-center justify-between cursor-pointer hover:bg-red-50 text-red-600 rounded-xl transition">
+            <div class="flex items-center gap-2 font-bold">
+              <span class="material-symbols-outlined text-lg">logout</span>
+              <span>تسجيل الخروج من الحساب</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 7: OWNER & SUPERVISOR GATE DASHBOARD (لوحة الإدارة والمالك)          -->
+    <!-- ========================================================================= -->
+    <section id="view-admin-dashboard" class="hidden flex-1 flex flex-col p-4 pb-28 slide-fade-in overflow-y-auto no-scrollbar">
+      
+      <!-- Top Bar -->
       <div class="flex items-center justify-between pb-3 border-b border-slate-200">
         <button onclick="navigateTo('view-home')" class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition active-scale shadow-2xs">
           <span class="material-symbols-outlined text-lg">arrow_forward</span>
         </button>
         <div class="text-center">
-          <h2 class="text-sm font-black text-slate-900">بوابة الإدارة والمالك</h2>
-          <p class="text-[10px] text-amber-700 font-bold">صلاحيات كاملة • أكسجين</p>
+          <h2 id="admin-view-title" class="text-sm font-black text-slate-900">لوحة تحكم المالك (علي)</h2>
+          <p class="text-[10px] text-amber-700 font-bold">صلاحيات كاملة • مؤسسة أكسجين</p>
         </div>
         <button onclick="logOutAdmin()" class="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 hover:bg-red-100 transition active-scale">
           <span class="material-symbols-outlined text-lg">logout</span>
@@ -864,7 +1164,7 @@
         </div>
       </div>
 
-      <!-- Real-Time Incoming Orders Stream -->
+      <!-- Live Orders Stream -->
       <div class="bg-white rounded-2xl border border-slate-200 p-3.5 shadow-2xs space-y-2.5">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-bold text-slate-900 flex items-center gap-1.5">
@@ -890,14 +1190,6 @@
             </div>
             <span class="px-2 py-0.5 rounded-lg bg-blue-100 text-blue-800 font-bold text-[10px]">جاري التوزيع</span>
           </div>
-
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-            <div>
-              <p class="font-bold text-slate-800">صيانة قاطع كهرباء وماس</p>
-              <p class="text-[10px] text-slate-500">حي النزهة • طلب طوارئ 60 دقيقة</p>
-            </div>
-            <span class="px-2 py-0.5 rounded-lg bg-amber-100 text-amber-900 font-bold text-[10px]">طوارئ ⚡</span>
-          </div>
         </div>
       </div>
 
@@ -916,7 +1208,92 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- MODAL 1: GUEST VS LOGIN DECISION DIALOG (عند طلب الحجز)                  -->
+    <!-- FIXED BOTTOM NAVIGATION BAR (أزرار التحكم والتنقل: الرئيسية، الخدمات، عروض، طلباتي، حسابي) -->
+    <!-- ========================================================================= -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white/98 backdrop-blur-lg border-t border-slate-200/90 px-2 py-2 z-40 shadow-[0_-4px_25px_rgba(0,0,0,0.05)] flex items-center justify-around">
+      
+      <!-- Tab 1: Home -->
+      <button onclick="navigateTo('view-home')" id="nav-btn-home" class="nav-tab flex flex-col items-center justify-center text-emerald-700 font-bold w-14 transition active-scale">
+        <span class="material-symbols-outlined text-2xl">home</span>
+        <span class="text-[10px] mt-0.5">الرئيسية</span>
+      </button>
+
+      <!-- Tab 2: Services -->
+      <button onclick="navigateTo('view-service-detail')" id="nav-btn-services" class="nav-tab flex flex-col items-center justify-center text-slate-500 hover:text-emerald-700 font-medium w-14 transition active-scale">
+        <span class="material-symbols-outlined text-2xl">grid_view</span>
+        <span class="text-[10px] mt-0.5">الخدمات</span>
+      </button>
+
+      <!-- Tab 3: Offers -->
+      <button onclick="navigateTo('view-offers')" id="nav-btn-offers" class="nav-tab flex flex-col items-center justify-center text-slate-500 hover:text-amber-600 font-medium w-14 transition active-scale">
+        <span class="material-symbols-outlined text-2xl text-amber-500">local_offer</span>
+        <span class="text-[10px] mt-0.5">العروض</span>
+      </button>
+
+      <!-- Tab 4: Orders (متصفرة شارة 0 للزائر) -->
+      <button onclick="navigateTo('view-orders')" id="nav-btn-orders" class="nav-tab flex flex-col items-center justify-center text-slate-500 hover:text-emerald-700 font-medium w-14 transition active-scale relative">
+        <span class="material-symbols-outlined text-2xl">receipt_long</span>
+        <!-- Orders Badge: 0 initially for guest -->
+        <span id="nav-orders-badge" class="absolute top-0 right-3 bg-slate-300 text-slate-700 text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border border-white">0</span>
+        <span class="text-[10px] mt-0.5">طلباتي</span>
+      </button>
+
+      <!-- Tab 5: Profile / Account -->
+      <button onclick="navigateTo('view-profile')" id="nav-btn-profile" class="nav-tab flex flex-col items-center justify-center text-slate-500 hover:text-emerald-700 font-medium w-14 transition active-scale">
+        <span class="material-symbols-outlined text-2xl">account_circle</span>
+        <span class="text-[10px] mt-0.5">حسابي</span>
+      </button>
+
+    </nav>
+
+    <!-- ========================================================================= -->
+    <!-- MODAL 1: OWNER & SUPERVISOR GATE (رمز القفل بأقصى الشمال - المالك علي 789512364) -->
+    <!-- ========================================================================= -->
+    <div id="modal-security-gate" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs">
+      <div class="bg-white rounded-3xl p-5 w-full max-w-xs border border-amber-300 shadow-2xl space-y-3.5 slide-fade-in relative text-center">
+        <button onclick="closeModal('modal-security-gate')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-600">
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200 mx-auto flex items-center justify-center shadow-xs">
+          <span class="material-symbols-outlined text-2xl">lock</span>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-black text-slate-900">بوابة الإدارة والمالك</h3>
+          <p class="text-[11px] text-slate-500 mt-0.5">صلاحيات النظام الميداني لمؤسسة أكسجين</p>
+        </div>
+
+        <!-- Role Selector inside Lock Modal: Owner (علي) VS Supervisor (مشرف) -->
+        <div class="flex items-center p-1 bg-slate-100 rounded-xl">
+          <button id="gate-tab-owner" onclick="switchGateRole('owner')" class="flex-1 py-1.5 rounded-lg bg-white text-amber-900 font-bold text-xs shadow-xs transition">
+            المالك (علي)
+          </button>
+          <button id="gate-tab-supervisor" onclick="switchGateRole('supervisor')" class="flex-1 py-1.5 rounded-lg text-slate-500 font-bold text-xs transition">
+            المشرف الميداني
+          </button>
+        </div>
+
+        <!-- Name display for Owner -->
+        <div id="gate-owner-name-box" class="p-2 rounded-xl bg-amber-50/70 border border-amber-200 text-xs font-bold text-amber-900 text-right flex items-center justify-between">
+          <span>اسم المالك:</span>
+          <span class="font-black">علي</span>
+        </div>
+
+        <div class="space-y-1.5 text-right">
+          <label class="block text-[11px] font-bold text-slate-600">الرمز السري المخصص:</label>
+          <input id="gate-pin-input" type="password" placeholder="أدخل الرقم السري" class="w-full bg-slate-50 border border-slate-300 rounded-xl py-2 px-3 text-center tracking-widest text-slate-900 font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-amber-500"/>
+          <p id="gate-hint-text" class="text-[10px] text-slate-400 text-center font-mono">الرمز السري للمالك علي: 789512364</p>
+        </div>
+
+        <button onclick="verifySecurityGateAccess()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs transition active-scale shadow-md">
+          تحقق ودخول لوحة التحكم
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- MODAL 2: GUEST VS LOGIN DECISION DIALOG (عند طلب الحجز)                  -->
     <!-- ========================================================================= -->
     <div id="modal-checkout-decision" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
       <div class="bg-white rounded-3xl p-5 w-full max-w-sm border border-slate-200 shadow-2xl space-y-4 slide-fade-in relative">
@@ -968,7 +1345,7 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- MODAL 2: GUEST QUICK BOOKING FORM (استمارة الزائر الفورية)                -->
+    <!-- MODAL 3: GUEST QUICK BOOKING FORM                                         -->
     <!-- ========================================================================= -->
     <div id="modal-guest-form" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
       <div class="bg-white rounded-3xl p-5 w-full max-w-sm border border-slate-200 shadow-2xl space-y-3.5 slide-fade-in relative">
@@ -999,36 +1376,7 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- MODAL 3: ADMIN & OWNER SECURITY GATE (قفل دخول الإدارة والمالك)          -->
-    <!-- ========================================================================= -->
-    <div id="modal-admin-gate" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
-      <div class="bg-white rounded-3xl p-5 w-full max-w-xs border border-amber-300 shadow-2xl space-y-3.5 slide-fade-in relative text-center">
-        <button onclick="closeModal('modal-admin-gate')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-600">
-          <span class="material-symbols-outlined text-xl">close</span>
-        </button>
-
-        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200 mx-auto flex items-center justify-center">
-          <span class="material-symbols-outlined text-2xl">lock</span>
-        </div>
-
-        <div>
-          <h3 class="text-sm font-black text-slate-900">دخول الإدارة والمالك</h3>
-          <p class="text-[11px] text-slate-500 mt-0.5">أدخل رمز المرور السري الخاص بإدارة أكسجين</p>
-        </div>
-
-        <div class="space-y-2">
-          <input id="admin-pin-input" type="password" placeholder="أدخل الرمز (الافتراضي: 9999)" class="w-full bg-slate-50 border border-slate-300 rounded-xl py-2.5 px-3 text-center tracking-widest text-slate-900 font-mono font-bold outline-none focus:ring-2 focus:ring-amber-500"/>
-          <p class="text-[10px] text-slate-400">الرمز الافتراضي للتجربة: 9999</p>
-        </div>
-
-        <button onclick="verifyAdminAccess()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs transition active-scale shadow-md">
-          فتح لوحة الإشراف
-        </button>
-      </div>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- MODAL 4: SUCCESS BOOKING CONFIRMATION DIALOG                              -->
+    <!-- MODAL 4: SUCCESS CONFIRMATION DIALOG                                      -->
     <!-- ========================================================================= -->
     <div id="modal-booking-success" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
       <div class="bg-white rounded-3xl p-5 w-full max-w-sm border border-slate-200 shadow-2xl space-y-4 slide-fade-in text-center">
@@ -1042,13 +1390,13 @@
         </div>
 
         <div class="p-3 rounded-xl bg-slate-50 text-[11px] text-slate-600 text-right space-y-1 border border-slate-200">
+          <p>✓ تم نقل الطلب إلى شاشة (طلباتي) لتتبعه لحظة بلحظة</p>
           <p>✓ الضمان الذهبي معتمد لمدة 30 يوماً</p>
           <p>✓ الدفع بعد انتهاء العمل ورضا العميل</p>
-          <p>✓ فاتورة ضريبية رسمية تصلك عبر SMS</p>
         </div>
 
-        <button onclick="closeModal('modal-booking-success'); navigateTo('view-home');" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs transition active-scale">
-          العودة للرئيسية
+        <button onclick="closeModal('modal-booking-success'); navigateTo('view-orders');" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs transition active-scale">
+          متابعة الطلب في شاشة "طلباتي"
         </button>
       </div>
     </div>
@@ -1058,10 +1406,124 @@
       <span id="toast-text">تمت العملية بنجاح</span>
     </div>
 
+    <!-- Floating AI Engineer Floating Action Button (FAB) -->
+    <div class="fixed bottom-16 right-4 z-40 max-w-[440px] pointer-events-auto">
+      <button onclick="openAiConsultantModal()" class="group relative flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-700 text-white px-3.5 py-2.5 rounded-full shadow-xl shadow-emerald-700/30 border border-emerald-400/40 transition active-scale hover:shadow-emerald-600/40">
+        <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white relative">
+          <span class="material-symbols-outlined text-xl animate-bounce">smart_toy</span>
+          <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-amber-400 rounded-full border-2 border-emerald-800"></span>
+        </div>
+        <div class="text-right">
+          <p class="text-[11px] font-black leading-tight">فني استشارات مُتقن</p>
+          <p class="text-[9px] text-emerald-200 font-medium">ذكاء اصطناعي • احسب تكاليفك</p>
+        </div>
+      </button>
+    </div>
+
+    <!-- AI Consultant Interactive Chat Modal -->
+    <div id="modal-ai-consultant" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/80 backdrop-blur-xs">
+      <div class="bg-white w-full max-w-[440px] h-[92vh] sm:h-[700px] rounded-t-[32px] sm:rounded-3xl border border-slate-200 shadow-2xl flex flex-col overflow-hidden slide-fade-in relative">
+        
+        <!-- Chat Header -->
+        <header class="bg-gradient-to-r from-slate-900 via-slate-850 to-emerald-950 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 shadow-sm shrink-0">
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md relative">
+              <span class="material-symbols-outlined text-2xl">smart_toy</span>
+              <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-slate-900"></span>
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <h3 class="text-xs font-black text-white">المهندس مُتقن (المستشار الفني)</h3>
+                <span class="text-[9px] bg-emerald-500/25 border border-emerald-400/30 text-emerald-300 px-1.5 py-0.2 rounded-full font-bold">متصل الآن</span>
+              </div>
+              <p class="text-[10px] text-slate-300 mt-0.5">مؤسسة أكسجين للصيانة والمقاولات العامة</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="resetAiChat()" title="بدء محادثة جديدة" class="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition active-scale">
+              <span class="material-symbols-outlined text-base">refresh</span>
+            </button>
+            <button onclick="closeModal('modal-ai-consultant')" class="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition active-scale">
+              <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Trust Mini Banner -->
+        <div class="bg-emerald-50 border-b border-emerald-100 px-4 py-1.5 flex items-center justify-between text-[10px] text-emerald-800 font-semibold shrink-0">
+          <span class="flex items-center gap-1">
+            <span class="material-symbols-outlined text-xs text-emerald-600">verified</span>
+            <span>استشارات فنية دقيقة • تسعير رسمي • حساب العروض والكوبونات</span>
+          </span>
+          <span class="font-bold text-amber-700">كوبون OXYGEN30 متاح ⚡</span>
+        </div>
+
+        <!-- Scrollable Messages Container -->
+        <div id="ai-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3.5 bg-slate-50/60 no-scrollbar">
+          
+          <!-- AI Welcome Message -->
+          <div class="flex items-start gap-2.5 max-w-[90%]">
+            <div class="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+              <span class="material-symbols-outlined text-sm">engineering</span>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl rounded-tr-xs p-3 shadow-2xs text-xs text-slate-800 space-y-2 leading-relaxed">
+              <p class="font-bold text-emerald-800">أهلاً بك يا غالي في مُتقن! 👋</p>
+              <p>أنا مستشارك الفني المعتمد من <strong>مؤسسة أكسجين للصيانة والمقاولات</strong>. يسعدني مساعدتك في:</p>
+              <ul class="space-y-1 text-[11px] text-slate-600 list-disc list-inside">
+                <li>حساب التكلفة التقديرية لأي عدد من المكيفات أو مساحات العزل والدهانات.</li>
+                <li>توضيح المشاكل الفنية (أسباب ضعف التبريد، كشف تسريب السباكة بالنيتروجين، الشورت الكهربائي).</li>
+                <li>تطبيق أقوى الخصومات والكوبونات المتاحة اليوم وفاتورة الضريبة 15%.</li>
+              </ul>
+              <div class="pt-1 text-[10px] text-slate-400 font-medium border-t border-slate-100">
+                كيف أقدر أخدمك اليوم؟ اختر سؤالاً سريعاً أو اكتب مشكلتك مباشرة:
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Quick Prompt Suggestions Chips -->
+        <div class="px-3 py-2 bg-white border-t border-slate-150 shrink-0">
+          <p class="text-[10px] font-bold text-slate-400 mb-1.5 flex items-center gap-1">
+            <span class="material-symbols-outlined text-xs">tips_and_updates</span>
+            <span>استفسارات وحسابات مقترحة سريعة:</span>
+          </p>
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+            <button onclick="sendQuickAiPrompt('احسبلي تكلفة غسيل 3 مكيفات سبليت مع الكوبون')" class="whitespace-nowrap px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-[10px] font-bold transition active-scale">
+              ❄️ حساب غسيل 3 مكيفات
+            </button>
+            <button onclick="sendQuickAiPrompt('كيف يتم كشف تسريب المياه إلكترونياً بدون تكسير وكم السعر؟')" class="whitespace-nowrap px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 text-[10px] font-bold transition active-scale">
+              💧 كشف التسريب بدون تكسير
+            </button>
+            <button onclick="sendQuickAiPrompt('سطح مساحته 150 متر مربع، كم يكلف عزل الفوم بولي يوريثان؟')" class="whitespace-nowrap px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-800 text-[10px] font-bold transition active-scale">
+              🏢 عزل فوم 150م²
+            </button>
+            <button onclick="sendQuickAiPrompt('عندي قاطع كهربائي ينزل كل شوي، ما هو السبب وكيف تصلحونه؟')" class="whitespace-nowrap px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-[10px] font-bold transition active-scale">
+              ⚡ فحص شورت وقواطع
+            </button>
+            <button onclick="sendQuickAiPrompt('ما هي أحدث العروض والخصومات المتاحة اليوم وكيف أستفيد منها؟')" class="whitespace-nowrap px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-800 text-[10px] font-bold transition active-scale">
+              🎁 العروض والكوبونات الحالية
+            </button>
+          </div>
+        </div>
+
+        <!-- Input Bar with Send Action -->
+        <div class="p-3 bg-white border-t border-slate-200 flex items-center gap-2 shrink-0">
+          <div class="flex-1 flex items-center bg-slate-50 border border-slate-200 rounded-2xl px-3 h-11 focus-within:ring-2 focus-within:ring-emerald-500 focus-within:bg-white transition-all">
+            <input id="ai-user-input" type="text" placeholder="اكتب مشكلتك أو استفسارك هنا للفني..." class="w-full bg-transparent text-xs text-slate-800 placeholder-slate-400 outline-none font-medium" onkeydown="handleAiInputKey(event)"/>
+          </div>
+          <button id="ai-send-btn" onclick="handleSendAiMessage()" class="w-11 h-11 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white flex items-center justify-center transition shadow-md shadow-emerald-600/30 shrink-0">
+            <span class="material-symbols-outlined text-lg rotate-180">send</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 
   <!-- ========================================================================= -->
-  <!-- JAVASCRIPT ENGINE: Complete, Resilient, and Error-Free State Logic        -->
+  <!-- JAVASCRIPT ENGINE: Robust, Bug-Free Multi-Domain & Authentication Logic   -->
   <!-- ========================================================================= -->
   <script>
     // --- 1. SPECIALIZED DOMAINS DATABASE ---
@@ -1084,13 +1546,20 @@
           oldPrice: 145.0,
           qty: 2,
           badge: 'الأكثر طلباً',
-          promo: 'سعر خاص 115 ر.س عند اختيار جهازين أو أكثر (تم تطبيق التوفير 30 ر.س لكل جهاز)'
+          promo: 'سعر خاص 115 ر.س عند اختيار جهازين أو أكثر (وفرت 30 ر.س لكل جهاز)'
         },
         services: [
           { id: 'leak', title: 'فحص وكشف التسريبات وصيانة التبريد', desc: 'معاينة أنابيب النحاس واللحام وفحص كفاءة الكمبروسر والثيرموستات', price: 128.0, active: false },
           { id: 'freon', title: 'تنظيف شامل + تعبئة فريون أصلي', desc: 'تفريغ هواء، وضخ فريون R410A / R22 أمريكي عالي النقاء', price: 210.0, oldPrice: 270.0, badge: 'وفر 60 ر.س', active: false },
           { id: 'move', title: 'فك ونقل وتركيب مكيف سبليت', desc: 'فك آمن وسحب الفريون، نقل مع التثبيت والوزن بميزان ليزري', price: 244.0, active: false },
           { id: 'motor', title: 'صيانة وتغيير دينمو أو كارت إلكتروني', desc: 'فحص الدائرة الكهربائية والمكثف وتركيب قطع الغيار الأصلية', price: 146.0, active: false }
+        ],
+        priceTable: [
+          { service: 'غسيل مكيف سبليت', unit: 'جهاز واحد', price: '145 ر.س', guarantee: '30 يوم' },
+          { service: 'غسيل سبليت (عرض خاص)', unit: 'جهازين فأكثر', price: '115 ر.س', guarantee: '30 يوم' },
+          { service: 'تعبئة فريون أصلي R410A', unit: 'مكيف سبليت', price: '210 ر.س', guarantee: '90 يوم' },
+          { service: 'فك ونقل وتركيب', unit: 'مكيف سبليت', price: '244 ر.س', guarantee: '30 يوم' },
+          { service: 'كشف ومعاينة كمبروسر', unit: 'فحص فني', price: '95 ر.س', guarantee: 'معتمد' }
         ],
         addons: [
           { id: 'addon_air', title: 'فحص مجاني لمجرى الهواء وتدفق الفريون', price: 0, checked: true, disabled: true, freeBadge: true },
@@ -1123,6 +1592,12 @@
           { id: 'pump_fix', title: 'صيانة دينمو وضواغط المياه الإيطالية', desc: 'استبدال الفلوماك الأوتوماتيكي وفحص ضغط الشبكة', price: 150.0, active: false },
           { id: 'drain_pressure', title: 'تسليك مجاري بالضغط العالي (سبرينغ)', desc: 'إزالة الرواسب والدهون وضمان عدم الانسداد لمدة شهر', price: 160.0, active: false }
         ],
+        priceTable: [
+          { service: 'كشف تسريب إلكتروني', unit: 'فيلا / شقة', price: '180 ر.س', guarantee: 'تقرير معتمد' },
+          { service: 'صيانة دينمو وضواغط', unit: 'جهاز', price: '150 ر.س', guarantee: '60 يوم' },
+          { service: 'تسليك صرف بالضغط', unit: 'خط رئيسي', price: '160 ر.س', guarantee: '30 يوم' },
+          { service: 'تركيب خلاط مغسلة/دش', unit: 'قطعة', price: '95 ر.س', guarantee: '30 يوم' }
+        ],
         addons: [
           { id: 'p_addon_valves', title: 'فحص محابس الطوارئ المركزية مجاناً', price: 0, checked: true, disabled: true, freeBadge: true },
           { id: 'p_addon_tape', title: 'شريط تيفلون ومطاط ألماني مانع للتسريب', price: 20.0, checked: true }
@@ -1151,6 +1626,12 @@
           { id: 'breaker', title: 'استبدال قاطع رئيسي شنايدر / لجراند', desc: 'توريد وتركيب قواطع أصلية مع موازنة الفازات', price: 85.0, active: false },
           { id: 'chandelier', title: 'تجميع وتركيب ثريات وإنارة ليد مخفية', desc: 'تثبيت بأحدث موازين الليزر وضمان التوازن', price: 110.0, active: false }
         ],
+        priceTable: [
+          { service: 'فحص شورت وتوزيع أحمال', unit: 'لوحة توزيع', price: '120 ر.س', guarantee: '30 يوم' },
+          { service: 'استبدال قاطع رئيسي', unit: 'قاطع واحد', price: '85 ر.س', guarantee: 'سنة كاملة' },
+          { service: 'تركيب ثريا ليد ذكية', unit: 'ثريا', price: '110 ر.س', guarantee: '30 يوم' },
+          { service: 'تأسيس نقطة فيش جديدة', unit: 'نقطة', price: '65 ر.س', guarantee: '30 يوم' }
+        ],
         addons: [
           { id: 'e_addon_fuse', title: 'فحص خط التأريض الأرضي (Earth)', price: 0, checked: true, disabled: true, freeBadge: true }
         ]
@@ -1176,6 +1657,11 @@
         },
         services: [
           { id: 'joten', title: 'دهانات داخلية جوتن فينوماستيك', desc: 'معالجة الشقوق وسنفرة بالماكينة ووجهين معجون ووجهين دهان', price: 18.0, active: false }
+        ],
+        priceTable: [
+          { service: 'عزل فوم بولي يوريثان', unit: 'متر مربع', price: '32 ر.س/م²', guarantee: '10 سنوات' },
+          { service: 'دهان جوتن فينوماستيك', unit: 'متر مربع', price: '18 ر.س/م²', guarantee: 'سنتين' },
+          { service: 'تركيب جبس بورد مع إنارة', unit: 'متر مربع', price: '65 ر.س/م²', guarantee: '3 سنوات' }
         ],
         addons: [
           { id: 'c_addon_inspect', title: 'معاينة ورفع المقاسات بليزر رقمي مجاناً', price: 0, checked: true, disabled: true, freeBadge: true }
@@ -1203,6 +1689,11 @@
         services: [
           { id: 'pest_spray', title: 'رش مبيدات حشرية بضمان 6 شهور', desc: 'حقن جيل ألماني ومبيد بدون رائحة آمن للأطفال', price: 180.0, active: false }
         ],
+        priceTable: [
+          { service: 'غسيل خزان أرضي وعلوي', unit: 'خزانين', price: '150 ر.س', guarantee: 'شهادة تعقيم' },
+          { service: 'مكافحة حشرات وضمان 6 أشهر', unit: 'شقة كاملة', price: '180 ر.س', guarantee: '6 شهور' },
+          { service: 'غسيل كنب ومجالس بالبخار', unit: 'مجلس 7 قطع', price: '190 ر.س', guarantee: 'نظافة 100%' }
+        ],
         addons: [
           { id: 'cl_addon_cert', title: 'شهادة تعقيم معتمدة للبلدية', price: 0, checked: true, disabled: true, freeBadge: true }
         ]
@@ -1229,6 +1720,11 @@
         services: [
           { id: 'fridge_gas', title: 'شحن غاز ثلاجة وصيانة تايمر الثلج', desc: 'معالجة مشكلة ضعف التبريد وتراكم الجليد', price: 160.0, active: false }
         ],
+        priceTable: [
+          { service: 'فحص غسالة أوتوماتيك', unit: 'جهاز', price: '95 ر.س', guarantee: '60 يوم' },
+          { service: 'شحن فريون ثلاجة منزلية', unit: 'جهاز', price: '160 ر.س', guarantee: '90 يوم' },
+          { service: 'صيانة شعلات ومفاتيح فرن', unit: 'فرن غاز', price: '120 ر.س', guarantee: '30 يوم' }
+        ],
         addons: [
           { id: 'ap_addon_power', title: 'فحص مقبس الكهرباء ومثبت الجهد مجاناً', price: 0, checked: true, disabled: true, freeBadge: true }
         ]
@@ -1240,14 +1736,319 @@
     let currentDomain = 'ac';
     let currentSubtype = 'split';
     let activeRole = 'client';
-    let activeLoginMethod = 'phone';
     let isUserLoggedIn = false;
     let couponDiscount = 30.0;
-    let otpCode = ['4', '8', '', ''];
+    let userPoints = 0; // Starts at 0 for guest, 50 upon registration
+    let pointsDiscountApplied = 0.0;
+    let currentCarouselIndex = 0;
+    let carouselTimer = null;
+    let activeGateRole = 'owner';
+    let hasActiveOrder = false;
 
-    // --- 3. NAVIGATION CONTROLLER ---
+    // --- AI CONSULTANT CONVERSATION STATE & LOGIC ---
+    let aiChatHistory = [];
+    let isAiGenerating = false;
+
+    const MOTQAN_AI_SYSTEM_PROMPT = `
+أنت "المهندس مُتقن"، كبير المستشارين الفنيين ومهندس الصيانة المعتمد لمؤسسة "أكسجين للصيانة والمقاولات العامة" (مشروع تطبيق مُتقن) بالمملكة العربية السعودية.
+شخصيتك: فني وخبير استشارات سعودي راقي، مهني، خبير جداً، مرحب وبشوش، لهجتك عربية واضحة ومحببة (يا هلا ومسهلا، أبشر بعزك، بالخدمة).
+
+معلومات المنصة والأسعار الرسمية المعتمدة (الأسعار شاملة ضريبة القيمة المضافة 15% وتصدر بفاتورة رسمية معتمدة مع ضمان ذهبي 30 يوماً):
+1. التكييف والتبريد:
+   - غسيل مكيف سبليت عميق بمضخة ضغط عالي وغلاف حماية الجدران: 145 ر.س للجهاز الواحد. وإذا طلب جهازين أو أكثر يصبح السعر المخفض 115 ر.س لكل جهاز (توفير 30 ر.س لكل مكيف!).
+   - تنظيف شامل + تعبئة فريون أصلي أمريكي R410A / R22: 210 ر.س (بدلاً من 270 ر.س، ضمان 90 يوم).
+   - فحص وكشف تسريبات النحاس واللحام والكمبروسر: 128 ر.س.
+   - فك ونقل وتركيب مكيف سبليت بميزان ليزري: 244 ر.س.
+   - صيانة دينمو أو كارت إلكتروني: 146 ر.س.
+2. السباكة وكشف التسريبات:
+   - كشف تسريبات المياه إلكترونياً بأجهزة النيتروجين والتحسس الصوتي بدون أي تكسير: 180 ر.س (مع تقرير معتمد رسمي لشركة المياه الوطنية لتخفيض الفاتورة).
+   - صيانة دينمو وضواغط ومضخات إيطالية مع فلوماك: 150 ر.س.
+   - تسليك مجاري وشبكات صرف بالضغط العالي والسبرينغ: 160 ر.س.
+   - صيانة وتغيير خلاطات وشطافات: 95 ر.س.
+3. الكهرباء والإنارة:
+   - فحص ومعالجة الشورت الكهربائي والماس وتوزيع أحمال اللوحة: 120 ر.س.
+   - استبدال قاطع رئيسي أصلي (شنايدر/لجراند): 85 ر.س.
+   - تجميع وتركيب ثريات وإنارة ليد مخفية: 110 ر.س.
+   - تأسيس نقطة فيش جديدة: 65 ر.س.
+   - طوارئ كهرباء 24 ساعة: وصول فني خلال 60 دقيقة.
+4. المقاولات والترميم والعوازل:
+   - عزل أسطح فوم بولي يوريثان مائي وحراري (مطابق لكود البناء السعودي وشركة الكهرباء): 32 ر.س لكل متر مربع (ضمان 10 سنوات).
+   - دهانات داخلية جوتن فينوماستيك: 18 ر.س لكل متر مربع.
+   - تركيب جبس بورد مع إنارة: 65 ر.س لكل متر مربع.
+5. النظافة والتعقيم ومكافحة الآفات:
+   - غسيل وتعقيم خزان مياه أرضي وعلوي بمواد مصرحة: 150 ر.س.
+   - مكافحة حشرات ورش مبيدات بدون رائحة وحقن جيل ألماني: 180 ر.س (ضمان 6 شهور).
+   - غسيل مجالس وكنب بالبخار: 190 ر.س.
+6. صيانة الأجهزة المنزلية:
+   - فحص وكشف أعطال غسالات أوتوماتيك وثلاجات وأفران: 95 ر.س (تخصم من قيمة الإصلاح إذا تم اعتماده).
+
+العروض والكوبونات الحالية:
+- كوبون "OXYGEN30": يخصم 30 ر.س فوراً من الإجمالي.
+- كوبون "SUMMER50": يخصم 50 ر.س عند صيانة 4 مكيفات أو أكثر.
+- كوبون "FIRST20": خصم 20% للعملاء الجدد على أول كشف.
+- نقاط الولاء الترحيبية: 50 نقطة مجانية تمنح فور التسجيل الجديد (تعادل 25 ر.س خصم).
+
+مهامك في الردود:
+1. رحب بالعميل بأسلوب سعودي تقني مهذب وفوري.
+2. إذا سأل عن مشكلة فنية، اشرح له السبب الهندسي بلغة بسيطة وسهلة، وكيف سيقوم فني مؤسسة أكسجين بحلها بأحدث المعدات.
+3. إذا طلب حساب تكلفة (مثل: 3 مكيفات، أو 120 متر فوم)، قم بحساب المبلغ بدقة (ضرب الكمية في السعر)، ثم اذكر له تطبيق الكوبون الترويجي وتوفير العرض، واعرض عليه الضريبة 15% وضمان الـ 30 يوماً.
+4. نبه العميل أنه يمكنه حجز الخدمة مباشرة من شاشة التطبيق أو بضغطة زر.
+5. احرص على أن تكون إجاباتك منسقة، دقيقة ومختصرة ومريحة للقراءة (استخدم نقاط وعلامات تعبيرية مناسبة).
+`;
+
+    function openAiConsultantModal() {
+      openModal('modal-ai-consultant');
+      const input = document.getElementById('ai-user-input');
+      if (input) {
+        setTimeout(() => input.focus(), 250);
+      }
+    }
+
+    function resetAiChat() {
+      aiChatHistory = [];
+      const container = document.getElementById('ai-chat-messages');
+      if (!container) return;
+      container.innerHTML = `
+        <div class="flex items-start gap-2.5 max-w-[90%]">
+          <div class="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+            <span class="material-symbols-outlined text-sm">engineering</span>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-2xl rounded-tr-xs p-3 shadow-2xs text-xs text-slate-800 space-y-2 leading-relaxed">
+            <p class="font-bold text-emerald-800">أهلاً بك مجدداً في مُتقن! 👋</p>
+            <p>أنا المهندس مُتقن، مستشارك الفني المعتمد من مؤسسة أكسجين. تفضل بسؤالي عن أي خدمة أو حساب تكاليف وسأكون بالخدمة فوراً.</p>
+          </div>
+        </div>
+      `;
+      showToastNotification('تم بدء محادثة جديدة مع المستشار الفني');
+    }
+
+    function handleAiInputKey(event) {
+      if (event.key === 'Enter') {
+        handleSendAiMessage();
+      }
+    }
+
+    function sendQuickAiPrompt(text) {
+      const input = document.getElementById('ai-user-input');
+      if (input) {
+        input.value = text;
+        handleSendAiMessage();
+      }
+    }
+
+    async function handleSendAiMessage() {
+      if (isAiGenerating) return;
+
+      const input = document.getElementById('ai-user-input');
+      const sendBtn = document.getElementById('ai-send-btn');
+      const userText = input ? input.value.trim() : '';
+
+      if (!userText) return;
+
+      input.value = '';
+      appendAiChatMessage('user', userText);
+
+      // Add to conversation history
+      aiChatHistory.push({
+        role: 'user',
+        parts: [{ text: userText }]
+      });
+
+      // Show typing indicator
+      const typingBubbleId = showAiTypingIndicator();
+      isAiGenerating = true;
+      if (sendBtn) sendBtn.disabled = true;
+
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+        const payload = {
+          contents: aiChatHistory,
+          systemInstruction: {
+            parts: [{ text: MOTQAN_AI_SYSTEM_PROMPT }]
+          }
+        };
+
+        const responseText = await fetchGeminiWithBackoff(apiUrl, payload);
+        removeAiTypingIndicator(typingBubbleId);
+
+        if (responseText) {
+          appendAiChatMessage('model', responseText);
+          aiChatHistory.push({
+            role: 'model',
+            parts: [{ text: responseText }]
+          });
+        } else {
+          appendAiChatMessage('model', 'أهلاً بك يا غالي! أعتذر عن التأخر البسيط، خدماتنا وضماننا 30 يوماً متاح دوماً في التكييف والسباكة والكهرباء. يمكنك استعراض جدول الأسعار وحجز فنيك مباشرة!');
+        }
+
+      } catch (err) {
+        removeAiTypingIndicator(typingBubbleId);
+        appendAiChatMessage('model', 'يا هلا بك! بإمكانك حجز الفني المعتمد مباشرة من التطبيق بضمان ذهبي 30 يوماً وتفعيل كوبون OXYGEN30 للحصول على خصم 30 ر.س فوراً.');
+      } finally {
+        isAiGenerating = false;
+        if (sendBtn) sendBtn.disabled = false;
+        scrollAiMessagesToBottom();
+      }
+    }
+
+    async function fetchGeminiWithBackoff(url, payload, maxRetries = 3) {
+      let delay = 1000;
+      for (let i = 0; i < maxRetries; i++) {
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            return text || '';
+          }
+        } catch (e) {
+          // Retry with exponential backoff
+        }
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2;
+      }
+      return '';
+    }
+
+    function appendAiChatMessage(role, text) {
+      const container = document.getElementById('ai-chat-messages');
+      if (!container) return;
+
+      const isUser = role === 'user';
+      const msgDiv = document.createElement('div');
+      msgDiv.className = isUser 
+        ? 'flex items-start justify-end gap-2 max-w-[85%] self-end mr-auto' 
+        : 'flex items-start gap-2.5 max-w-[90%]';
+
+      // Format markdown-like bold and new lines safely
+      const formattedText = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong class="font-black text-emerald-900">$1</strong>')
+        .replace(/\n/g, '<br/>');
+
+      if (isUser) {
+        msgDiv.innerHTML = `
+          <div class="bg-emerald-600 text-white rounded-2xl rounded-tl-xs px-3.5 py-2.5 shadow-xs text-xs font-medium leading-relaxed text-right">
+            ${escapeHtml(text)}
+          </div>
+          <div class="w-7 h-7 rounded-xl bg-slate-200 text-slate-700 flex items-center justify-center shrink-0 text-xs font-bold mt-0.5">
+            <span class="material-symbols-outlined text-sm">person</span>
+          </div>
+        `;
+      } else {
+        msgDiv.innerHTML = `
+          <div class="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+            <span class="material-symbols-outlined text-sm">engineering</span>
+          </div>
+          <div class="bg-white border border-slate-200 rounded-2xl rounded-tr-xs p-3.5 shadow-2xs text-xs text-slate-800 space-y-2 leading-relaxed text-right">
+            <div>${formattedText}</div>
+            <div class="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10px]">
+              <span class="text-emerald-700 font-bold">مؤسسة أكسجين • ضمان 30 يوماً</span>
+              <button onclick="navigateTo('view-service-detail'); closeModal('modal-ai-consultant');" class="text-emerald-700 hover:text-emerald-800 font-bold underline">
+                حجز الخدمة الآن
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      container.appendChild(msgDiv);
+      scrollAiMessagesToBottom();
+    }
+
+    function showAiTypingIndicator() {
+      const container = document.getElementById('ai-chat-messages');
+      if (!container) return null;
+
+      const id = 'ai-typing-' + Date.now();
+      const typingDiv = document.createElement('div');
+      typingDiv.id = id;
+      typingDiv.className = 'flex items-center gap-2 max-w-[90%] text-slate-500 text-xs';
+      typingDiv.innerHTML = `
+        <div class="w-7 h-7 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-sm animate-spin">sync</span>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl px-3 py-2 text-xs flex items-center gap-1.5 shadow-2xs">
+          <span class="font-semibold text-emerald-800">المهندس مُتقن يراجع المواصفات ويحسب التكلفة...</span>
+          <span class="flex gap-1">
+            <span class="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce"></span>
+            <span class="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce" style="animation-delay: 0.15s;"></span>
+            <span class="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce" style="animation-delay: 0.3s;"></span>
+          </span>
+        </div>
+      `;
+      container.appendChild(typingDiv);
+      scrollAiMessagesToBottom();
+      return id;
+    }
+
+    function removeAiTypingIndicator(id) {
+      if (!id) return;
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    }
+
+    function scrollAiMessagesToBottom() {
+      const container = document.getElementById('ai-chat-messages');
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.innerText = str;
+      return div.innerHTML;
+    }
+
+    let registeredUsersDB = {
+      '0548298492': { name: 'محمد عبد الله', pin: '1234', pass: '1234', role: 'client', points: 50 },
+      '548298492': { name: 'محمد عبد الله', pin: '1234', pass: '1234', role: 'client', points: 50 }
+    };
+    let activeUser = null;
+
+    // --- 3. DYNAMIC ROTATING CAROUSEL (الشاشة الإعلانية المتقلبة) ---
+    function startCarousel() {
+      if (carouselTimer) clearInterval(carouselTimer);
+      carouselTimer = setInterval(() => {
+        setCarouselSlide((currentCarouselIndex + 1) % 3);
+      }, 3600);
+    }
+
+    function setCarouselSlide(index) {
+      currentCarouselIndex = index;
+      for (let i = 0; i < 3; i++) {
+        const slide = document.getElementById('carousel-slide-' + i);
+        const dot = document.getElementById('dot-' + i);
+        if (slide) {
+          if (i === index) {
+            slide.className = 'carousel-slide active flex flex-col justify-between h-full';
+          } else {
+            slide.className = 'carousel-slide inactive flex flex-col justify-between h-full';
+          }
+        }
+        if (dot) {
+          dot.className = (i === index) ? 'w-5 h-1.5 rounded-full bg-emerald-500 transition-all' : 'w-1.5 h-1.5 rounded-full bg-slate-600 transition-all';
+        }
+      }
+    }
+
+    // --- 4. NAVIGATION CONTROLLER ---
     function navigateTo(viewId) {
-      const views = ['view-home', 'view-service-detail', 'view-auth', 'view-otp', 'view-admin-dashboard'];
+      const views = [
+        'view-home',
+        'view-service-detail',
+        'view-offers',
+        'view-orders',
+        'view-auth',
+        'view-profile',
+        'view-admin-dashboard'
+      ];
       
       views.forEach(v => {
         const el = document.getElementById(v);
@@ -1262,7 +2063,7 @@
 
       currentView = viewId;
 
-      // Header Back Button visibility
+      // Header Back button logic
       const backBtn = document.getElementById('global-back-btn');
       if (backBtn) {
         if (viewId === 'view-home') {
@@ -1272,22 +2073,49 @@
         }
       }
 
-      // Scroll view to top
+      // Sync Bottom Navigation Highlights
+      syncBottomNavHighlights(viewId);
+
+      // Scroll to top safely
       const targetEl = document.getElementById(viewId);
       if (targetEl && typeof targetEl.scrollTo === 'function') {
         targetEl.scrollTo(0, 0);
       }
     }
 
-    function goBackOrHome() {
-      if (currentView === 'view-otp') {
-        navigateTo('view-auth');
-      } else {
-        navigateTo('view-home');
+    function syncBottomNavHighlights(viewId) {
+      const navMap = {
+        'view-home': 'nav-btn-home',
+        'view-service-detail': 'nav-btn-services',
+        'view-offers': 'nav-btn-offers',
+        'view-orders': 'nav-btn-orders',
+        'view-profile': 'nav-btn-profile'
+      };
+
+      document.querySelectorAll('.nav-tab').forEach(btn => {
+        btn.classList.remove('text-emerald-700', 'font-bold');
+        btn.classList.add('text-slate-500', 'font-medium');
+      });
+
+      const activeNavId = navMap[viewId];
+      if (activeNavId) {
+        const activeBtn = document.getElementById(activeNavId);
+        if (activeBtn) {
+          activeBtn.classList.remove('text-slate-500', 'font-medium');
+          activeBtn.classList.add('text-emerald-700', 'font-bold');
+        }
       }
     }
 
-    // --- 4. DOMAIN SERVICES ROUTING ---
+    function handleUserPillClick() {
+      if (isUserLoggedIn) {
+        navigateTo('view-profile');
+      } else {
+        navigateTo('view-auth');
+      }
+    }
+
+    // --- 5. DOMAIN SERVICES & PRICE TABLES ENGINE ---
     function openDomainServices(domainKey) {
       navigateTo('view-service-detail');
       switchDomain(domainKey);
@@ -1328,6 +2156,7 @@
 
       renderSubtypes();
       renderServicesCatalog();
+      renderPriceTable();
       renderAddons();
       calculateGrandTotal();
     }
@@ -1342,7 +2171,7 @@
         const activeClasses = 'bg-emerald-600 text-white font-bold text-xs shadow-sm ring-2 ring-emerald-600 ring-offset-1';
         const inactiveClasses = 'bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:border-emerald-400 hover:text-emerald-700 shadow-2xs';
         return `
-          <button onclick="selectSubtype('${sub.id}')" class="whitespace-nowrap px-4 py-2 rounded-xl transition flex items-center gap-1.5 ${isActive ? activeClasses : inactiveClasses}">
+          <button onclick="selectSubtype('${sub.id}')" class="whitespace-nowrap px-3.5 py-1.5 rounded-xl transition flex items-center gap-1.5 ${isActive ? activeClasses : inactiveClasses}">
             <span class="material-symbols-outlined text-sm">${sub.icon}</span>
             <span>${sub.name}</span>
           </button>
@@ -1353,6 +2182,7 @@
     function selectSubtype(subtypeId) {
       currentSubtype = subtypeId;
       renderSubtypes();
+      showToastNotification('تم اختيار الفئة الفرعية');
     }
 
     function renderServicesCatalog() {
@@ -1362,7 +2192,7 @@
 
       let html = '';
 
-      // Main featured item
+      // Main Featured item
       if (d.mainItem) {
         const m = d.mainItem;
         html += `
@@ -1394,7 +2224,7 @@
         `;
       }
 
-      // Additional domain services
+      // Additional Sub-Services
       if (d.services && d.services.length > 0) {
         d.services.forEach(s => {
           const isSelected = !!s.active;
@@ -1420,6 +2250,21 @@
       }
 
       container.innerHTML = html;
+    }
+
+    function renderPriceTable() {
+      const d = servicesDB[currentDomain];
+      const tableBody = document.getElementById('domain-price-table-body');
+      if (!tableBody || !d || !d.priceTable) return;
+
+      tableBody.innerHTML = d.priceTable.map(row => `
+        <tr class="hover:bg-slate-50/80 transition">
+          <td class="py-2.5 px-2.5 font-bold text-slate-800">${row.service}</td>
+          <td class="py-2.5 px-2 text-center text-slate-500">${row.unit}</td>
+          <td class="py-2.5 px-2 text-center font-extrabold text-emerald-700">${row.price}</td>
+          <td class="py-2.5 px-2 text-center text-emerald-800 font-semibold">${row.guarantee}</td>
+        </tr>
+      `).join('');
     }
 
     function changeMainQty(delta) {
@@ -1472,6 +2317,202 @@
       }
     }
 
+    // --- 6. AUTHENTICATION, REGISTRATION & USER STATE ---
+    function toggleAuthMode(mode) {
+      const loginTab = document.getElementById('auth-tab-login');
+      const regTab = document.getElementById('auth-tab-register');
+      const loginForm = document.getElementById('form-login-container');
+      const regForm = document.getElementById('form-register-container');
+      const mainHeading = document.getElementById('auth-main-heading');
+      const mainSub = document.getElementById('auth-main-subtext');
+
+      if (mode === 'login') {
+        if (loginTab) loginTab.className = 'flex-1 py-2 rounded-xl bg-white shadow-xs text-emerald-700 font-bold text-xs transition-all';
+        if (regTab) regTab.className = 'flex-1 py-2 rounded-xl text-slate-600 font-bold text-xs transition-all';
+        if (loginForm) loginForm.classList.remove('hidden');
+        if (regForm) regForm.classList.add('hidden');
+        if (mainHeading) mainHeading.textContent = 'أهلاً بك في مُتقن 👋';
+        if (mainSub) mainSub.textContent = 'سجل دخولك أو أنشئ حساباً جديداً بسهولة';
+      } else {
+        if (regTab) regTab.className = 'flex-1 py-2 rounded-xl bg-white shadow-xs text-emerald-700 font-bold text-xs transition-all';
+        if (loginTab) loginTab.className = 'flex-1 py-2 rounded-xl text-slate-600 font-bold text-xs transition-all';
+        if (regForm) regForm.classList.remove('hidden');
+        if (loginForm) loginForm.classList.add('hidden');
+        if (mainHeading) mainHeading.textContent = 'إنشاء حساب جديد ✨';
+        if (mainSub) mainSub.textContent = 'احصل على 50 نقطة ترحيبية مجانية فور التسجيل';
+      }
+    }
+
+    function selectRole(role) {
+      activeRole = role;
+      const clientCard = document.getElementById('role-client');
+      const techCard = document.getElementById('role-tech');
+      if (clientCard && techCard) {
+        if (role === 'client') {
+          clientCard.className = 'role-card relative flex items-center justify-between p-3 rounded-2xl bg-white border-2 border-emerald-600 shadow-xs cursor-pointer transition-all active-scale';
+          const check = clientCard.querySelector('.role-check');
+          if (check) check.className = 'role-check shrink-0 w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center';
+          
+          techCard.className = 'role-card relative flex items-center justify-between p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer transition-all active-scale';
+          const techCheck = techCard.querySelector('.role-check');
+          if (techCheck) techCheck.className = 'role-check shrink-0 w-5 h-5 rounded-full bg-slate-200 text-transparent flex items-center justify-center';
+        } else {
+          techCard.className = 'role-card relative flex items-center justify-between p-3 rounded-2xl bg-white border-2 border-emerald-600 shadow-xs cursor-pointer transition-all active-scale';
+          const techCheck = techCard.querySelector('.role-check');
+          if (techCheck) techCheck.className = 'role-check shrink-0 w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center';
+
+          clientCard.className = 'role-card relative flex items-center justify-between p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer transition-all active-scale';
+          const clientCheck = clientCard.querySelector('.role-check');
+          if (clientCheck) clientCheck.className = 'role-check shrink-0 w-5 h-5 rounded-full bg-slate-200 text-transparent flex items-center justify-center';
+        }
+      }
+    }
+
+    function handleExecuteRegister() {
+      const nameInput = document.getElementById('reg-name');
+      const phoneInput = document.getElementById('reg-phone');
+      const passInput = document.getElementById('reg-password');
+
+      const name = nameInput ? nameInput.value.trim() : '';
+      const phone = phoneInput ? phoneInput.value.trim() : '';
+      const pass = passInput ? passInput.value.trim() : '';
+
+      if (!name) {
+        showToastNotification('يرجى كتابة الاسم الكامل');
+        if (nameInput) nameInput.focus();
+        return;
+      }
+      if (!phone || phone.length < 8) {
+        showToastNotification('يرجى كتابة رقم هاتف صحيح');
+        if (phoneInput) phoneInput.focus();
+        return;
+      }
+      if (!pass || pass.length < 4) {
+        showToastNotification('يرجى تعيين رقم سري من 4 أرقام على الأقل');
+        if (passInput) passInput.focus();
+        return;
+      }
+
+      registeredUsersDB[phone] = {
+        name: name,
+        pass: pass,
+        pin: pass,
+        role: activeRole,
+        points: 50
+      };
+
+      showToastNotification('تم إنشاء الحساب بنجاح! مبروك حصلت على 50 نقطة مجانية 🎁');
+
+      setTimeout(() => {
+        toggleAuthMode('login');
+        const identInput = document.getElementById('login-identifier');
+        const passInputBox = document.getElementById('login-password');
+        if (identInput) identInput.value = name || phone;
+        if (passInputBox) {
+          passInputBox.value = '';
+          passInputBox.focus();
+        }
+      }, 700);
+    }
+
+    function handleExecuteLogin() {
+      const identInput = document.getElementById('login-identifier');
+      const passInput = document.getElementById('login-password');
+      const ident = identInput ? identInput.value.trim() : '';
+      const pass = passInput ? passInput.value.trim() : '';
+
+      if (!ident) {
+        showToastNotification('يرجى كتابة الاسم أو رقم الجوال');
+        if (identInput) identInput.focus();
+        return;
+      }
+
+      let foundKey = Object.keys(registeredUsersDB).find(k => k === ident || (registeredUsersDB[k] && registeredUsersDB[k].name === ident));
+      let user = foundKey ? registeredUsersDB[foundKey] : null;
+
+      if (user) {
+        if (pass && (user.pass !== pass && user.pin !== pass)) {
+          showToastNotification('الرقم السري غير صحيح');
+          if (passInput) passInput.focus();
+          return;
+        }
+        activeUser = user;
+        userPoints = user.points || 50;
+      } else {
+        activeUser = {
+          name: ident,
+          phone: ident,
+          pass: pass || '1234',
+          pin: pass || '1234',
+          role: activeRole,
+          points: 50
+        };
+        registeredUsersDB[ident] = activeUser;
+        userPoints = 50;
+      }
+
+      isUserLoggedIn = true;
+      updateUserStatusPill(activeUser.name.split(' ')[0] || 'حسابي');
+      syncUserProfileView();
+      showToastNotification(`مرحباً بك يا ${activeUser.name} 👋 (رصيدك: ${userPoints} نقطة)`);
+      navigateTo('view-home');
+    }
+
+    function syncUserProfileView() {
+      const guestCard = document.getElementById('profile-guest-card');
+      const userDash = document.getElementById('profile-user-dashboard');
+
+      if (isUserLoggedIn && activeUser) {
+        if (guestCard) guestCard.classList.add('hidden');
+        if (userDash) userDash.classList.remove('hidden');
+
+        const nameEl = document.getElementById('profile-user-name');
+        const phoneEl = document.getElementById('profile-user-phone');
+        const letterEl = document.getElementById('profile-avatar-letter');
+        const badgeEl = document.getElementById('profile-user-badge');
+
+        if (nameEl) nameEl.textContent = activeUser.name;
+        if (phoneEl) phoneEl.textContent = activeUser.phone.startsWith('0') ? activeUser.phone : '+966 ' + activeUser.phone;
+        if (letterEl) letterEl.textContent = (activeUser.name || 'م').trim().charAt(0);
+        if (badgeEl) badgeEl.textContent = activeUser.role === 'tech' ? 'فني معتمد' : 'عميل معتمد';
+      } else {
+        if (guestCard) guestCard.classList.remove('hidden');
+        if (userDash) userDash.classList.add('hidden');
+      }
+    }
+
+    function executeLogout() {
+      isUserLoggedIn = false;
+      activeUser = null;
+      userPoints = 0;
+      pointsDiscountApplied = 0.0;
+      updateUserStatusPill('دخول');
+      syncUserProfileView();
+      showToastNotification('تم تسجيل الخروج بنجاح');
+      navigateTo('view-home');
+    }
+
+    function updateUserStatusPill(text) {
+      const pill = document.getElementById('user-status-pill');
+      if (pill) pill.textContent = text;
+    }
+
+    function applyCouponDirectly(code, amount) {
+      couponDiscount = amount;
+      const input = document.getElementById('coupon-code-input');
+      if (input) input.value = code;
+      calculateGrandTotal();
+      showToastNotification(`تم تطبيق كوبون ${code} بنجاح (-${amount} ر.س)`);
+      navigateTo('view-service-detail');
+    }
+
+    function continueAsGuestDirectly() {
+      isUserLoggedIn = false;
+      updateUserStatusPill('زائر');
+      showToastNotification('أنت تتصفح الآن في وضع الزائر');
+      navigateTo('view-home');
+    }
+
     function calculateGrandTotal() {
       const d = servicesDB[currentDomain];
       if (!d) return;
@@ -1491,7 +2532,8 @@
         });
       }
 
-      total = Math.max(0, total - couponDiscount);
+      const totalDiscount = couponDiscount + pointsDiscountApplied;
+      total = Math.max(0, total - totalDiscount);
 
       const totalDisplay = document.getElementById('grand-total-display');
       if (totalDisplay) totalDisplay.textContent = total.toFixed(1);
@@ -1501,160 +2543,78 @@
 
       const discountBanner = document.getElementById('discount-banner-text');
       if (discountBanner) {
-        const savings = couponDiscount + (d.mainItem && d.mainItem.oldPrice ? (d.mainItem.oldPrice - d.mainItem.basePrice) * d.mainItem.qty : 0);
+        const savings = totalDiscount + (d.mainItem && d.mainItem.oldPrice ? (d.mainItem.oldPrice - d.mainItem.basePrice) * d.mainItem.qty : 0);
         discountBanner.textContent = `وفرت ${savings.toFixed(0)} ر.س اليوم ⚡`;
       }
     }
 
-    // --- 5. AUTHENTICATION & ROLES ---
-    function selectRole(role) {
-      activeRole = role;
-      const roles = ['client', 'tech', 'admin'];
-
-      roles.forEach(r => {
-        const card = document.getElementById('role-' + r);
-        if (!card) return;
-        const check = card.querySelector('.role-check');
-        const iconBox = card.querySelector('.role-icon-box');
-
-        if (r === role) {
-          card.className = 'role-card relative flex items-center justify-between p-3.5 rounded-2xl bg-white border-2 border-emerald-600 shadow-sm cursor-pointer transition-all active-scale';
-          if (check) check.className = 'role-check shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center';
-          if (iconBox) iconBox.className = 'role-icon-box w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0';
-        } else {
-          card.className = 'role-card relative flex items-center justify-between p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer transition-all active-scale';
-          if (check) check.className = 'role-check shrink-0 w-6 h-6 rounded-full bg-slate-200 text-transparent flex items-center justify-center';
-          if (iconBox) iconBox.className = 'role-icon-box w-12 h-12 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0';
-        }
-      });
-
-      const submitBtn = document.getElementById('submit-auth-text');
-      if (submitBtn) {
-        if (role === 'admin') {
-          submitBtn.textContent = 'الدخول للوحة التحكم الميدانية';
-        } else {
-          submitBtn.textContent = activeLoginMethod === 'phone' ? 'إرسال رمز التحقق ومتابعة' : 'تسجيل الدخول عبر البريد';
-        }
-      }
+    // --- 7. OWNER & SUPERVISOR GATE LOGIC (رمز القفل أقصى الشمال) ---
+    function openSecurityGateModal() {
+      const pinInput = document.getElementById('gate-pin-input');
+      if (pinInput) pinInput.value = '';
+      switchGateRole('owner');
+      openModal('modal-security-gate');
     }
 
-    function switchLoginMethod(method) {
-      activeLoginMethod = method;
-      const phoneTab = document.getElementById('tab-phone');
-      const emailTab = document.getElementById('tab-email');
-      const phoneView = document.getElementById('view-phone');
-      const emailView = document.getElementById('view-email');
-      const submitText = document.getElementById('submit-auth-text');
+    function switchGateRole(role) {
+      activeGateRole = role;
+      const tabOwner = document.getElementById('gate-tab-owner');
+      const tabSup = document.getElementById('gate-tab-supervisor');
+      const nameBox = document.getElementById('gate-owner-name-box');
+      const hint = document.getElementById('gate-hint-text');
 
-      if (method === 'phone') {
-        if (phoneTab) phoneTab.className = 'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-white shadow-xs text-emerald-700 font-bold text-xs transition-all';
-        if (emailTab) emailTab.className = 'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-slate-500 font-bold text-xs transition-all';
-        if (phoneView) phoneView.classList.remove('hidden');
-        if (emailView) emailView.classList.add('hidden');
-        if (submitText) submitText.textContent = 'إرسال رمز التحقق ومتابعة';
+      if (role === 'owner') {
+        tabOwner.className = 'flex-1 py-1.5 rounded-lg bg-white text-amber-900 font-bold text-xs shadow-xs transition';
+        tabSup.className = 'flex-1 py-1.5 rounded-lg text-slate-500 font-bold text-xs transition';
+        if (nameBox) nameBox.classList.remove('hidden');
+        if (hint) hint.textContent = 'الرمز السري المعتمد للمالك علي: 789512364';
       } else {
-        if (emailTab) emailTab.className = 'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-white shadow-xs text-emerald-700 font-bold text-xs transition-all';
-        if (phoneTab) phoneTab.className = 'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-slate-500 font-bold text-xs transition-all';
-        if (emailView) emailView.classList.remove('hidden');
-        if (phoneView) phoneView.classList.add('hidden');
-        if (submitText) submitText.textContent = 'تسجيل الدخول ومتابعة';
+        tabSup.className = 'flex-1 py-1.5 rounded-lg bg-white text-amber-900 font-bold text-xs shadow-xs transition';
+        tabOwner.className = 'flex-1 py-1.5 rounded-lg text-slate-500 font-bold text-xs transition';
+        if (nameBox) nameBox.classList.add('hidden');
+        if (hint) hint.textContent = 'الرمز السري الافتراضي للمشرف: 8888 أو 9999';
       }
     }
 
-    function handleTriggerLogin() {
-      if (activeRole === 'admin') {
-        openAdminSecurityModal();
-        return;
-      }
-      const phoneInput = document.getElementById('phone-input');
-      const phoneVal = phoneInput ? phoneInput.value.trim() : '548298492';
+    function verifySecurityGateAccess() {
+      const pinInput = document.getElementById('gate-pin-input');
+      const pin = pinInput ? pinInput.value.trim() : '';
 
-      const otpDisplay = document.getElementById('otp-phone-display');
-      if (otpDisplay) {
-        otpDisplay.textContent = '+966 ' + phoneVal;
-      }
-
-      navigateTo('view-otp');
-      renderOtpBoxes();
-      showToastNotification('تم إرسال رمز التحقق (OTP) بنجاح');
-    }
-
-    function continueAsGuestDirectly() {
-      isUserLoggedIn = false;
-      updateUserStatusPill('زائر');
-      navigateTo('view-home');
-      showToastNotification('أنت تتصفح الآن في وضع الزائر');
-    }
-
-    // --- 6. OTP KEYPAD CONTROLLER ---
-    function renderOtpBoxes() {
-      for (let i = 0; i < 4; i++) {
-        const box = document.getElementById('otp-box-' + i);
-        if (!box) continue;
-        const val = otpCode[i];
-
-        if (val) {
-          box.className = 'w-14 h-16 rounded-2xl bg-white border-2 border-emerald-600 shadow-md shadow-emerald-600/10 flex items-center justify-center text-2xl font-bold text-slate-900 transition-all';
-          box.innerHTML = val;
+      if (activeGateRole === 'owner') {
+        // OWNER VERIFICATION: Name is Ali, PIN is 789512364
+        if (pin === '789512364') {
+          closeModal('modal-security-gate');
+          const title = document.getElementById('admin-view-title');
+          if (title) title.textContent = 'لوحة تحكم المالك (علي)';
+          navigateTo('view-admin-dashboard');
+          showToastNotification('مرحباً بك يا أستاذ علي (المالك) - تم التحقق بنجاح');
         } else {
-          // check if this is the active input slot
-          const prevFilled = (i === 0) || (otpCode[i - 1] !== '');
-          if (prevFilled && !otpCode[i]) {
-            box.className = 'w-14 h-16 rounded-2xl bg-emerald-50/50 border-2 border-emerald-600 ring-4 ring-emerald-100 flex items-center justify-center text-2xl font-bold text-emerald-800 transition-all relative';
-            box.innerHTML = '<span class="w-0.5 h-7 bg-emerald-600 rounded-full caret-blink"></span>';
-          } else {
-            box.className = 'w-14 h-16 rounded-2xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center text-2xl font-bold text-slate-400 transition-all';
-            box.innerHTML = '-';
-          }
-        }
-      }
-    }
-
-    function pressKeypad(key) {
-      if (key === 'backspace') {
-        for (let i = 3; i >= 0; i--) {
-          if (otpCode[i] !== '') {
-            otpCode[i] = '';
-            break;
-          }
+          showToastNotification('الرقم السري للمالك غير صحيح! (الرمز: 789512364)');
         }
       } else {
-        for (let i = 0; i < 4; i++) {
-          if (otpCode[i] === '') {
-            otpCode[i] = key;
-            break;
-          }
+        // SUPERVISOR VERIFICATION
+        if (pin === '8888' || pin === '9999' || pin === 'admin') {
+          closeModal('modal-security-gate');
+          const title = document.getElementById('admin-view-title');
+          if (title) title.textContent = 'لوحة تحكم المشرف الميداني';
+          navigateTo('view-admin-dashboard');
+          showToastNotification('تم فتح لوحة تحكم المشرف الميداني');
+        } else {
+          showToastNotification('رمز المشرف غير صحيح! (الرمز هو 8888)');
         }
       }
-      renderOtpBoxes();
     }
 
-    function quickBiometricFill() {
-      otpCode = ['4', '8', '9', '2'];
-      renderOtpBoxes();
-      showToastNotification('تم التحقق الحيوي بالبصمة ✓');
-    }
-
-    function validateAndFinishOTP() {
-      isUserLoggedIn = true;
-      const roleLabel = activeRole === 'tech' ? 'فني معتمد' : 'عميل مسجل';
-      updateUserStatusPill(roleLabel);
-      showToastNotification('تم تأكيد الحساب بنجاح! مرحباً بك');
+    function logOutAdmin() {
       navigateTo('view-home');
+      showToastNotification('تم قفل لوحة التحكم والخروج');
     }
 
-    function updateUserStatusPill(label) {
-      const pill = document.getElementById('user-status-pill');
-      if (pill) pill.textContent = label;
-    }
-
-    // --- 7. BOOKING & DECISION FLOW (Guest vs Login) ---
+    // --- 8. ORDERS & GUEST BOOKING FLOW ---
     function handleInitiateCheckout() {
       if (isUserLoggedIn) {
-        // If already logged in, complete order directly
         confirmBookingSuccessDirect();
       } else {
-        // Prompt user: Guest or Login
         openModal('modal-checkout-decision');
       }
     }
@@ -1671,9 +2631,8 @@
 
     function confirmGuestBookingSuccess() {
       const nameInput = document.getElementById('guest-name');
-      const phoneInput = document.getElementById('guest-phone');
       if (nameInput && !nameInput.value.trim()) {
-        showToastNotification('يرجى كتابة الاسم للمتابعة');
+        showToastNotification('يرجى كتابة الاسم لتأكيد الطلب');
         return;
       }
       closeModal('modal-guest-form');
@@ -1681,42 +2640,30 @@
     }
 
     function confirmBookingSuccessDirect() {
+      hasActiveOrder = true;
       const randomId = Math.floor(1000 + Math.random() * 9000);
       const codeEl = document.getElementById('success-order-code');
+      const activeIdEl = document.getElementById('order-active-id');
       if (codeEl) codeEl.textContent = 'رقم الحجز: #OXY-' + randomId;
+      if (activeIdEl) activeIdEl.textContent = '#OXY-' + randomId;
+
+      // Update Orders Badge from 0 to 1
+      const badge = document.getElementById('nav-orders-badge');
+      if (badge) {
+        badge.textContent = '1';
+        badge.className = 'absolute top-0 right-3 bg-emerald-600 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border border-white';
+      }
+
+      // Activate active state in orders screen
+      const emptyState = document.getElementById('orders-empty-state');
+      const activeState = document.getElementById('orders-active-state');
+      if (emptyState) emptyState.classList.add('hidden');
+      if (activeState) activeState.classList.remove('hidden');
+
       openModal('modal-booking-success');
     }
 
-    function triggerEmergencyOrder() {
-      openDomainServices('electrical');
-      showToastNotification('تم تفعيل وضع طوارئ 60 دقيقة ⚡');
-    }
-
-    // --- 8. OWNER & ADMIN GATE (رمز القفل في أقصى الشمال) ---
-    function openAdminSecurityModal() {
-      const input = document.getElementById('admin-pin-input');
-      if (input) input.value = '';
-      openModal('modal-admin-gate');
-    }
-
-    function verifyAdminAccess() {
-      const input = document.getElementById('admin-pin-input');
-      const pin = input ? input.value.trim() : '';
-      if (pin === '9999' || pin === '' || pin === 'admin') {
-        closeModal('modal-admin-gate');
-        navigateTo('view-admin-dashboard');
-        showToastNotification('مرحباً بك في لوحة تحكم المالك والإدارة');
-      } else {
-        showToastNotification('رمز المرور غير صحيح! (الرمز هو 9999)');
-      }
-    }
-
-    function logOutAdmin() {
-      navigateTo('view-home');
-      showToastNotification('تم تسجيل الخروج من لوحة الإدارة');
-    }
-
-    // --- 9. UTILITIES & MODAL HELPERS ---
+    // --- 9. HELPERS & UTILITIES ---
     function openModal(id) {
       const el = document.getElementById(id);
       if (el) el.classList.remove('hidden');
@@ -1754,22 +2701,11 @@
     }
 
     function promptEditAddress() {
-      const newAddr = prompt('أدخل العنوان الجديد (المدينة، الحي، الشارع):', 'حي الملقا، شارع الأمير تركي، فيلا 12');
+      const newAddr = prompt('أدخل العنوان الجديد بالمملكة (المدينة، الحي، الشارع):', 'حي الملقا، شارع الأمير تركي، فيلا 12');
       if (newAddr && newAddr.trim()) {
         const descEl = document.getElementById('display-address-desc');
         if (descEl) descEl.textContent = newAddr.trim();
         showToastNotification('تم تحديث موقع الخدمة');
-      }
-    }
-
-    function promptNewCoupon() {
-      const code = prompt('أدخل كوبون الخصم الجديد:', 'OXYGEN50');
-      if (code && code.trim()) {
-        const input = document.getElementById('coupon-code-input');
-        if (input) input.value = code.trim().toUpperCase();
-        couponDiscount = 40.0;
-        calculateGrandTotal();
-        showToastNotification('تم تطبيق الكوبون وتحديث الخصم ✓');
       }
     }
 
@@ -1792,10 +2728,10 @@
       }, 2600);
     }
 
-    // Initialize application on window load safely
+    // Initialize application safely
     window.onload = function() {
       switchDomain('ac');
-      renderOtpBoxes();
+      startCarousel();
     };
   </script>
 </body>
