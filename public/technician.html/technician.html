@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مُتقن OXYGEN - لوحة الفني ومزود الخدمة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root {
+            --tech-dark: #1e293b;
+            --tech-yellow: #f59e0b;
+            --tech-blue: #0284c7;
+            --tech-green: #10b981;
+            --tech-red: #ef4444;
+            --tech-bg: #f1f5f9;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Tajawal', sans-serif; background: var(--tech-bg); color: #0f172a; direction: rtl; }
+        .tech-shell { max-width: 480px; margin: 0 auto; min-height: 100vh; background: #fff; border-left: 1px solid #cbd5e1; border-right: 1px solid #cbd5e1; }
+
+        /* شريط الحالة والورديات */
+        .tech-topbar { background: var(--tech-dark); color: #fff; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .stat-badge { background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 12px; text-align: center; font-size: 0.75rem; font-weight: 800; }
+
+        .duty-switch-card { background: #fef3c7; border: 1.5px solid #fde68a; padding: 12px; margin: 12px; border-radius: 16px; text-align: center; }
+        .btn-shift { width: 100%; background: var(--tech-yellow); border: none; padding: 12px; border-radius: 12px; font-weight: 900; font-size: 0.95rem; cursor: pointer; color: #78350f; }
+        .btn-shift.active { background: var(--tech-green); color: #fff; }
+
+        /* بطاقة الطلب النشط */
+        .active-task-card { background: #fff; border: 2px solid var(--tech-blue); border-radius: 20px; padding: 16px; margin: 12px; box-shadow: 0 4px 12px rgba(2,132,199,0.08); }
+        .task-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 10px; }
+        
+        .action-circle-group { display: flex; justify-content: space-around; margin: 16px 0; }
+        .circle-action { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; text-decoration: none; color: inherit; }
+        .circle-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; }
+        .btn-finish-work { width: 100%; background: var(--tech-dark); color: #fff; border: none; padding: 14px; border-radius: 14px; font-weight: 900; cursor: pointer; }
+
+        /* نافذة إنهاء العمل */
+        .modal-wrap { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; display: none; align-items: flex-end; justify-content: center; }
+        .modal-body { background: #fff; width: 100%; max-width: 480px; border-radius: 24px 24px 0 0; padding: 20px; max-height: 85vh; overflow-y: auto; }
+        .input-field { width: 100%; height: 42px; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 0 10px; font-family: inherit; font-weight: 700; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="tech-shell">
+    
+    <!-- الهيدر الخاص بالفني -->
+    <div class="tech-topbar">
+        <div>
+            <div class="tech-name" style="font-weight:900; font-size:0.95rem;">الفني: وليد أحمد محمد</div>
+            <div style="font-size:0.75rem; color:#94a3b8;">مجموعة أكسجين المركزية</div>
+        </div>
+        <div style="display:flex; gap:6px;">
+            <div class="stat-badge">الرصيد<br><span id="tech-wallet">529.7</span> ر.س</div>
+            <div class="stat-badge">التقييم<br>⭐ 5.0</div>
+        </div>
+    </div>
+
+    <!-- زر استقبال الطلبات والورديات -->
+    <div class="duty-switch-card">
+        <button class="btn-shift" id="btn-shift-toggle" onclick="toggleDuty()">
+            <i class="fas fa-radar"></i> ابدأ استقبال الطلبات الميدانية
+        </button>
+        <div style="font-size:0.7rem; color:#92400e; margin-top:6px; font-weight:700;">
+            سوف يتعطل استقبال الطلبات تلقائياً بعد مرور 10 ساعات دون قبول طلب
+        </div>
+    </div>
+
+    <!-- حاوية استعراض الطلب الميداني -->
+    <div id="tech-orders-container" style="padding: 0 4px;">
+        <p style="text-align:center; color:#64748b; padding:20px;">اضغط على "ابدأ استقبال الطلبات" لتفعيل الرادار الميداني</p>
+    </div>
+
+    <!-- نافذة إتمام العمل وإصدار الفاتورة للعميل -->
+    <div id="finish-modal" class="modal-wrap">
+        <div class="modal-body">
+            <h3 style="font-weight:900; margin-bottom:6px;">الله يعطيك العافية - تفاصيل الإنجاز</h3>
+            <p style="font-size:0.75rem; color:#64748b; margin-bottom:14px;">لضمان حقك وحق العميل، أدخل ما تم صيانته وتكلفة قطع الغيار.</p>
+            
+            <label style="font-size:0.75rem; font-weight:800; display:block; margin-bottom:4px;">أجرة يد الفني المعتمدة:</label>
+            <input type="number" id="finish-labor-fee" class="input-field" value="127.0">
+
+            <label style="font-size:0.75rem; font-weight:800; display:block; margin-bottom:4px;">تكلفة قطع الغيار المشتراة (إن وجدت):</label>
+            <input type="number" id="finish-parts-cost" class="input-field" placeholder="0.0">
+
+            <label style="font-size:0.75rem; font-weight:800; display:block; margin-bottom:4px;">إرفاق صورة فاتورة قطع الغيار أو كرت العمل:</label>
+            <input type="file" id="finish-parts-invoice" accept="image/*" class="input-field" style="padding-top:6px;">
+
+            <button class="btn-finish-work" style="background:var(--tech-green); margin-top:8px;" onclick="finalizeOrderToClient()">
+                <i class="fas fa-check-double"></i> تأكيد الإنهاء وتحويل الفاتورة للعميل
+            </button>
+            <button class="btn-finish-work" style="background:#64748b; margin-top:6px;" onclick="document.getElementById('finish-modal').style.display='none'">
+                رجوع للطلب
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const socket = io();
+    let isOnDuty = false;
+    let activeTasks = [];
+    let currentHandlingOrderId = null;
+
+    function toggleDuty() {
+        isOnDuty = !isOnDuty;
+        const btn = document.getElementById('btn-shift-toggle');
+        if(isOnDuty) {
+            btn.classList.add('active');
+            btn.innerHTML = '<i class="fas fa-satellite-dish"></i> أنت الآن متصل ونشط لاستقبال الطلبات';
+            renderCurrentTask();
+        } else {
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="fas fa-radar"></i> ابدأ استقبال الطلبات الميدانية';
+            document.getElementById('tech-orders-container').innerHTML = '<p style="text-align:center; color:#64748b; padding:20px;">تم إيقاف الوردية واستقبال الطلبات</p>';
+        }
+    }
+
+    socket.on('init_orders', (orders) => {
+        activeTasks = orders;
+        if(isOnDuty) renderCurrentTask();
+    });
+
+    socket.on('order_created', (order) => {
+        activeTasks.unshift(order);
+        if(isOnDuty) {
+            alert(`⚡ طلب عاجل وارد من العميل: ${order.service}`);
+            renderCurrentTask();
+        }
+    });
+
+    socket.on('order_updated', (order) => {
+        const idx = activeTasks.findIndex(o => o.id === order.id);
+        if(idx !== -1) activeTasks[idx] = order;
+        if(isOnDuty) renderCurrentTask();
+    });
+
+    function renderCurrentTask() {
+        const container = document.getElementById('tech-orders-container');
+        const active = activeTasks.find(t => !t.status.includes('مغلق'));
+
+        if(!active) {
+            container.innerHTML = `<p style="text-align:center; color:#64748b; padding:20px;">لا توجد طلبات جارية بمحيطك حالياً</p>`;
+            return;
+        }
+
+        currentHandlingOrderId = active.id;
+        container.innerHTML = `
+            <div class="active-task-card">
+                <div class="task-header">
+                    <div>
+                        <span style="font-size:0.75rem; color:#64748b;">رقم المهمة:</span>
+                        <strong style="color:var(--tech-blue)">#${active.id}</strong>
+                    </div>
+                    <span style="background:#e0f2fe; color:#0369a1; padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:800;">الحالة: ${active.status}</span>
+                </div>
+                <div style="font-size:0.9rem; font-weight:900; margin-bottom:4px;">العميل: ${active.clientName}</div>
+                <div style="font-size:0.8rem; color:#475569;"><i class="fas fa-map-pin"></i> ${active.address}</div>
+                <div style="font-size:0.85rem; color:var(--tech-dark); font-weight:800; margin-top:6px;">الخدمة: ${active.service}</div>
+
+                <div class="action-circle-group">
+                    <div class="circle-action" onclick="openMapNavigation('${active.address}')">
+                        <div class="circle-icon" style="background:#1e293b;"><i class="fas fa-location-arrow"></i></div>
+                        <span style="font-size:0.75rem; font-weight:800;">الموقع</span>
+                    </div>
+                    <div class="circle-action" onclick="postponeTask('${active.id}')">
+                        <div class="circle-icon" style="background:#475569;"><i class="fas fa-flag"></i></div>
+                        <span style="font-size:0.75rem; font-weight:800;">تأجيل</span>
+                    </div>
+                    <div class="circle-action" onclick="quickNotifyClient('${active.id}')">
+                        <div class="circle-icon" style="background:#0d9488;"><i class="fas fa-comment-dots"></i></div>
+                        <span style="font-size:0.75rem; font-weight:800;">إشعار وصول</span>
+                    </div>
+                </div>
+
+                <button class="btn-finish-work" onclick="openFinishDialog()">
+                    <i class="fas fa-check-circle"></i> تم إنجاز العمل الميداني
+                </button>
+            </div>
+        `;
+    }
+
+    function openMapNavigation(address) {
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank');
+    }
+
+    function postponeTask(orderId) {
+        const reason = prompt("حدد سبب تأجيل المهمة:", "انتظار قطع الغيار المعتمدة");
+        if(reason) {
+            socket.emit('tech_update_task', {
+                orderId: orderId,
+                status: `مؤجل: ${reason}`
+            });
+            alert("تم إشعار الإدارة والعميل بتأجيل الطلب.");
+        }
+    }
+
+    function quickNotifyClient(orderId) {
+        socket.emit('send_chat_message', {
+            orderId: orderId,
+            sender: 'الفني',
+            text: 'أنا متواجد الآن أمام المبنى.'
+        });
+        alert("تم إرسال إشعار الوصول إلى شاشة العميل مباشرة.");
+    }
+
+    function openFinishDialog() {
+        document.getElementById('finish-modal').style.display = 'flex';
+    }
+
+    function finalizeOrderToClient() {
+        const labor = parseFloat(document.getElementById('finish-labor-fee').value) || 0;
+        const parts = parseFloat(document.getElementById('finish-parts-cost').value) || 0;
+        const total = labor + parts;
+
+        socket.emit('tech_update_task', {
+            orderId: currentHandlingOrderId,
+            status: "تم الإنجاز / بإنتظار سداد العميل",
+            laborFee: labor,
+            partsFee: parts,
+            totalPrice: total
+        });
+
+        alert(`تم رفع الفاتورة الميدانية بإجمالي ${total} ر.س.`);
+        document.getElementById('finish-modal').style.display = 'none';
+    }
+</script>
+</body>
+</html>
