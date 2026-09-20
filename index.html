@@ -3,155 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مُتقن - البوابة الرئيسية للخدمات</title>
+    <title>مُتقن - منصة الخدمات الشاملة</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 480px; background: #fff; min-height: 100vh; margin: auto; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
-        .header { text-align: center; padding: 20px 0; border-bottom: 1px solid #e2e8f0; }
-        .header h1 { color: #0f172a; font-size: 1.5rem; margin-bottom: 5px; }
-        .header p { color: #64748b; font-size: 0.9rem; }
-        .content { padding: 20px 0; flex-grow: 1; }
-        .service-card { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .service-card h3 { color: #0284c7; margin-bottom: 8px; font-size: 1.1rem; }
-        .service-card p { color: #475569; font-size: 0.85rem; }
-        .footer-actions { padding: 15px 0; text-align: center; border-top: 1px solid #e2e8f0; }
-        input, button { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem; }
-        button { background-color: #0284c7; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background-color: #0369a1; }
-        .secondary-btn { background-color: #f1f5f9; color: #475569; }
-        .secondary-btn:hover { background-color: #e2e8f0; }
+        body { background-color: #f4f6f8; color: #1e293b; padding-bottom: 70px; }
+        
+        /* الهيدر العلوي */
+        .top-header { background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .location-box { font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 5px; }
+        .actions-box { display: flex; gap: 15px; align-items: center; }
+        .cart-icon { font-size: 1.2rem; cursor: pointer; }
+
+        /* البنر الترويجي */
+        .promo-banner { background: linear-gradient(135deg, #7c3aed, #4f46e5); color: white; margin: 15px; border-radius: 16px; padding: 20px; text-align: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2); }
+        .promo-banner h3 { font-size: 1.1rem; margin-bottom: 8px; }
+        .promo-banner p { font-size: 1.5rem; font-weight: bold; }
+
+        /* شبكة الخدمات */
+        .section-title { padding: 0 20px; font-size: 1.1rem; font-weight: bold; margin: 20px 0 10px; color: #0f172a; }
+        .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 0 15px; }
+        .service-card { background: #fff; border-radius: 12px; padding: 15px 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); cursor: pointer; transition: 0.2s; border: 1px solid #f1f5f9; }
+        .service-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .service-icon { font-size: 1.8rem; margin-bottom: 8px; display: block; }
+        .service-name { font-size: 0.85rem; color: #334155; font-weight: 600; }
+
+        /* القائمة السفلية الثابتة */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #e2e8f0; z-index: 1000; }
+        .nav-item { text-align: center; color: #64748b; text-decoration: none; font-size: 0.75rem; cursor: pointer; flex: 1; }
+        .nav-item.active { color: #059669; font-weight: bold; }
+        .nav-icon { font-size: 1.3rem; display: block; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
-    <div id="app" class="container">
-        <!-- المحتوى الافتراضي لواجهة الزوار -->
-        <div>
-            <div class="header">
-                <h1>مؤسسة أكسجين / مُتقن</h1>
-                <p>بوابة صيانة وخدمات التكييف والتبريد الشاملة</p>
-            </div>
-            <div class="content">
-                <div class="service-card">
-                    <h3>خدمات الصيانة والتركيب</h3>
-                    <p>نقدم خدمات متكاملة لصيانة المكيفات المركزية والاسبلت وغرف التبريد بجودة عالية.</p>
-                </div>
-                <div class="service-card">
-                    <h3>معرفة ودعم فني</h3>
-                    <p>استكشف أحدث التقنيات والحلول الهندسية المعتمدة في إدارة ورش الصيانة.</p>
-                </div>
-            </div>
+    <!-- الهيدر العلوي -->
+    <div class="top-header">
+        <div class="location-box">
+            <span>📍</span>
+            <span>الإننتصار، 3481، حي الع...</span>
         </div>
-        
-        <div class="footer-actions">
-            <button onclick="showLoginScreen()">تسجيل الدخول / لوحة التحكم</button>
+        <div class="actions-box">
+            <span class="cart-icon">🛒</span>
+            <span style="background: #f1f5f9; padding: 5px 10px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; color: #059669;">⚖️ 0.00 ر.س</span>
         </div>
     </div>
 
+    <!-- البنر الترويجي -->
+    <div class="promo-banner">
+        <h3>اشتراك في فني Happy واحصل على</h3>
+        <p>30% كاش باك على كل طلب</p>
+    </div>
+
+    <!-- شبكة أهم الخدمات -->
+    <div class="section-title">أهم الخدمات 🧡 صارت أقرب لك 🚀</div>
+    <div class="services-grid">
+        <div class="service-card" onclick="openService('سباكة')">
+            <span class="service-icon">🚰</span>
+            <span class="service-name">سباكة</span>
+        </div>
+        <div class="service-card" onclick="openService('كهرباء')">
+            <span class="service-icon">🔌</span>
+            <span class="service-name">كهرباء</span>
+        </div>
+        <div class="service-card" onclick="openService('أجهزة منزلية')">
+            <span class="service-icon">🧺</span>
+            <span class="service-name">أجهزة منزلية</span>
+        </div>
+        <div class="service-card" onclick="openService('ستلايت')">
+            <span class="service-icon">📡</span>
+            <span class="service-name">ستلايت</span>
+        </div>
+        <div class="service-card" onclick="openService('نجارة')">
+            <span class="service-icon">🪚</span>
+            <span class="service-name">نجارة</span>
+        </div>
+        <div class="service-card" onclick="openService('تكييف')">
+            <span class="service-icon">❄️</span>
+            <span class="service-name">تكييف</span>
+        </div>
+        <div class="service-card" onclick="openService('تنظيف')">
+            <span class="service-icon">🧹</span>
+            <span class="service-name">تنظيف</span>
+        </div>
+        <div class="service-card" onclick="openService('دهان')">
+            <span class="service-icon">🎨</span>
+            <span class="service-name">دهان</span>
+        </div>
+    </div>
+
+    <!-- القائمة السفلية الثابتة (مطابقة للصورة الأصلية) -->
+    <div class="bottom-nav">
+        <a class="nav-item" onclick="navigate('settings')">
+            <span class="nav-icon">👤</span>
+            الإعدادات / الحساب
+        </a>
+        <a class="nav-item" onclick="navigate('stores')">
+            <span class="nav-icon">🏪</span>
+            المتاجر
+        </a>
+        <a class="nav-item" onclick="navigate('offers')">
+            <span class="nav-icon">🏷️</span>
+            العروض
+        </a>
+        <a class="nav-item" onclick="navigate('orders')">
+            <span class="nav-icon">📋</span>
+            الطلبات
+        </a>
+        <a class="nav-item active" onclick="navigate('home')">
+            <span class="nav-icon">🏠</span>
+            الرئيسية
+        </a>
+    </div>
+
     <script>
-        // التحقق التلقائي إذا كان المستخدم مسجل مسبقاً وتوجيهه لنطاقه المخصص
-        window.onload = function() {
-            const activeUser = localStorage.getItem('activeUser');
-            if (activeUser) {
-                try {
-                    const user = JSON.parse(activeUser);
-                    redirectToRoleDomain(user.role);
-                } catch (e) {
-                    // البقاء في واجهة الزوار إذا حدث خطأ في البيانات المخزنة
+        function openService(serviceName) {
+            alert('أهلاً بك! تم اختيار خدمة: '  + serviceName + '. جاري فتح تفاصيل الخدمة...');
+        }
+
+        function navigate(page) {
+            if (page === 'settings') {
+                // التحقق إذا كان مسجلاً مسبقاً يوجهه لدومينه، وإلا ينقله لصفحة تسجيل الدخول
+                const activeUser = localStorage.getItem('activeUser');
+                if (activeUser) {
+                    try {
+                        const user = JSON.parse(activeUser);
+                        const domains = {
+                            'client': 'https://client.oxygen11.com',
+                            'admin': 'https://admin.oxygen11.com',
+                            'owner': 'https://owner.oxygen11.com',
+                            'technician': 'https://technician.oxygen11.com'
+                        };
+                        if(domains[user.role]) {
+                            window.location.href = domains[user.role];
+                            return;
+                        }
+                    } catch(e) {}
                 }
-            }
-        };
-
-        function showLoginScreen() {
-            document.getElementById('app').innerHTML = `
-                <div>
-                    <div class="header">
-                        <h1>تسجيل الدخول</h1>
-                        <p>أدخل بيانات الحساب للمتابعة</p>
-                    </div>
-                    <div class="content" style="margin-top: 20px;">
-                        <input type="text" id="userInput" placeholder="رقم الهاتف أو الاسم">
-                        <input type="password" id="passInput" placeholder="الرقم السري">
-                        <button onclick="handleLogin()">دخول</button>
-                        <button class="secondary-btn" onclick="showRegisterScreen()">إنشاء حساب جديد</button>
-                    </div>
-                </div>
-                <div class="footer-actions">
-                    <button class="secondary-btn" onclick="location.reload()">العودة للرئيسية</button>
-                </div>
-            `;
-        }
-
-        function showRegisterScreen() {
-            document.getElementById('app').innerHTML = `
-                <div>
-                    <div class="header">
-                        <h1>حساب جديد</h1>
-                        <p>انضم إلى منصة مُتقن</p>
-                    </div>
-                    <div class="content" style="margin-top: 10px;">
-                        <input type="text" id="regName" placeholder="الاسم">
-                        <input type="text" id="regPhone" placeholder="رقم الهاتف">
-                        <input type="password" id="regPassword" placeholder="الرقم السري">
-                        <select id="regRole" style="width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 8px;">
-                            <option value="client">عميل</option>
-                            <option value="technician">فني</option>
-                            <option value="owner">المدير (أونر)</option>
-                            <option value="admin">شركة / أدمن</option>
-                        </select>
-                        <button onclick="handleRegister()">تسجيل الحساب</button>
-                    </div>
-                </div>
-                <div class="footer-actions">
-                    <button class="secondary-btn" onclick="showLoginScreen()">لدي حساب بالفعل</button>
-                </div>
-            `;
-        }
-
-        function handleLogin() {
-            const input = document.getElementById('userInput').value;
-            const password = document.getElementById('passInput').value;
-
-            const users = JSON.parse(localStorage.getItem('systemUsers')) || [];
-            const user = users.find(u => (u.phone === input || u.name === input) && u.password === password);
-
-            if (user) {
-                localStorage.setItem('activeUser', JSON.stringify(user));
-                redirectToRoleDomain(user.role);
+                // لو مش مسجل، افتح صفحة تسجيل الدخول الحرة
+                window.location.href = 'login.html';
             } else {
-                alert('بيانات الدخول غير صحيحة.');
-            }
-        }
-
-        function handleRegister() {
-            const name = document.getElementById('regName').value;
-            const phone = document.getElementById('regPhone').value;
-            const password = document.getElementById('regPassword').value;
-            const role = document.getElementById('regRole').value;
-
-            if (!name || !phone || !password) {
-                alert('الرجاء تعبئة جميع الحقول.');
-                return;
-            }
-
-            let users = JSON.parse(localStorage.getItem('systemUsers')) || [];
-            users.push({ name, phone, password, role });
-            localStorage.setItem('systemUsers', JSON.stringify(users));
-            alert('تم إنشاء الحساب بنجاح!');
-            showLoginScreen();
-        }
-
-        function redirectToRoleDomain(role) {
-            const domains = {
-                'client': 'https://client.oxygen11.com',
-                'admin': 'https://admin.oxygen11.com',
-                'owner': 'https://owner.oxygen11.com',
-                'technician': 'https://technician.oxygen11.com'
-            };
-
-            if (domains[role]) {
-                window.location.href = domains[role];
+                alert('أنت الآن في صفحة: ' + page);
             }
         }
     </script>
