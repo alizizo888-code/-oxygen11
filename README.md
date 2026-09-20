@@ -50,7 +50,6 @@ git push origin main
 
 ### 🌐 الموقع المباشر
 
-👉 [airconditioningservicecontractor.com](https://airconditioningservicecontractor.com)
 
 ### 📋 المتطلبات
 
