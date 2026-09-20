@@ -1,12 +1,10 @@
 /**
- * auth-system.js
- * محرك الجلسات والتوجيه الصحيح لكل نطاق فرعي (Subdomain) بشكل مستقل
+ * auth-system.js (المحدث لحل مشكلة الارتداد للرئيسي)
  */
 const MotqanAuthSystem = (function () {
   const STORAGE_SESSION_KEY = 'motqan_active_session';
   const STORAGE_USERS_KEY = 'motqan_registered_users';
 
-  // جدول التوجيه الدقيق لكل دور إلى نطاقه الفرعي المخصص حصرياً
   const REDIRECT_DOMAINS = {
     client: 'https://client.oxygen11.com',
     tech: 'https://technician.oxygen11.com',
@@ -14,32 +12,30 @@ const MotqanAuthSystem = (function () {
     owner: 'https://owner.oxygen11.com'
   };
 
-  function getRegisteredUsers() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_USERS_KEY)) || {};
-    } catch (e) {
-      return {};
-    }
-  }
-
-  function saveRegisteredUsers(users) {
-    localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+  // دالة تشفير وتمرير الجلسة للنطاق الفرعي
+  function redirectToSubdomain(role, userData) {
+    if (!REDIRECT_DOMAINS[role]) return;
+    
+    // تحويل بيانات المستخدم لنص مشفر يُمرر للفرع
+    const sessionToken = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(userData)))));
+    const targetUrl = `${REDIRECT_DOMAINS[role]}/?auth_token=${sessionToken}`;
+    
+    window.location.replace(targetUrl);
   }
 
   return {
-    // 1. التحقق التلقائي عند فتح الموقع الرئيسي وتوجيه كل فرع لمكانه الصحيح
     autoRedirectIfLoggedIn: function () {
       try {
         const session = localStorage.getItem(STORAGE_SESSION_KEY);
         if (session) {
           const user = JSON.parse(session);
-          if (user && user.role && REDIRECT_DOMAINS[user.role]) {
-            // منع إعادة التوجيه اللانهائي إذا كان المستخدم موجوداً بالفعل في نفس النطاق الفرعي الخاص به
+          if (user && user.role) {
+            // فحص عشان ميعملش تحويل لو إحنا أصلاً في الفرع
             const currentHost = window.location.hostname;
-            const targetDomain = new URL(REDIRECT_DOMAINS[user.role]).hostname;
+            const targetHost = new URL(REDIRECT_DOMAINS[user.role]).hostname;
             
-            if (currentHost !== targetDomain) {
-              window.location.replace(REDIRECT_DOMAINS[user.role]);
+            if (currentHost !== targetHost && currentHost.includes('oxygen11.com')) {
+              redirectToSubdomain(user.role, user);
               return true;
             }
           }
@@ -50,35 +46,34 @@ const MotqanAuthSystem = (function () {
       return false;
     },
 
-    // 2. تسجيل حساب جديد وتوجيهه للنطاق الفرعي الخاص به فوراً
     register: function ({ name, phone, password, role }) {
       if (!phone || !password) throw new Error('يرجى إدخال الجوال وكلمة المرور');
 
-      const users = getRegisteredUsers();
+      const users = JSON.parse(localStorage.getItem(STORAGE_USERS_KEY) || '{}');
       const cleanPhone = phone.trim();
-
       const assignedRole = ['client', 'tech', 'supervisor', 'owner'].includes(role) ? role : 'client';
 
       const newUser = {
         name: (name || '').trim(),
         phone: cleanPhone,
         password: password.trim(),
-        role: assignedRole
+        role: assignedRole,
+        wallet: 0.0,
+        points: 50
       };
 
       users[cleanPhone] = newUser;
-      saveRegisteredUsers(users);
+      localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
       localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(newUser));
 
-      // التحويل للنطاق الفرعي الدقيق
-      window.location.replace(REDIRECT_DOMAINS[assignedRole]);
+      // تحويل فوري مع تمرير التوكن للفرع
+      redirectToSubdomain(assignedRole, newUser);
     },
 
-    // 3. تسجيل الدخول والتوجيه للنطاق الفرعي الخاص بالدور
     login: function ({ phone, password }) {
       if (!phone || !password) throw new Error('يرجى إدخال الجوال وكلمة المرور');
 
-      const users = getRegisteredUsers();
+      const users = JSON.parse(localStorage.getItem(STORAGE_USERS_KEY) || '{}');
       const user = users[phone.trim()];
 
       if (!user || user.password !== password.trim()) {
@@ -86,18 +81,10 @@ const MotqanAuthSystem = (function () {
       }
 
       localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(user));
-      
-      // التحويل للنطاق الفرعي الدقيق
-      window.location.replace(REDIRECT_DOMAINS[user.role]);
-    },
-
-    // 4. تسجيل الخروج والعودة للموقع الرئيسي (www.oxygen11.com)
-    logout: function () {
-      localStorage.removeItem(STORAGE_SESSION_KEY);
-      window.location.replace('https://www.oxygen11.com');
+      redirectToSubdomain(user.role, user);
     }
   };
 })();
 
-// تشغيل الفحص اللحظي فور التحميل
+// تشغيل الفحص التلقائي
 MotqanAuthSystem.autoRedirectIfLoggedIn();
