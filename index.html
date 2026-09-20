@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مُتقن - البوابة الرئيسية</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .loading-screen { text-align: center; font-size: 1.2rem; color: #0284c7; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <div class="loading-screen" id="loadingText">جاري التحقق من بيانات الحساب...</div>
+    </div>
+
+    <script>
+        // التحقق الفوري من حالة الدخول عند تحميل الصفحة الرئيسية
+        window.onload = function() {
+            setTimeout(checkUserSession, 400);
+        };
+
+        function checkUserSession() {
+            const activeUser = localStorage.getItem('activeUser');
+            
+            if (activeUser) {
+                try {
+                    const user = JSON.parse(activeUser);
+                    redirectToRoleDomain(user.role);
+                } catch (e) {
+                    console.error('خطأ في قراءة بيانات المستخدم');
+                    showVisitorInterface();
+                }
+            } else {
+                showVisitorInterface();
+            }
+        }
+
+        function redirectToRoleDomain(role) {
+            const domains = {
+                'client': 'https://client.oxygen11.com',
+                'admin': 'https://admin.oxygen11.com',
+                'owner': 'https://owner.oxygen11.com',
+                'technician': 'https://technician.oxygen11.com'
+            };
+
+            if (domains[role]) {
+                window.location.href = domains[role];
+            } else {
+                showVisitorInterface();
+            }
+        }
+
+        function showVisitorInterface() {
+            // إظهار واجهة الزوار والخدمات والتصميم الظاهر في الصور
+            document.getElementById('app').innerHTML = `
+                <div style="width: 100%; max-width: 480px; background: #fff; min-height: 100vh; margin: auto; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+                    <h2 style="color: #0f172a; margin-bottom: 15px; text-align: center;">مرحباً بك في مُتقن</h2>
+                    <p style="text-align: center; color: #64748b; margin-bottom: 25px;">بوابة خدمات الصيانة الشاملة</p>
+                    <div style="background: #0284c7; color: white; padding: 15px; text-align: center; border-radius: 10px; cursor: pointer; font-weight: bold;" onclick="goToLogin()">
+                        تسجيل الدخول / إنشاء حساب
+                    </div>
+                </div>
+            `;
+        }
+
+        function goToLogin() {
+            // يمكن توجيه المستخدم لصفحة تسجيل الدخول أو إظهار نموذج التسجيل
+            alert الانتقال لصفحة تسجيل الدخول لتحديد الدور (عميل / فني / أدمن);
+        }
+    </script>
+</body>
+</html>
