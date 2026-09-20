@@ -3,53 +3,47 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>اللوحة السيادية للمالك (علي) | مُتقن</title>
-  <script src="./motqan-global-header.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <title>لوحة المالك السيادية | مُتقن</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://www.oxygen11.com/oxygen_core/oxygen-theme.css"/>
 
   <script>
     (function checkOwner() {
-      const s = JSON.parse(localStorage.getItem('motqan_owner_session') || '{}');
-      if (s.role !== 'owner') {
-        const pin = prompt('أدخل الرمز السري الحصري للمالك (علي: 789512364):');
-        if (pin === '789512364') {
-          localStorage.setItem('motqan_owner_session', JSON.stringify({ role: 'owner', name: 'علي' }));
-        } else {
-          alert('غير مصرح بالدخول!');
-          window.location.replace('https://www.oxygen11.com');
-        }
+      const pin = prompt('أدخل الرمز السري للمالك (علي: 789512364):');
+      if (pin !== '789512364') {
+        alert('غير مصرح لك بالدخول!');
+        window.location.replace('https://client.oxygen11.com');
       }
     })();
   </script>
 </head>
-<body class="min-h-screen flex justify-center items-start p-0 sm:py-6">
-  <div class="w-full max-w-4xl bg-slate-900 text-white min-h-screen rounded-3xl p-5 space-y-4 shadow-2xl border border-amber-500/30">
+<body class="min-h-screen bg-[#070d18] flex justify-center items-start p-0 sm:py-6 text-white font-['Cairo']">
+  <div class="w-full max-w-4xl bg-slate-900 rounded-3xl p-5 space-y-4 shadow-2xl border border-amber-500/30">
     <header class="flex items-center justify-between border-b border-slate-800 pb-3">
       <div class="flex items-center gap-2.5">
         <div class="w-10 h-10 bg-amber-500/20 text-amber-400 rounded-xl flex items-center justify-center font-black text-xl border border-amber-500/30">👑</div>
         <div>
           <h1 class="font-black text-sm">لوحة تحكم المالك (علي)</h1>
-          <p class="text-[10px] text-amber-400">صلاحيات سيادية كاملة على كافة الفروع</p>
+          <p class="text-[10px] text-amber-400">owner.oxygen11.com • صلاحيات سيادية كاملة</p>
         </div>
       </div>
-      <button onclick="localStorage.removeItem('motqan_owner_session'); window.location.replace('https://www.oxygen11.com');" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-xl text-xs font-bold border border-red-500/30">قفل الجلسة</button>
+      <button onclick="window.location.replace('https://client.oxygen11.com')" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-xl text-xs font-bold border border-red-500/30">
+        قفل الجلسة
+      </button>
     </header>
 
-    <div class="grid grid-cols-3 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-        <span class="text-xs text-slate-400 font-bold block">إيقاف استقبال الطلبات كلياً</span>
-        <button onclick="alert('تم تجميد المنصة لكافة العملاء')" class="mt-2 w-full py-2 bg-red-600 text-white font-black text-xs rounded-xl">إيقاف الطوارئ</button>
+        <span class="text-xs text-slate-400 font-bold block">إيقاف استقبال الطلبات</span>
+        <button onclick="alert('تم تجميد المنظومة كلياً')" class="mt-2 w-full py-2 bg-red-600 text-white font-bold text-xs rounded-xl">
+          إيقاف الطوارئ كلياً
+        </button>
       </div>
       <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-        <span class="text-xs text-slate-400 font-bold block">تعديل التسعيرة الرسمية</span>
-        <button onclick="alert('تم نشر جدول الأسعار الجديد لكافة الفروع ومستشار الذكاء الاصطناعي')" class="mt-2 w-full py-2 bg-[#006948] text-white font-black text-xs rounded-xl">تحديث الأسعار</button>
-      </div>
-      <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-        <span class="text-xs text-slate-400 font-bold block">إدارة المشتركين</span>
-        <a href="https://admin.oxygen11.com/admin-users-manager.html" class="mt-2 block text-center py-2 bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-600">لوحة المشتركين</a>
+        <span class="text-xs text-slate-400 font-bold block">الانتقال لفرع المشرفين</span>
+        <button onclick="window.location.replace('https://admin.oxygen11.com')" class="mt-2 w-full py-2 bg-[#006948] text-white font-bold text-xs rounded-xl">
+          فتح لوحة المشرف admin
+        </button>
       </div>
     </div>
   </div>
