@@ -3,36 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول - تطبيق مُتقن</title>
+    <title>تسجيل الدخول - نظام متقن</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0f172a; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-box { background: #1e293b; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; width: 320px; border: 1px solid #334155; }
-        h1 { color: #38bdf8; margin-bottom: 20px; font-size: 1.4rem; }
-        input[type="password"] { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; text-align: center; font-size: 1.2rem; box-sizing: border-box; }
-        button { width: 100%; background: #0284c7; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.2s; }
-        button:hover { background: #0369a1; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; text-align: center; padding: 50px; }
+        .container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block; width: 300px; }
+        input, button { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        button { background-color: #28a745; color: white; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #218838; }
+        .toggle-btn { background-color: #007bff; }
+        .toggle-btn:hover { background-color: #0056b3; }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h1>بوابة تسجيل الدخول</h1>
-        <input type="password" id="passInput" placeholder="أدخل رقم الصلاحية (1 إلى 4)" autofocus>
-        <button onclick="routeUser()">دخول النظام</button>
+
+    <div class="container" id="loginBox">
+        <h2>تسجيل الدخول</h2>
+        <input type="text" id="loginInput" placeholder="رقم الهاتف أو الاسم">
+        <input type="password" id="loginPassword" placeholder="الرقم السري">
+        <button onclick="handleLogin()">دخول</button>
+        <button class="toggle-btn" onclick="showRegister()">إنشاء حساب جديد</button>
+    </div>
+
+    <div class="container" id="registerBox" style="display: none;">
+        <h2>إنشاء حساب</h2>
+        <input type="text" id="regName" placeholder="الاسم">
+        <input type="text" id="regPhone" placeholder="رقم التليفون">
+        <input type="password" id="regPassword" placeholder="الرقم السري">
+        <select id="regRole" style="width: 95%; padding: 10px; margin: 10px 0;">
+            <option value="client">عميل</option>
+            <option value="technician">فني</option>
+            <option value="owner">المدير (أونر)</option>
+            <option value="admin">شركة / أدمن</option>
+        </select>
+        <button onclick="handleRegister()">تسجيل</button>
+        <button class="toggle-btn" onclick="showLogin()">لدي حساب بالفعل</button>
     </div>
 
     <script>
-        function routeUser() {
-            const val = document.getElementById('passInput').value.trim();
-            if (val === '1') {
-                window.location.href = 'client/index.html';
-            } else if (val === '2') {
-                window.location.href = 'admin/index.html';
-            } else if (val === '3') {
-                window.location.href = 'owner/index.html';
-            } else if (val === '4') {
-                window.location.href = 'channel/index.html';
+        // قاعدة بيانات مبدئية مخزنة محلياً ويتم تسجيل حساب المدير الافتراضي بها
+        const defaultUsers = [
+            { name: "علي", phone: "owner", password: "789512364", role: "owner" }
+        ];
+
+        if (!localStorage.getItem('systemUsers')) {
+            localStorage.setItem('systemUsers', JSON.stringify(defaultUsers));
+        }
+
+        function showRegister() {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('registerBox').style.display = 'inline-block';
+        }
+
+        function showLogin() {
+            document.getElementById('registerBox').style.display = 'none';
+            document.getElementById('loginBox').style.display = 'inline-block';
+        }
+
+        function handleRegister() {
+            const name = document.getElementById('regName').value;
+            const phone = document.getElementById('regPhone').value;
+            const password = document.getElementById('regPassword').value;
+            const role = document.getElementById('regRole').value;
+
+            if (!name || !phone || !password) {
+                alert('الرجاء ملء جميع البيانات.');
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('systemUsers'));
+            users.push({ name, phone, password, role });
+            localStorage.setItem('systemUsers', JSON.stringify(users));
+            alert('تم تسجيل الحساب بنجاح!');
+            showLogin();
+        }
+
+        function handleLogin() {
+            const input = document.getElementById('loginInput').value;
+            const password = document.getElementById('loginPassword').value;
+
+            let users = JSON.parse(localStorage.getItem('systemUsers'));
+            const user = users.find(u => (u.phone === input || u.name === input) && u.password === password);
+
+            if (user) {
+                redirectUser(user.role);
             } else {
-                alert('رمز الدخول غير صحيح! الرجاء إدخال رقم من 1 إلى 4.');
+                alert('خطأ في البيانات أو الرقم السري غير صحيح.');
+            }
+        }
+
+        function redirectUser(role) {
+            if (role === 'client') {
+                window.location.href = 'https://client.oxygen11.com';
+            } else if (role === 'admin') {
+                window.location.href = 'https://admin.oxygen11.com';
+            } else if (role === 'owner') {
+                window.location.href = 'https://owner.oxygen11.com';
+            } else if (role === 'technician') {
+                window.location.href = 'https://technician.oxygen11.com';
+            } else {
+                alert('دور المستخدم غير معروف.');
             }
         }
     </script>
