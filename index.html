@@ -1,40 +1,114 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html dir="rtl" lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
     <title>مُتقن - البوابة الرئيسية</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .loading-screen { text-align: center; font-size: 1.2rem; color: #0284c7; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-    <div id="app">
-        <div class="loading-screen" id="loadingText">جاري التحقق من بيانات الحساب...</div>
-    </div>
-
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // التحقق الفوري من حالة الدخول عند تحميل الصفحة الرئيسية
-        window.onload = function() {
-            setTimeout(checkUserSession, 400);
-        };
-
-        function checkUserSession() {
+        // التحقق التلقائي عند فتح الموقع: لو المستخدم مسجل دخول قبل كده، يوجهه لدومينه الفرعي فوراً
+        (function() {
             const activeUser = localStorage.getItem('activeUser');
-            
             if (activeUser) {
                 try {
                     const user = JSON.parse(activeUser);
-                    redirectToRoleDomain(user.role);
+                    const domains = {
+                        'client': 'https://client.oxygen11.com',
+                        'admin': 'https://admin.oxygen11.com',
+                        'owner': 'https://owner.oxygen11.com',
+                        'technician': 'https://technician.oxygen11.com'
+                    };
+                    if (domains[user.role]) {
+                        window.location.href = domains[user.role];
+                        return;
+                    }
                 } catch (e) {
-                    console.error('خطأ في قراءة بيانات المستخدم');
-                    showVisitorInterface();
+                    console.error('خطأ في قراءة البيانات');
                 }
+            }
+        })();
+    </script>
+</head>
+<body class="bg-slate-50 font-['Be_Vietnam_Pro'] text-slate-900 pt-safe pb-safe flex flex-col min-h-screen">
+    <main class="flex flex-col flex-1 relative w-full px-4 max-w-md mx-auto pb-24">
+        <!-- رأس الصفحة / الموقع -->
+        <header class="flex flex-col gap-3.5 pt-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white shadow-sm">
+                    <span class="material-symbols-outlined text-emerald-600 text-[20px]">location_on</span>
+                    <span class="text-sm font-semibold text-slate-800">مكة المكرمة وجدة</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="handleAccountClick()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 font-bold shadow-sm">
+                        <span class="material-symbols-outlined text-[18px]">person</span>
+                        <span>حسابي / دخول</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- الترحيب بالموقع -->
+            <div>
+                <h1 class="text-2xl font-extrabold text-slate-900 flex items-center gap-1.5">
+                    مرحباً بك في مُتقن <span>👋</span>
+                </h1>
+                <p class="text-xs text-slate-500">إحدى مبادرات مؤسسة أكسجين للصيانة والمقاولات العامة</p>
+            </div>
+        </header>
+
+        <!-- البنر الرئيسي -->
+        <section class="mt-4 relative overflow-hidden rounded-2xl bg-gradient-to-l from-emerald-700 to-emerald-900 text-white shadow-md p-4 flex flex-col justify-between min-h-[150px]">
+            <div class="z-10">
+                <span class="bg-amber-500 text-white text-xs px-2.5 py-0.5 rounded-full font-bold">عروض باقات التوفير</span>
+                <h2 class="text-xl font-bold mt-1">كاش باك 30% على كل طلب</h2>
+                <p class="text-xs text-emerald-100 mt-1">خصومات موسمية فورية على جميع أعمال السباكة، الكهرباء وغسيل المكيفات.</p>
+            </div>
+        </section>
+
+        <!-- الخدمات المتاحة -->
+        <section class="mt-6 space-y-3">
+            <h2 class="text-lg font-bold text-slate-900">أهم الخدمات المتاحة 🛠️</h2>
+            <div class="grid grid-cols-3 gap-3">
+                <div class="p-3 rounded-xl bg-white shadow-sm text-center">
+                    <span class="material-symbols-outlined text-emerald-600 text-3xl">mode_fan</span>
+                    <p class="text-xs font-bold mt-1">صيانة وتكييف</p>
+                </div>
+                <div class="p-3 rounded-xl bg-white shadow-sm text-center">
+                    <span class="material-symbols-outlined text-emerald-600 text-3xl">bolt</span>
+                    <p class="text-xs font-bold mt-1">كهرباء</p>
+                </div>
+                <div class="p-3 rounded-xl bg-white shadow-sm text-center">
+                    <span class="material-symbols-outlined text-emerald-600 text-3xl">faucet</span>
+                    <p class="text-xs font-bold mt-1">سباكة</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- الشريط السفلي للتطبيق -->
+    <nav class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md shadow-lg z-50 px-2 py-2 flex items-center justify-around border-t border-slate-100">
+        <button class="flex flex-col items-center text-emerald-600 font-bold">
+            <span class="material-symbols-outlined text-2xl">home</span>
+            <span class="text-[10px]">الرئيسية</span>
+        </button>
+        <button onclick="handleAccountClick()" class="flex flex-col items-center text-slate-500">
+            <span class="material-symbols-outlined text-2xl">person</span>
+            <span class="text-[10px]">حسابي</span>
+        </button>
+    </nav>
+
+    <script>
+        // دالة التعامل عند الضغط على زر الحساب أو تسجيل الدخول
+        function handleAccountClick() {
+            const activeUser = localStorage.getItem('activeUser');
+            if (activeUser) {
+                const user = JSON.parse(activeUser);
+                redirectToRoleDomain(user.role);
             } else {
-                showVisitorInterface();
+                // لو مش مسجل، توجيهه لصفحة التسجيل أو نافذة تسجيل الدخول
+                alert("يرجى تسجيل الدخول لاختيار حسابك (عميل، فني، أدمن)");
+                // يمكنك استبدال الـ alert بفتح صفحة تسجيل الدخول الداخلية الخاصة بك
             }
         }
 
@@ -45,30 +119,9 @@
                 'owner': 'https://owner.oxygen11.com',
                 'technician': 'https://technician.oxygen11.com'
             };
-
             if (domains[role]) {
                 window.location.href = domains[role];
-            } else {
-                showVisitorInterface();
             }
-        }
-
-        function showVisitorInterface() {
-            // إظهار واجهة الزوار والخدمات والتصميم الظاهر في الصور
-            document.getElementById('app').innerHTML = `
-                <div style="width: 100%; max-width: 480px; background: #fff; min-height: 100vh; margin: auto; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
-                    <h2 style="color: #0f172a; margin-bottom: 15px; text-align: center;">مرحباً بك في مُتقن</h2>
-                    <p style="text-align: center; color: #64748b; margin-bottom: 25px;">بوابة خدمات الصيانة الشاملة</p>
-                    <div style="background: #0284c7; color: white; padding: 15px; text-align: center; border-radius: 10px; cursor: pointer; font-weight: bold;" onclick="goToLogin()">
-                        تسجيل الدخول / إنشاء حساب
-                    </div>
-                </div>
-            `;
-        }
-
-        function goToLogin() {
-            // يمكن توجيه المستخدم لصفحة تسجيل الدخول أو إظهار نموذج التسجيل
-            alert الانتقال لصفحة تسجيل الدخول لتحديد الدور (عميل / فني / أدمن);
         }
     </script>
 </body>
