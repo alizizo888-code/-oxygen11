@@ -3,18 +3,24 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-<script src="./motqan-global-header.js"></script>
-  <title>بوابة العميل | مُتقن - أكسجين للصيانة والمقاولات</title>
-  <script src="./motqan-global-header.js"></script>
+  <title>مُتقن | أكسجين للصيانة والمقاولات</title>
+  
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://www.oxygen11.com/oxygen_core/oxygen-theme.css"/>
 
-  <!-- فحص الجلسة واستلام التوكن لمنع أي ارتداد -->
+  <style>
+    body { font-family: 'Cairo', sans-serif; background-color: #0b1320; color: #1e293b; user-select: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .press-scale:active { transform: scale(0.96); }
+  </style>
+
+  <!-- فك التوكن وتثبيته محلياً بدون أي توجيه خارجي -->
   <script>
-    (function initSession() {
-      const token = new URLSearchParams(window.location.search).get('auth_token');
+    (function initClient() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('auth_token');
       if (token) {
         try {
           const raw = decodeURIComponent(escape(atob(decodeURIComponent(token))));
@@ -22,634 +28,272 @@
           window.history.replaceState({}, document.title, window.location.pathname);
         } catch(e) { console.error(e); }
       }
-      const session = JSON.parse(localStorage.getItem('motqan_client_session') || '{}');
-      if (!session.phone && !token) {
-        window.location.replace('https://www.oxygen11.com');
-      }
     })();
   </script>
 </head>
 <body class="min-h-screen flex justify-center items-start p-0 sm:py-4">
 
-  <!-- إطار الموبايل المتجاوب -->
   <div class="w-full max-w-[440px] bg-[#F8FAFC] min-h-screen relative shadow-2xl flex flex-col sm:rounded-[36px] overflow-hidden pb-20">
 
-    <!-- شريط الرأس العلوي (الموقع والمحفظة والإشعارات) -->
-    <header class="bg-white border-b border-slate-100 px-4 py-2.5 sticky top-0 z-40 flex items-center justify-between shadow-2xs">
-      <div onclick="autoGetLocation()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 cursor-pointer press-scale max-w-[62%]">
-        <span class="material-symbols-outlined text-[#006948] text-[19px] shrink-0" style="font-variation-settings: 'FILL' 1;">location_on</span>
-        <div class="flex flex-col min-w-0">
-          <span class="text-[9px] text-slate-400 font-bold leading-tight">موقع تقديم الخدمة</span>
-          <div class="flex items-center gap-0.5">
-            <span id="loc-text" class="text-xs font-bold text-slate-800 truncate">جدة، حي الروضة - شارع الأمل</span>
-            <span class="material-symbols-outlined text-slate-400 text-[14px]">expand_more</span>
-          </div>
+    <!-- شريط الرأس الموحد -->
+    <header class="bg-white border-b border-slate-150 px-4 py-2.5 sticky top-0 z-40 flex items-center justify-between shadow-2xs">
+      <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('home')">
+        <div class="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200 text-[#006948] flex items-center justify-center font-black">
+          <span class="material-symbols-outlined text-lg">home_repair_service</span>
+        </div>
+        <div>
+          <span class="text-xs font-black text-slate-900 block leading-tight">مُتقن</span>
+          <span class="text-[9px] font-bold text-slate-400 block leading-tight">client.oxygen11.com</span>
         </div>
       </div>
 
       <div class="flex items-center gap-1.5">
-        <div onclick="switchTab('profile')" class="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-slate-800 cursor-pointer press-scale">
-          <span class="material-symbols-outlined text-[#006948] text-[17px]" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
-          <span id="wallet-balance-top" class="text-xs font-black text-emerald-800">150.00</span>
-          <span class="text-[9px] font-bold text-emerald-600">ر.س</span>
-        </div>
-        <button onclick="showToast('لا توجد إشعارات جديدة حالياً')" class="w-9 h-9 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-700 press-scale relative">
-          <span class="material-symbols-outlined text-[19px]">notifications</span>
-          <span class="absolute top-1.5 left-1.5 w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+        <button id="auth-action-btn" onclick="handleAuthButtonClick()" class="h-8 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-[#006948] text-xs font-black flex items-center gap-1 press-scale">
+          <span class="material-symbols-outlined text-sm">person</span>
+          <span id="auth-btn-label">دخول</span>
+        </button>
+
+        <!-- القفل السري للمالك والمشرف (باسوورد مشفر تماماً) -->
+        <button onclick="openSecurityGate()" title="بوابة الإدارة والمالك" class="w-8 h-8 rounded-xl bg-amber-50 border border-amber-300 text-amber-800 flex items-center justify-center press-scale">
+          <span class="material-symbols-outlined text-[17px]">lock</span>
         </button>
       </div>
     </header>
 
-    <!-- مساحة المحتوى المتبدل بسلاسة -->
+    <!-- المحتوى -->
     <main class="flex-1 overflow-y-auto no-scrollbar">
 
-      <!-- ================= 1. تبويب الرئيسية ================= -->
-      <section id="tab-home" class="view-container p-3.5 space-y-3.5">
-        <!-- رسالة الترحيب -->
-        <div class="flex items-center justify-between px-1">
-          <div>
-            <h1 class="text-base font-black text-slate-900 flex items-center gap-1.5">
-              مرحباً بك في مُتقن <span class="animate-bounce">👋</span>
-            </h1>
-            <p class="text-[10px] text-slate-500 font-medium">إحدى مبادرات مؤسسة أكسجين للصيانة والمقاولات العامة</p>
-          </div>
-          <div class="flex items-center gap-1 bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded-full text-[10px] font-bold">
-            <span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
-            <span>ضمان ذهبي</span>
-          </div>
-        </div>
-
-        <!-- حقل البحث السريع مع زر المساعد -->
-        <div class="relative flex items-center">
-          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[#006948]">
-            <span class="material-symbols-outlined text-[20px]">search</span>
-          </div>
-          <input id="search-input" onkeyup="filterServices(this.value)" class="w-full h-11 pr-10 pl-11 rounded-2xl bg-white border border-slate-200 text-slate-800 placeholder:text-slate-400 text-xs shadow-2xs focus:outline-none focus:border-[#006948] transition" placeholder="ابحث عن: غسيل مكيف، سباكة، كهربائي، قفل ذكي..." type="text"/>
-          <button onclick="switchTab('ai')" class="absolute inset-y-0 left-1.5 my-auto w-8 h-8 rounded-xl bg-emerald-50 text-[#006948] flex items-center justify-center press-scale">
-            <span class="material-symbols-outlined text-[18px]">smart_toy</span>
-          </button>
-        </div>
-
-        <!-- البانر الإعلاني الكبير المقتبس من الهوية -->
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-l from-[#006948] via-[#047857] to-[#065f46] text-white p-4 min-h-[160px] flex flex-col justify-between shadow-md">
-          <div class="absolute -left-6 -bottom-8 w-32 h-32 rounded-full bg-emerald-400/20 blur-xl pointer-events-none"></div>
-          <div class="relative z-10 flex items-start justify-between">
-            <div class="max-w-[78%] space-y-1">
-              <span class="inline-flex items-center gap-1 bg-amber-500 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-2xs">
-                <span class="material-symbols-outlined text-[12px]">local_fire_department</span>
-                عروض باقات التوفير الكبرى
-              </span>
-              <h2 class="text-base font-black leading-tight mt-1">كاش باك 30% على كل طلب</h2>
-              <p class="text-[11px] text-emerald-100 mt-0.5 leading-snug">خصومات موسمية فورية على جميع أعمال السباكة، الكهرباء وغسيل المكيفات.</p>
-            </div>
-            <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-amber-300">
-              <span class="material-symbols-outlined text-[30px]" style="font-variation-settings: 'FILL' 1;">stars</span>
-            </div>
-          </div>
-
-          <div class="relative z-10 flex items-center justify-between pt-3 mt-1">
-            <div class="flex items-center gap-2">
-              <button onclick="openBookingFlow('التكييف والتبريد', 115)" class="px-3.5 py-2 rounded-xl bg-white text-[#006948] font-black text-xs shadow-sm press-scale flex items-center gap-1">
-                <span>احجز فنيك الآن</span>
-                <span class="material-symbols-outlined text-[16px] rotate-180">arrow_back</span>
-              </button>
-              <span class="text-[10px] font-bold bg-emerald-900/60 text-emerald-200 px-2 py-1 rounded-lg border border-emerald-500/40">كود: OXYGEN30</span>
-            </div>
-            <span class="text-[10px] text-emerald-200 font-bold flex items-center gap-1">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              متاح لـ 24 ساعة
-            </span>
+      <!-- 1. الرئيسية -->
+      <section id="tab-home" class="p-3.5 space-y-3.5">
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-l from-[#006948] via-[#047857] to-[#065f46] text-white p-4 min-h-[150px] flex flex-col justify-between shadow-md">
+          <span class="self-start inline-flex items-center gap-1 bg-amber-500 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full">
+            عروض باقات التوفير الكبرى
+          </span>
+          <h2 class="text-base font-black leading-tight mt-1">كاش باك 30% على كل طلب صيانة</h2>
+          <p class="text-[11px] text-emerald-100">غسيل مكيف سبليت عميق بـ 115 ر.س فقط للجهاز</p>
+          <div class="flex items-center justify-between pt-2">
+            <button onclick="checkAuthAndOrder('صيانة وتكييف', 115)" class="px-3.5 py-2 rounded-xl bg-white text-[#006948] font-black text-xs press-scale">
+              احجز فنيك الآن
+            </button>
+            <span class="text-[10px] bg-emerald-900/60 text-emerald-200 px-2 py-1 rounded-lg border border-emerald-500/40 font-bold">كود: OXYGEN30</span>
           </div>
         </div>
 
-        <!-- شريط الضمان الذهبي 30 يوماً المعتمد -->
-        <div class="flex items-center justify-between p-3 rounded-2xl bg-[#fffbeb] border border-[#fde68a] text-[#92400e] shadow-2xs">
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">verified</span>
-            </div>
-            <div>
-              <p class="text-xs font-black">ضمان أكسجين الذهبي المعتمد 30 يوماً</p>
-              <p class="text-[10px] text-amber-800">إعادة خدمة مجانية أو استرداد كامل المبلغ في حال عدم الرضا</p>
-            </div>
-          </div>
-          <span class="material-symbols-outlined text-amber-700 text-[18px]">arrow_back_ios</span>
-        </div>
-
-        <!-- شبكة الخدمات الرئيسية (مطابقة لتوزيع الأيقونات في الشاشة) -->
-        <div class="space-y-2.5">
-          <div class="flex items-end justify-between px-1">
-            <div>
-              <h2 class="text-sm font-black text-slate-900 flex items-center gap-1.5">أهم الخدمات المتاحة 🛠️</h2>
-              <p class="text-[10px] text-slate-500">فنيون معتمدون، تسعيرة واضحة، وأمان مضمون</p>
-            </div>
-            <span class="text-[11px] font-bold text-[#006948]">عرض 18 خدمة &gt;</span>
-          </div>
-
-          <div class="grid grid-cols-4 gap-2" id="services-grid">
-            <!-- صيانة وتكييف -->
-            <div onclick="openBookingFlow('صيانة وتكييف', 115)" class="col-span-2 p-3 rounded-2xl bg-white border border-[#006948] shadow-2xs flex flex-col justify-between cursor-pointer press-scale relative">
-              <span class="self-start px-2 py-0.5 rounded-full bg-[#006948] text-white text-[9px] font-black mb-1">الأكثر طلباً</span>
-              <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-[#006948] mb-1.5">
-                <span class="material-symbols-outlined text-[24px]">mode_fan</span>
-              </div>
-              <div>
-                <h3 class="font-black text-xs text-slate-900">صيانة وتكييف</h3>
-                <p class="text-[10px] text-slate-500 mt-0.5">غسيل، فك وتركيب، فريون</p>
-              </div>
-            </div>
-
-            <!-- كهرباء -->
-            <div onclick="openBookingFlow('كهرباء', 120)" class="p-2.5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex flex-col items-center text-center justify-between cursor-pointer press-scale">
-              <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 mb-1">
-                <span class="material-symbols-outlined text-[22px]">bolt</span>
-              </div>
-              <span class="font-bold text-[11px] text-slate-800">كهرباء</span>
-            </div>
-
-            <!-- سباكة -->
-            <div onclick="openBookingFlow('سباكة', 180)" class="p-2.5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex flex-col items-center text-center justify-between cursor-pointer press-scale">
-              <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-1">
-                <span class="material-symbols-outlined text-[22px]">faucet</span>
-              </div>
-              <span class="font-bold text-[11px] text-slate-800">سباكة</span>
-            </div>
-
-            <!-- أقفال ونجارة -->
-            <div onclick="openBookingFlow('أقفال ونجارة', 150)" class="p-2.5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex flex-col items-center text-center justify-between cursor-pointer press-scale">
-              <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 mb-1">
-                <span class="material-symbols-outlined text-[22px]">lock</span>
-              </div>
-              <span class="font-bold text-[10px] text-slate-800">أقفال ونجارة</span>
-            </div>
-
-            <!-- أجهزة منزلية -->
-            <div onclick="openBookingFlow('أجهزة منزلية', 95)" class="p-2.5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex flex-col items-center text-center justify-between cursor-pointer press-scale">
-              <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-700 mb-1">
-                <span class="material-symbols-outlined text-[22px]">local_laundry_service</span>
-              </div>
-              <span class="font-bold text-[10px] text-slate-800">أجهزة منزلية</span>
-            </div>
-
-            <!-- ستالايت ودش -->
-            <div onclick="openBookingFlow('ستالايت ودش', 85)" class="p-2.5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex flex-col items-center text-center justify-between cursor-pointer press-scale">
-              <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center text-sky-700 mb-1">
-                <span class="material-symbols-outlined text-[22px]">satellite_alt</span>
-              </div>
-              <span class="font-bold text-[10px] text-slate-800">ستالايت ودش</span>
-            </div>
-
-            <!-- دهان وديكور -->
-            <div onclick="openBookingFlow('دهان وديكور', 18)" class="p-2.5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex flex-col items-center text-center justify-between cursor-pointer press-scale">
-              <div class="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-700 mb-1">
-                <span class="material-symbols-outlined text-[22px]">format_paint</span>
-              </div>
-              <span class="font-bold text-[10px] text-slate-800">دهان وديكور</span>
-            </div>
-
-            <!-- مقاولات عامة وإشراف -->
-            <div onclick="openBookingFlow('مقاولات عامة', 32)" class="col-span-2 p-3 rounded-2xl bg-slate-100 text-slate-900 border border-slate-200 shadow-2xs flex items-center justify-between cursor-pointer press-scale">
-              <div class="flex items-center gap-2.5">
-                <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-[#006948] shadow-2xs shrink-0">
-                  <span class="material-symbols-outlined text-[22px]">engineering</span>
-                </div>
-                <div>
-                  <h3 class="font-black text-xs">مقاولات عامة وإشراف</h3>
-                  <p class="text-[10px] text-slate-500">عزل فوم، كوادر هندسية</p>
-                </div>
-              </div>
-              <span class="material-symbols-outlined text-[#006948] text-[18px]">chevron_left</span>
-            </div>
-
-            <!-- كاميرات ومراقبة -->
-            <div onclick="openBookingFlow('كاميرات ومراقبة', 200)" class="col-span-2 p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between cursor-pointer press-scale">
-              <div class="flex items-center gap-2.5">
-                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-700 shrink-0">
-                  <span class="material-symbols-outlined text-[22px]">videocam</span>
-                </div>
-                <div>
-                  <h3 class="font-black text-xs">كاميرات وأمن ذكي</h3>
-                  <p class="text-[10px] text-slate-500">تركيب وبرمجة أنظمة المراقبة</p>
-                </div>
-              </div>
-              <span class="material-symbols-outlined text-slate-400 text-[18px]">chevron_left</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- بطاقة الطلب النشط المباشر مع زر الاتصال -->
-        <div onclick="switchTab('orders')" class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between cursor-pointer press-scale">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
-              <span class="material-symbols-outlined">person</span>
-            </div>
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-black text-slate-900">الفني: ريان العمري</span>
-                <span class="px-2 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">في الطريق 🚗</span>
-              </div>
-              <p class="text-[10px] text-slate-500 mt-0.5">فحص تسريب سباكة • وصول متوقع 15 دقيقة</p>
-            </div>
-          </div>
-          <a href="tel:0500000000" onclick="event.stopPropagation()" class="w-9 h-9 rounded-full bg-[#006948] text-white flex items-center justify-center press-scale">
-            <span class="material-symbols-outlined text-base">call</span>
-          </a>
-        </div>
-      </section>
-
-      <!-- ================= 2. تبويب الطلبات ================= -->
-      <section id="tab-orders" class="view-container hidden p-3.5 space-y-3">
-        <h2 class="text-sm font-black text-slate-900">سجل الطلبات والمتابعة</h2>
-        <div id="orders-list" class="space-y-2.5">
-          <!-- بطاقة طلب جارية -->
-          <div class="bg-white border-2 border-[#006948] rounded-2xl p-3.5 shadow-xs space-y-2.5">
-            <div class="flex items-center justify-between">
-              <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-black text-[10px]">فني في الطريق 🚗</span>
-              <span class="text-xs font-mono font-bold text-slate-600">#8341</span>
-            </div>
-            <div>
-              <h3 class="font-black text-xs text-slate-900">كشف تسريب سباكة إلكتروني بالنيتروجين</h3>
-              <p class="text-[10px] text-slate-500 mt-0.5">حي الروضة • الموعد: اليوم (الفترة المسائية)</p>
-            </div>
-            <div class="flex items-center justify-between pt-2 border-t text-xs">
-              <span class="font-bold text-slate-600">الفاتورة الإجمالية:</span>
-              <span class="font-black text-[#006948] text-sm">180.00 ر.س</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= 3. تبويب مستشار الذكاء الاصطناعي (AI) ================= -->
-      <section id="tab-ai" class="view-container hidden p-3.5 flex flex-col h-[calc(100vh-140px)] space-y-3">
-        <div class="bg-slate-900 text-white p-3 rounded-2xl flex items-center justify-between">
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-[#fffbeb] border border-[#fde68a] text-[#92400e]">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-              <span class="material-symbols-outlined text-lg">smart_toy</span>
-            </div>
-            <div>
-              <h3 class="text-xs font-black">مستشار مُتقن الذكي (AI)</h3>
-              <p class="text-[9px] text-slate-300">حساب التكاليف والتشخيص الصوتي الفوري</p>
-            </div>
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+            <span class="text-xs font-black">ضمان أكسجين الذهبي المعتمد 30 يوماً</span>
           </div>
-          <button onclick="toggleSound()" id="sound-btn" class="p-1.5 bg-slate-800 text-emerald-400 rounded-lg">
-            <span class="material-symbols-outlined text-base">volume_up</span>
-          </button>
+          <span class="text-[10px] font-bold">100% موثوق</span>
         </div>
 
-        <div id="ai-chat" class="flex-1 bg-white border border-slate-200 rounded-2xl p-3 overflow-y-auto space-y-2 text-xs">
-          <div class="bg-emerald-50 text-emerald-950 p-3 rounded-2xl rounded-tr-none max-w-[90%] leading-relaxed border border-emerald-100">
-            أهلاً بك يا غالي! أنا المهندس مُتقن، مستشارك الفني المعتمد. تفضل بطرح مشكلتك كتابةً أو صوتياً عبر المايكروفون وسأحسب لك التكلفة المعتمدة فوراً مع الضمان الذهبي 30 يوماً! ❄️💧
+        <div class="grid grid-cols-2 gap-2.5">
+          <div onclick="checkAuthAndOrder('غسيل مكيف سبليت', 115)" class="p-3 rounded-2xl bg-white border border-[#006948] shadow-2xs cursor-pointer press-scale">
+            <span class="material-symbols-outlined text-[#006948] text-2xl">mode_fan</span>
+            <h3 class="font-black text-xs text-slate-900 mt-1">صيانة وتكييف</h3>
+            <p class="text-[10px] text-emerald-700 font-bold">يبدأ 115 ر.س</p>
           </div>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <button id="mic-btn" onclick="toggleSpeech()" class="w-11 h-11 bg-[#006948] text-white rounded-2xl flex items-center justify-center press-scale shadow-xs">
-            <span class="material-symbols-outlined text-lg">mic</span>
-          </button>
-          <input id="ai-input" type="text" placeholder="اكتب مشكلتك أو استفسارك هنا..." class="flex-1 bg-white border border-slate-200 rounded-2xl px-3.5 py-2.5 text-xs outline-none focus:border-[#006948]" onkeydown="if(event.key==='Enter') sendAiMessage()"/>
-          <button onclick="sendAiMessage()" class="w-11 h-11 bg-slate-900 text-white rounded-2xl flex items-center justify-center press-scale shadow-xs">
-            <span class="material-symbols-outlined text-base rotate-180">send</span>
-          </button>
+          <div onclick="checkAuthAndOrder('كشف تسريب مياه', 180)" class="p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer press-scale">
+            <span class="material-symbols-outlined text-blue-600 text-2xl">faucet</span>
+            <h3 class="font-black text-xs text-slate-900 mt-1">سباكة وتسريبات</h3>
+            <p class="text-[10px] text-blue-700 font-bold">كشف إلكتروني 180 ر.س</p>
+          </div>
+          <div onclick="checkAuthAndOrder('فحص كهرباء', 120)" class="p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer press-scale">
+            <span class="material-symbols-outlined text-amber-600 text-2xl">bolt</span>
+            <h3 class="font-black text-xs text-slate-900 mt-1">كهرباء وإنارة</h3>
+            <p class="text-[10px] text-amber-700 font-bold">فحص شورت 120 ر.س</p>
+          </div>
+          <div onclick="checkAuthAndOrder('عزل فوم وترميم', 32)" class="p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer press-scale">
+            <span class="material-symbols-outlined text-purple-600 text-2xl">format_paint</span>
+            <h3 class="font-black text-xs text-slate-900 mt-1">مقاولات وعزل</h3>
+            <p class="text-[10px] text-purple-700 font-bold">32 ر.س/م²</p>
+          </div>
         </div>
       </section>
 
-      <!-- ================= 4. تبويب العروض ================= -->
-      <section id="tab-offers" class="view-container hidden p-3.5 space-y-3">
-        <div class="bg-gradient-to-r from-amber-500 to-amber-600 rounded-3xl p-4 text-slate-950 shadow-md">
-          <span class="px-2 py-0.5 bg-white/90 rounded-md text-[10px] font-black uppercase">عروض حصرية</span>
-          <h3 class="text-base font-black text-white mt-1">كوبون OXYGEN30 مفعل</h3>
-          <p class="text-xs text-white/90 mt-0.5">يمنحك خصم 30 ر.س على أي طلب صيانة أو سباكة أو تكييف.</p>
+      <!-- 2. صفحة تسجيل الدخول / إنشاء حساب داخل الفرع نفسه -->
+      <section id="tab-auth-modal" class="hidden p-4 space-y-4">
+        <div class="flex items-center justify-between">
+          <button onclick="switchTab('home')" class="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center">
+            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </button>
+          <span class="text-xs font-bold text-[#006948]">تسجيل حساب المنظومة</span>
+          <div class="w-8"></div>
         </div>
-        <!-- عرض قفل ذكي -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-3 flex items-center justify-between shadow-2xs">
+
+        <div class="space-y-3 bg-white p-4 rounded-2xl border border-slate-200">
           <div>
-            <span class="text-[9px] font-black bg-amber-50 text-amber-800 px-2 py-0.5 rounded-full">باقة العودة</span>
-            <h4 class="text-xs font-black text-slate-900 mt-1">تركيب قفل ذكي SK80 إلكتروني</h4>
-            <p class="text-[10px] text-slate-500">بصمة، بطاقة، رقم سري ومفتاح طوارئ</p>
-            <span class="text-xs font-black text-[#006948] mt-1 block">490.9 ر.س <s class="text-slate-400 font-normal text-[10px]">650 ر.س</s></span>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">الاسم</label>
+            <input id="in-name" type="text" placeholder="الاسم الكريم" class="w-full bg-slate-50 border rounded-xl p-2.5 text-xs font-bold outline-none"/>
           </div>
-          <button onclick="openBookingFlow('قفل ذكي SK80', 490.9)" class="px-3 py-1.5 bg-[#006948] text-white text-xs font-bold rounded-xl press-scale">طلب +</button>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">رقم الجوال</label>
+            <input id="in-phone" type="tel" placeholder="05XXXXXXXX" class="w-full bg-slate-50 border rounded-xl p-2.5 text-xs font-bold outline-none"/>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">نوع الحساب</label>
+            <select id="in-role" class="w-full bg-slate-50 border rounded-xl p-2.5 text-xs font-bold outline-none">
+              <option value="client">عميل (client.oxygen11.com)</option>
+              <option value="tech">فني ميداني (technician.oxygen11.com)</option>
+            </select>
+          </div>
+          <button onclick="executeLoginOrRegister()" class="w-full py-3 bg-[#006948] text-white rounded-xl font-bold text-xs shadow-md press-scale">
+            دخول مباشر وتفعيل الحساب
+          </button>
         </div>
       </section>
 
-      <!-- ================= 5. تبويب الإعدادات والحساب (مطابق للصورة 1 بالكامل) ================= -->
-      <section id="tab-profile" class="view-container hidden p-3.5 space-y-3">
-        <!-- البطاقات العلوية الثلاث (المساعدة، طلباتي، حسابي) -->
-        <div class="grid grid-cols-3 gap-2.5">
-          <div onclick="switchTab('ai')" class="bg-white border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center text-center shadow-2xs cursor-pointer press-scale">
-            <div class="w-12 h-12 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-600 mb-1.5">
-              <span class="material-symbols-outlined text-[28px]">support_agent</span>
-            </div>
-            <span class="text-xs font-bold text-slate-800">المساعدة</span>
+      <!-- 3. تبويب الطلبات -->
+      <section id="tab-orders" class="hidden p-3.5 space-y-3">
+        <h2 class="text-sm font-black text-slate-900">سجل طلباتي الجارية</h2>
+        <div id="orders-box" class="space-y-2">
+          <div class="p-3 rounded-2xl bg-white border border-slate-200 text-xs">
+            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">فني في الطريق 🚗</span>
+            <h4 class="font-bold text-slate-900 mt-1">غسيل مكيف سبليت (جهازين)</h4>
+            <p class="text-[10px] text-slate-500">الفني: ريان العمري • وصول خلال 15 دقيقة</p>
           </div>
+        </div>
+      </section>
 
-          <div onclick="switchTab('orders')" class="bg-white border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center text-center shadow-2xs cursor-pointer press-scale">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-[#006948] mb-1.5">
-              <span class="material-symbols-outlined text-[28px]">checklist</span>
-            </div>
-            <span class="text-xs font-bold text-slate-800">طلباتي</span>
+      <!-- 4. تبويب الحساب والإعدادات -->
+      <section id="tab-profile" class="hidden p-3.5 space-y-3">
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 text-center space-y-2">
+          <div class="w-12 h-12 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center font-black mx-auto">
+            <span class="material-symbols-outlined text-2xl">person</span>
           </div>
-
-          <div onclick="openProfileEdit()" class="bg-white border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center text-center shadow-2xs cursor-pointer press-scale">
-            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 mb-1.5">
-              <span class="material-symbols-outlined text-[28px]">person</span>
-            </div>
-            <span class="text-xs font-bold text-slate-800">حسابي</span>
+          <h3 id="prof-name" class="font-black text-xs text-slate-900">زائر</h3>
+          <p id="prof-phone" class="text-[10px] text-slate-500 font-mono">غير مسجل</p>
+          <div class="p-2 bg-emerald-50 rounded-xl text-xs font-bold text-emerald-800">
+            رصيد المحفظة: <span id="prof-wallet">0.00</span> ر.س
           </div>
         </div>
 
-        <!-- قائمة الخيارات المنسدلة المقتبسة من شاشة الإعدادات -->
-        <div class="space-y-1.5">
-          <!-- المحفظة -->
-          <div onclick="rechargePrompt()" class="bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs cursor-pointer press-scale">
-            <div class="flex items-center gap-1.5 text-xs text-slate-500 font-bold">
-              <span class="material-symbols-outlined text-sm">chevron_left</span>
-              <span id="profile-wallet-text" class="font-mono text-[#006948]">150.00 ر.س</span>
-            </div>
-            <div class="flex items-center gap-2.5">
-              <span class="text-xs font-bold text-slate-900">المحفظة</span>
-              <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
-                <span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- الفنيين المفضلين -->
-          <div onclick="showToast('قائمة الفنيين المفضلين فارغة حالياً')" class="bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-slate-400 text-sm">chevron_left</span>
-            <div class="flex items-center gap-2.5">
-              <span class="text-xs font-bold text-slate-900">الفنيين المفضلين</span>
-              <div class="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600">
-                <span class="material-symbols-outlined text-[20px]">person_check</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- سجل العناوين -->
-          <div onclick="autoGetLocation()" class="bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-slate-400 text-sm">chevron_left</span>
-            <div class="flex items-center gap-2.5">
-              <span class="text-xs font-bold text-slate-900">سجل العناوين</span>
-              <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
-                <span class="material-symbols-outlined text-[20px]">map</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- المكافآت -->
-          <div onclick="showToast('رصيد مكافآتك: 60 نقطة ولاء 🎁')" class="bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-slate-400 text-sm">chevron_left</span>
-            <div class="flex items-center gap-2.5">
-              <span class="text-xs font-bold text-slate-900">المكافآت</span>
-              <div class="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
-                <span class="material-symbols-outlined text-[20px]">card_giftcard</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- الشكاوي -->
-          <div onclick="showToast('يمكنك رفع شكوى مباشرة للمشرف وسيتصل بك خلال 30 دقيقة')" class="bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-slate-400 text-sm">chevron_left</span>
-            <div class="flex items-center gap-2.5">
-              <span class="text-xs font-bold text-slate-900">الشكاوي</span>
-              <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-                <span class="material-symbols-outlined text-[20px]">build</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- شارك التطبيق -->
-          <div onclick="shareApp()" class="bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-slate-400 text-sm">chevron_left</span>
-            <div class="flex items-center gap-2.5">
-              <span class="text-xs font-bold text-slate-900">شارك التطبيق</span>
-              <div class="w-9 h-9 rounded-xl bg-pink-50 flex items-center justify-center text-pink-600">
-                <span class="material-symbols-outlined text-[20px]">diversity_3</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- الإعدادات -->
-          <div onclick="openProfileEdit()" class="bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-slate-400 text-sm">chevron_left</span>
-            <div class="flex items-center gap-2.5">
-              <span class="text-xs font-bold text-slate-900">الإعدادات</span>
-              <div class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700">
-                <span class="material-symbols-outlined text-[20px]">settings</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- سجل كمقدم خدمة -->
-          <div onclick="showToast('جاري فتح نموذج انضمام الفنيين المعتمدين لدى أكسجين')" class="bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-slate-400 text-sm">chevron_left</span>
-            <div class="flex items-center gap-2.5">
-              <span class="text-xs font-bold text-slate-900">سجل كمقدم خدمة</span>
-              <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-700">
-                <span class="material-symbols-outlined text-[20px]">handshake</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- عن فني / عن مُتقن -->
-          <div onclick="showToast('مُتقن: منصة أكسجين للصيانة والمقاولات العامة')" class="bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-slate-400 text-sm">chevron_left</span>
-            <div class="flex items-center gap-2.5">
-              <span class="text-xs font-bold text-slate-900">عن فني</span>
-              <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-700">
-                <span class="material-symbols-outlined text-[20px]">change_history</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- تسجيل الخروج -->
-          <div onclick="logout()" class="bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-red-400 text-sm">chevron_left</span>
-            <div class="flex items-center gap-2.5">
-              <span class="text-xs font-bold text-red-600">تسجيل الخروج</span>
-              <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-600">
-                <span class="material-symbols-outlined text-[20px]">logout</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <button onclick="executeLogout()" class="w-full py-3 rounded-2xl bg-red-50 text-red-600 font-bold text-xs border border-red-200 flex items-center justify-center gap-1.5 press-scale">
+          <span class="material-symbols-outlined text-sm">logout</span>
+          <span>تسجيل الخروج والعودة كزائر</span>
+        </button>
       </section>
 
     </main>
 
-    <!-- شريط التنقل السفلي المعتمد (الرئيسية، الطلبات، مستشار AI، العروض، الإعدادات) -->
-    <nav class="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white/95 bottom-nav-bar border-t border-slate-200 px-2 py-1.5 z-40 flex items-center justify-around text-[10px]">
-      <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center text-[#006948] font-black press-scale">
+    <!-- شريط التنقل السفلي المعتمد 100% داخل النطاقات الفرعية -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white/95 border-t border-slate-200 px-2 py-1.5 z-40 flex items-center justify-around text-[10px]">
+      <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center text-[#006948] font-black">
         <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">home</span>
-        <span class="mt-0.5">الرئيسية</span>
+        <span>الرئيسية</span>
       </button>
-
-      <button onclick="switchTab('orders')" id="nav-orders" class="flex flex-col items-center text-slate-500 press-scale relative">
+      <button onclick="switchTab('orders')" id="nav-orders" class="flex flex-col items-center text-slate-500">
         <span class="material-symbols-outlined text-xl">receipt_long</span>
-        <span class="mt-0.5">الطلبات</span>
+        <span>الطلبات</span>
       </button>
-
-      <!-- زر مستشار AI العائم المرتفع في المنتصف -->
-      <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center press-scale -mt-4">
-        <div class="w-11 h-11 rounded-full bg-[#006948] text-white flex items-center justify-center shadow-md border-2 border-white">
-          <span class="material-symbols-outlined text-2xl">smart_toy</span>
-        </div>
-        <span class="mt-0.5 font-bold text-[#006948]">مستشار AI</span>
-      </button>
-
-      <button onclick="switchTab('offers')" id="nav-offers" class="flex flex-col items-center text-slate-500 press-scale">
-        <span class="material-symbols-outlined text-xl">local_offer</span>
-        <span class="mt-0.5">العروض</span>
-      </button>
-
-      <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-slate-500 press-scale">
+      <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-slate-500">
         <span class="material-symbols-outlined text-xl">account_circle</span>
-        <span class="mt-0.5">الإعدادات</span>
+        <span>حسابي</span>
       </button>
     </nav>
-
-    <!-- توست الإشعارات السريع -->
-    <div id="toast" class="fixed top-4 left-4 right-4 max-w-[380px] mx-auto bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-xl z-50 text-xs font-bold text-center transition-all duration-300 transform -translate-y-20 opacity-0 pointer-events-none"></div>
 
   </div>
 
   <script>
-    let activeClient = { name: 'عبد العزيز السالم', phone: '0555123456', wallet: 150.00 };
-    let soundEnabled = true;
-    let isListening = false;
+    let currentSession = null;
 
     window.addEventListener('DOMContentLoaded', () => {
-      const stored = localStorage.getItem('motqan_client_session');
-      if (stored) activeClient = { ...activeClient, ...JSON.parse(stored) };
-      syncUi();
+      checkUserSession();
     });
 
-    function syncUi() {
-      document.getElementById('wallet-balance-top').textContent = activeClient.wallet.toFixed(2);
-      document.getElementById('profile-wallet-text').textContent = activeClient.wallet.toFixed(2) + ' ر.س';
+    function checkUserSession() {
+      try {
+        currentSession = JSON.parse(localStorage.getItem('motqan_client_session'));
+      } catch(e) { currentSession = null; }
+
+      const authBtn = document.getElementById('auth-action-btn');
+      const authLabel = document.getElementById('auth-btn-label');
+
+      if (currentSession && currentSession.phone) {
+        authLabel.textContent = `خروج (${(currentSession.name || 'حسابي').split(' ')[0]})`;
+        authBtn.className = "h-8 px-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-black flex items-center gap-1 press-scale";
+        
+        document.getElementById('prof-name').textContent = currentSession.name || 'عميل معتمد';
+        document.getElementById('prof-phone').textContent = currentSession.phone;
+        document.getElementById('prof-wallet').textContent = (currentSession.wallet || 0).toFixed(2);
+      } else {
+        authLabel.textContent = "دخول";
+        authBtn.className = "h-8 px-3 rounded-xl bg-emerald-50 border border-emerald-200 text-[#006948] text-xs font-black flex items-center gap-1 press-scale";
+      }
     }
 
     function switchTab(tabId) {
-      ['home', 'orders', 'ai', 'offers', 'profile'].forEach(t => {
+      ['home', 'auth-modal', 'orders', 'profile'].forEach(t => {
         document.getElementById('tab-' + t)?.classList.add('hidden');
-        const nav = document.getElementById('nav-' + t);
-        if (nav && t !== 'ai') nav.className = 'flex flex-col items-center text-slate-500 press-scale';
       });
       document.getElementById('tab-' + tabId)?.classList.remove('hidden');
-      const curNav = document.getElementById('nav-' + tabId);
-      if (curNav && tabId !== 'ai') curNav.className = 'flex flex-col items-center text-[#006948] font-black press-scale';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
 
-    function openBookingFlow(service, price) {
-      if (confirm(`هل ترغب في تأكيد حجز (${service}) بسعر ${price} ر.س مع فني معتمد؟`)) {
-        showToast(`تم إرسال طلبك بنجاح! رقم التتبع #OXY-${Math.floor(1000+Math.random()*9000)}`);
-        switchTab('orders');
-      }
-    }
-
-    function autoGetLocation() {
-      showToast('جاري تحديد موقعك الجغرافي بالـ GPS...');
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          pos => {
-            document.getElementById('loc-text').textContent = `جدة (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})`;
-            showToast('تم التقاط موقعك الجغرافي بنجاح ✓');
-          },
-          () => showToast('يرجى السماح بصلاحية الموقع للمتصفح')
-        );
-      }
-    }
-
-    function rechargePrompt() {
-      const amt = prompt('أدخل المبلغ المراد شحنه في المحفظة (ر.س):', '100');
-      if (amt && !isNaN(amt)) {
-        activeClient.wallet += parseFloat(amt);
-        localStorage.setItem('motqan_client_session', JSON.stringify(activeClient));
-        syncUi();
-        showToast(`تم شحن المحفظة بنجاح بقيمة ${amt} ر.س ✓`);
-      }
-    }
-
-    function openProfileEdit() {
-      const n = prompt('تعديل الاسم:', activeClient.name);
-      if (n) {
-        activeClient.name = n.trim();
-        localStorage.setItem('motqan_client_session', JSON.stringify(activeClient));
-        showToast('تم تحديث بيانات الحساب ✓');
-      }
-    }
-
-    function shareApp() {
-      navigator.clipboard?.writeText('https://client.oxygen11.com');
-      showToast('تم نسخ رابط التطبيق وكود الخصم OXYGEN30 للمشاركة 🎁');
-    }
-
-    function logout() {
-      if (confirm('هل تريد تسجيل الخروج؟')) {
-        localStorage.removeItem('motqan_client_session');
-        window.location.replace('https://www.oxygen11.com');
-      }
-    }
-
-    // الذكاء الاصطناعي والصوت
-    function sendAiMessage() {
-      const input = document.getElementById('ai-input');
-      const text = input.value.trim();
-      if (!text) return;
-      const box = document.getElementById('ai-chat');
-      box.innerHTML += `<div class="bg-[#006948] text-white p-2.5 rounded-2xl rounded-tl-none max-w-[85%] mr-auto font-medium">${text}</div>`;
-      input.value = '';
-
-      setTimeout(() => {
-        const reply = "أهلاً بك يا غالي! أسعارنا معتمدة بضمان 30 يوماً. غسيل المكيف 115 ر.س وكشف التسريب 180 ر.س مع تقرير المياه المعتمد. هل تحب أثبت لك الحجز الآن؟";
-        box.innerHTML += `<div class="bg-emerald-50 text-emerald-950 p-3 rounded-2xl rounded-tr-none max-w-[90%] leading-relaxed border border-emerald-100">${reply}</div>`;
-        box.scrollTop = box.scrollHeight;
-        if (soundEnabled && 'speechSynthesis' in window) {
-          const utter = new SpeechSynthesisUtterance(reply);
-          utter.lang = 'ar-SA';
-          window.speechSynthesis.speak(utter);
-        }
-      }, 500);
-    }
-
-    function toggleSpeech() {
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) return showToast('المتصفح لا يدعم التسجيل الصوتي');
-      const rec = new SpeechRec();
-      rec.lang = 'ar-SA';
-      rec.onresult = e => {
-        document.getElementById('ai-input').value = e.results[0][0].transcript;
-        sendAiMessage();
-      };
-      rec.start();
-      showToast('تحدث الآن... جاري الاستماع 🎙️');
-    }
-
-    function toggleSound() {
-      soundEnabled = !soundEnabled;
-      document.getElementById('sound-btn').innerHTML = soundEnabled 
-        ? '<span class="material-symbols-outlined text-base">volume_up</span>' 
-        : '<span class="material-symbols-outlined text-base">volume_off</span>';
-      showToast(soundEnabled ? 'تم تفعيل الصوت' : 'تم كتم الصوت');
-    }
-
-    function filterServices(q) {
-      const term = q.toLowerCase();
-      document.querySelectorAll('#services-grid > div').forEach(c => {
-        c.style.display = c.textContent.toLowerCase().includes(term) ? '' : 'none';
+      ['home', 'orders', 'profile'].forEach(n => {
+        const btn = document.getElementById('nav-' + n);
+        if (btn) btn.className = 'flex flex-col items-center text-slate-500';
       });
+      const activeNav = document.getElementById('nav-' + tabId);
+      if (activeNav) activeNav.className = 'flex flex-col items-center text-[#006948] font-black';
     }
 
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.remove('opacity-0', '-translate-y-20', 'pointer-events-none');
-      t.classList.add('opacity-100', 'translate-y-0');
-      setTimeout(() => {
-        t.classList.remove('opacity-100', 'translate-y-0');
-        t.classList.add('opacity-0', '-translate-y-20', 'pointer-events-none');
-      }, 2500);
+    function handleAuthButtonClick() {
+      if (currentSession && currentSession.phone) {
+        executeLogout();
+      } else {
+        switchTab('auth-modal');
+      }
+    }
+
+    function executeLoginOrRegister() {
+      const name = document.getElementById('in-name').value.trim() || 'عميل';
+      const phone = document.getElementById('in-phone').value.trim();
+      const role = document.getElementById('in-role').value;
+
+      if (!phone) return alert('يرجى إدخال رقم الجوال');
+
+      const userObj = { name, phone, role, wallet: 150.0 };
+
+      if (role === 'tech') {
+        // توجيه الفني إلى نطاق الفني فقط
+        const token = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(userObj)))));
+        window.location.replace(`https://technician.oxygen11.com/?auth_token=${token}`);
+      } else {
+        // البقاء في نطاق العميل
+        localStorage.setItem('motqan_client_session', JSON.stringify(userObj));
+        checkUserSession();
+        switchTab('home');
+        alert('تم تسجيل الدخول بنجاح في فرع العميل ✓');
+      }
+    }
+
+    // تسجيل الخروج الصارم داخل الفرع فقط دون أي خروج للدومين الرئيسي
+    function executeLogout() {
+      if (confirm('هل ترغب في تسجيل الخروج؟')) {
+        localStorage.removeItem('motqan_client_session');
+        sessionStorage.clear();
+        currentSession = null;
+        checkUserSession();
+        // إعادة تحميل نفس صفحة العميل كزائر
+        window.location.replace('https://client.oxygen11.com');
+      }
+    }
+
+    function checkAuthAndOrder(service, price) {
+      alert(`تم حجز خدمة (${service}) بقيمة ${price} ر.س.`);
+      switchTab('orders');
+    }
+
+    function openSecurityGate() {
+      const pin = prompt('أدخل الرمز السري لبوابة الإدارة:');
+      if (pin === '789512364') {
+        // المالك -> owner.oxygen11.com فقط
+        window.location.replace('https://owner.oxygen11.com');
+      } else if (pin === '8888') {
+        // المشرف -> admin.oxygen11.com فقط
+        window.location.replace('https://admin.oxygen11.com');
+      } else if (pin) {
+        alert('الرمز السري غير صحيح');
+      }
     }
   </script>
 </body>
