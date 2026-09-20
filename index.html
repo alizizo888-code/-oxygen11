@@ -4,6 +4,34 @@
   <meta charset="utf-8"/>
   <title>بوابة الفنيين والميدان | مُتقن</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  // --- كود تثبيت الجلسة داخل الفرع (يمنع الارتداد للرئيسي نهائياً) ---
+(function receiveSessionToken() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('auth_token');
+
+  if (token) {
+    try {
+      // فك تشفير الجلسة وحفظها محلياً في ذاكرة الفرع
+      const decodedData = decodeURIComponent(escape(atob(decodeURIComponent(token))));
+      const userData = JSON.parse(decodedData);
+      
+      localStorage.setItem('motqan_active_session', JSON.stringify(userData));
+      
+      // تنظيف الرابط عشان التوكن ميظهرش في العنوان
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } catch (e) {
+      console.error("Token decoding error:", e);
+    }
+  }
+
+  // الآن نفحص الجلسة بعد ما اتثبتت في الفرع بنجاح
+  const session = JSON.parse(localStorage.getItem('motqan_active_session') || '{}');
+  
+  if (!session.phone || session.role !== 'client') {
+    // لو مفيش مستخدم فعلاً، يرجعه للرئيسي
+    window.location.replace('https://oxygen11.com');
+  }
+})();
 </head>
 <body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
   <div class="bg-white p-6 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
