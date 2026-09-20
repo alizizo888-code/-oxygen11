@@ -1,104 +1,101 @@
-// ==========================================
-// نظام إدارة التسجيل والدخول الموحد (مُتقن)
-// ==========================================
+/**
+ * auth-system.js
+ * نظام إدارة الجلسات والتوجيه التلقائي عبر النطاقات الفرعية (Subdomains)
+ */
+const MotqanAuthSystem = (function () {
+  const STORAGE_SESSION_KEY = 'motqan_active_session';
+  const STORAGE_USERS_KEY = 'motqan_registered_users';
 
-const AUTH_CONFIG = {
-  // روابط الواجهات التي يتم التوجيه إليها
-  REDIRECT_URLS: {
-    client: 'client.html',       // صفحة العميل
-    technician: 'technician.html' // صفحة الفني
-  },
-  STORAGE_KEYS: {
-    CURRENT_USER: 'motqan_active_session',
-    USERS_DB: 'motqan_users_db'
-  }
-};
+  // الروابط والنطاقات الفرعية المخصصة لكل دور
+  const REDIRECT_DOMAINS = {
+    client: 'https://client.oxygen11.com',
+    tech: 'https://technician.oxygen11.com'
+  };
 
-// 1. الفحص التلقائي الفوري عند فتح التطبيق
-(function autoRedirectSession() {
-  const session = localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.CURRENT_USER);
-  if (session) {
+  function getRegisteredUsers() {
     try {
-      const user = JSON.parse(session);
-      if (user && user.role && AUTH_CONFIG.REDIRECT_URLS[user.role]) {
-        // تحويل أوتوماتيك مباشر للواجهة المخصصة
-        window.location.replace(AUTH_CONFIG.REDIRECT_URLS[user.role]);
-      }
+      return JSON.parse(localStorage.getItem(STORAGE_USERS_KEY)) || {};
     } catch (e) {
-      console.error('خطأ في استعادة الجلسة:', e);
+      return {};
     }
   }
+
+  function saveRegisteredUsers(users) {
+    localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+  }
+
+  return {
+    // 1. فحص الجلسة التلقائي (يُستدعى فور فتح الموقع الرئيسي)
+    autoRedirectIfLoggedIn: function () {
+      try {
+        const session = localStorage.getItem(STORAGE_SESSION_KEY);
+        if (session) {
+          const user = JSON.parse(session);
+          if (user && user.role && REDIRECT_DOMAINS[user.role]) {
+            // التحويل الفوري للنطاق الفرعي الخاص بالعميل أو الفني
+            window.location.replace(REDIRECT_DOMAINS[user.role]);
+            return true;
+          }
+        }
+      } catch (err) {
+        console.error("Auth Session Error:", err);
+      }
+      return false; // يظل الزائر في الصفحة الرئيسية
+    },
+
+    // 2. إنشاء حساب جديد والتوجيه للنطاق الفرعي
+    register: function ({ name, phone, password, role }) {
+      if (!phone || !password) {
+        throw new Error('يرجى كتابة رقم الجوال وكلمة المرور');
+      }
+
+      const users = getRegisteredUsers();
+      const cleanPhone = phone.trim();
+
+      const newUser = {
+        name: (name || '').trim(),
+        phone: cleanPhone,
+        password: password.trim(),
+        role: role === 'tech' ? 'tech' : 'client',
+        createdAt: new Date().toISOString()
+      };
+
+      users[cleanPhone] = newUser;
+      saveRegisteredUsers(users);
+
+      // حفظ الجلسة النشطة
+      localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(newUser));
+
+      // التحويل الفوري للنطاق الفرعي
+      window.location.replace(REDIRECT_DOMAINS[newUser.role]);
+    },
+
+    // 3. تسجيل الدخول والتحقق ثم التوجيه بالنطاق الفرعي
+    login: function ({ phone, password }) {
+      if (!phone || !password) {
+        throw new Error('يرجى إدخال الجوال وكلمة المرور');
+      }
+
+      const users = getRegisteredUsers();
+      const cleanPhone = phone.trim();
+      const user = users[cleanPhone];
+
+      if (!user || user.password !== password.trim()) {
+        throw new Error('بيانات الدخول غير صحيحة');
+      }
+
+      // حفظ الجلسة والتوجيه للنطاق الفرعي
+      localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(user));
+      window.location.replace(REDIRECT_DOMAINS[user.role]);
+    },
+
+    // 4. تسجيل الخروج والعودة للرئيسية
+    logout: function (returnUrl = 'https://oxygen11.com') {
+      localStorage.removeItem(STORAGE_SESSION_KEY);
+      window.location.replace(returnUrl);
+    }
+  };
 })();
 
-// 2. دالة تسجيل حساب جديد من واجهة الزائر
-function registerNewUser(name, phone, pin, role = 'client') {
-  // تنظيف المدخلات
-  name = name.trim();
-  phone = phone.trim();
-  pin = pin.trim();
-
-  if (!name || !phone || !pin) {
-    alert('يرجى ملء جميع الحقول المطلوبة');
-    return false;
-  }
-
-  // جلب قاعدة البيانات المحلية للمستخدمين
-  let users = JSON.parse(localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.USERS_DB) || '{}');
-
-  // حفظ بيانات المستخدم
-  users[phone] = {
-    name: name,
-    phone: phone,
-    pin: pin,
-    role: role, // 'client' أو 'technician'
-    createdAt: new Date().toISOString()
-  };
-
-  localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.USERS_DB, JSON.stringify(users));
-
-  // تسجيل الدخول التلقائي وحفظ الجلسة
-  const sessionData = {
-    name: name,
-    phone: phone,
-    role: role,
-    token: 'SESSION_' + Date.now()
-  };
-  localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.CURRENT_USER, JSON.stringify(sessionData));
-
-  // التوجيه الفوري للواجهة المناسبة
-  window.location.replace(AUTH_CONFIG.REDIRECT_URLS[role]);
-  return true;
-}
-
-// 3. دالة تسجيل الدخول لحساب قائم
-function loginUser(phone, pin) {
-  phone = phone.trim();
-  pin = pin.trim();
-
-  let users = JSON.parse(localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.USERS_DB) || '{}');
-  const user = users[phone];
-
-  if (!user || user.pin !== pin) {
-    alert('رقم الجوال أو الرقم السري غير صحيح');
-    return false;
-  }
-
-  // تثبيت جلسة الدخول
-  const sessionData = {
-    name: user.name,
-    phone: user.phone,
-    role: user.role,
-    token: 'SESSION_' + Date.now()
-  };
-  localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.CURRENT_USER, JSON.stringify(sessionData));
-
-  // توجيه تلقائي
-  window.location.replace(AUTH_CONFIG.REDIRECT_URLS[user.role]);
-  return true;
-}
-
-// 4. دالة تسجيل الخروج (توضع في صفحة العميل وصفحة الفني للرجوع للزوار)
-function logoutUser() {
-  localStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.CURRENT_USER);
-  window.location.replace('index.html'); // العودة لصفحة الزوار الرئيسية
-}
+// تشغيل التحقق اللحظي فور تحميل السكربت
+MotqanAuthSystem.autoRedirectIfLoggedIn();
