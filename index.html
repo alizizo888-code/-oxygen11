@@ -2,76 +2,87 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <title>لوحة الإدارة الشاملة | مُتقن</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  // --- كود تثبيت الجلسة داخل الفرع (يمنع الارتداد للرئيسي نهائياً) ---
-(function receiveSessionToken() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get('auth_token');
-
-  if (token) {
-    try {
-      // فك تشفير الجلسة وحفظها محلياً في ذاكرة الفرع
-      const decodedData = decodeURIComponent(escape(atob(decodeURIComponent(token))));
-      const userData = JSON.parse(decodedData);
-      
-      localStorage.setItem('motqan_active_session', JSON.stringify(userData));
-      
-      // تنظيف الرابط عشان التوكن ميظهرش في العنوان
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } catch (e) {
-      console.error("Token decoding error:", e);
-    }
-  }
-
-  // الآن نفحص الجلسة بعد ما اتثبتت في الفرع بنجاح
-  const session = JSON.parse(localStorage.getItem('motqan_active_session') || '{}');
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>لوحة التحكم السيادية للمالك | مُتقن</title>
   
-  if (!session.phone || session.role !== 'client') {
-    // لو مفيش مستخدم فعلاً، يرجعه للرئيسي
-    window.location.replace('https://oxygen11.com');
-  }
-})();
-</head>
-<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">
-  <div class="bg-slate-900 p-6 rounded-3xl shadow-2xl max-w-md w-full text-center space-y-4 border border-amber-500/30">
-    <h1 id="admin-title" class="text-xl font-bold text-amber-400">لوحة تحكم الإدارة العليا</h1>
-    <p class="text-xs text-slate-400">النطاق الإداري: admin.oxygen11.com</p>
-    <button onclick="sessionStorage.removeItem('admin_auth'); localStorage.removeItem('motqan_active_session'); window.location.replace('https://oxygen11.com');" class="w-full py-3 bg-red-500/10 text-red-400 rounded-xl font-bold text-xs border border-red-500/20">
-      قفل الجلسة والعودة للرئيسية
-    </button>
-  </div>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style> body { font-family: 'Cairo', sans-serif; background-color: #070d18; color: #f8fafc; } </style>
+
+  <!-- التحقق السيادي واستلام توكن المالك -->
   <script>
-    (function verifyAdminPortal() {
-      const session = JSON.parse(localStorage.getItem('motqan_active_session') || '{}');
-      if (!session.role || (session.role !== 'owner' && session.role !== 'supervisor')) {
-        alert('غير مسموح بالدخول إلا للمالك أو المشرف');
-        window.location.replace('https://oxygen11.com');
-        return;
+    (function initOwnerSession() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('auth_token');
+
+      if (token) {
+        try {
+          const raw = decodeURIComponent(escape(atob(decodeURIComponent(token))));
+          localStorage.setItem('motqan_owner_session', raw);
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch(e) { console.error(e); }
       }
-<!-- استدعاء المنظومة المركزية من المجلد المشترك -->
-<script src="https://www.oxygen11.com/oxygen_core/auth-system.js"></script>
-<script src="https://www.oxygen11.com/oxygen_core/motqan-database.js"></script>
-<script src="https://www.oxygen11.com/oxygen_core/motqan-orders-engine.js"></script>
-<script src="https://www.oxygen11.com/oxygen_core/motqan-points-wallet.js"></script>
-<script src="https://www.oxygen11.com/oxygen_core/motqan-client-admin-bridge.js"></script>
-<script src="https://www.oxygen11.com/oxygen_core/motqan-comm-engine.js"></script>
-<script src="https://www.oxygen11.com/oxygen_core/motqan-ai-engine.js"></script>
-<script src="https://www.oxygen11.com/oxygen_core/motqan-wallet-geo.js"></script>
-      const isVerified = sessionStorage.getItem('admin_auth');
-      if (isVerified !== 'true') {
-        const pin = prompt(session.role === 'owner' ? 'أدخل رمز المالك (علي): 789512364' : 'أدخل رمز المشرف: 8888');
-        const validPin = session.role === 'owner' ? '789512364' : '8888';
-        
-        if (pin === validPin) {
-          sessionStorage.setItem('admin_auth', 'true');
-          document.getElementById('admin-title').textContent = session.role === 'owner' ? 'لوحة تحكم المالك (علي)' : 'لوحة تحكم المشرف الميداني';
+
+      const session = JSON.parse(localStorage.getItem('motqan_owner_session') || '{}');
+      if (session.role !== 'owner') {
+        const pin = prompt('أدخل الرمز السري الحصري للمالك (علي: 789512364):');
+        if (pin === '789512364') {
+          localStorage.setItem('motqan_owner_session', JSON.stringify({ role: 'owner', name: 'علي' }));
         } else {
-          alert('الرمز غير صحيح');
-          window.location.replace('https://oxygen11.com');
+          alert('غير مصرح بالدخول!');
+          window.location.replace('https://www.oxygen11.com');
         }
       }
     })();
+  </script>
+</head>
+<body class="min-h-screen p-4 sm:p-6 flex flex-col items-center">
+
+  <div class="w-full max-w-4xl space-y-5">
+    <header class="bg-slate-900 border border-amber-500/40 rounded-3xl p-5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center font-black text-2xl border border-amber-500/30">👑</div>
+        <div>
+          <h1 class="text-base font-black text-white">لوحة تحكم المالك (علي)</h1>
+          <p class="text-[10px] text-amber-400">صلاحيات سيادية كاملة • owner.oxygen11.com</p>
+        </div>
+      </div>
+      <button onclick="logoutOwner()" class="px-4 py-2 bg-red-500/20 text-red-400 rounded-xl text-xs font-bold border border-red-500/30">
+        قفل الجلسة
+      </button>
+    </header>
+
+    <!-- Sovereign Actions -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+        <span class="text-xs text-slate-400 font-bold block">إيقاف/تشغيل المنصة</span>
+        <button onclick="alert('تم تجميد استقبال الطلبات في كافة الفروع')" class="mt-2 w-full py-2 bg-amber-600 text-slate-950 font-black text-xs rounded-xl">
+          إيقاف الطوارئ كلياً
+        </button>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+        <span class="text-xs text-slate-400 font-bold block">تعديل الأسعار الفوري</span>
+        <button onclick="alert('تم تحديث جدول الأسعار لجميع الفروع والذكاء الاصطناعي')" class="mt-2 w-full py-2 bg-emerald-600 text-white font-black text-xs rounded-xl">
+          نشر تسعيرة جديدة
+        </button>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+        <span class="text-xs text-slate-400 font-bold block">فرع الإدارة والمشرفين</span>
+        <a href="https://admin.oxygen11.com" class="mt-2 block text-center py-2 bg-slate-800 text-slate-200 font-bold text-xs rounded-xl border border-slate-700">
+          فتح فرع admin
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function logoutOwner() {
+      localStorage.removeItem('motqan_owner_session');
+      window.location.replace('https://www.oxygen11.com');
+    }
   </script>
 </body>
 </html>
