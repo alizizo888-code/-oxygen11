@@ -13,3 +13,8 @@ function convertMyPoints() {
     }
   }
 }
+// يُستدعى فور اعتماد اكتمال الخدمة
+function onServiceCompleted(clientPhone, totalInvoice) {
+  const earned = MotqanFinance.awardPointsForOrder(clientPhone, totalInvoice);
+  alert(`تم إغلاق الطلب، وحصل العميل على ${earned} نقطة ولاء جديدة 🎁`);
+}
