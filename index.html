@@ -1,109 +1,25 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول - نظام متقن</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; text-align: center; padding: 50px; }
-        .container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block; width: 300px; }
-        input, button { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
-        button { background-color: #28a745; color: white; font-weight: bold; cursor: pointer; }
-        button:hover { background-color: #218838; }
-        .toggle-btn { background-color: #007bff; }
-        .toggle-btn:hover { background-color: #0056b3; }
-    </style>
+  <meta charset="utf-8"/>
+  <title>لوحة العميل | مُتقن</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-
-    <div class="container" id="loginBox">
-        <h2>تسجيل الدخول</h2>
-        <input type="text" id="loginInput" placeholder="رقم الهاتف أو الاسم">
-        <input type="password" id="loginPassword" placeholder="الرقم السري">
-        <button onclick="handleLogin()">دخول</button>
-        <button class="toggle-btn" onclick="showRegister()">إنشاء حساب جديد</button>
-    </div>
-
-    <div class="container" id="registerBox" style="display: none;">
-        <h2>إنشاء حساب</h2>
-        <input type="text" id="regName" placeholder="الاسم">
-        <input type="text" id="regPhone" placeholder="رقم التليفون">
-        <input type="password" id="regPassword" placeholder="الرقم السري">
-        <select id="regRole" style="width: 95%; padding: 10px; margin: 10px 0;">
-            <option value="client">عميل</option>
-            <option value="technician">فني</option>
-            <option value="owner">المدير (أونر)</option>
-            <option value="admin">شركة / أدمن</option>
-        </select>
-        <button onclick="handleRegister()">تسجيل</button>
-        <button class="toggle-btn" onclick="showLogin()">لدي حساب بالفعل</button>
-    </div>
-
-    <script>
-        // قاعدة بيانات مبدئية مخزنة محلياً ويتم تسجيل حساب المدير الافتراضي بها
-        const defaultUsers = [
-            { name: "علي", phone: "owner", password: "789512364", role: "owner" }
-        ];
-
-        if (!localStorage.getItem('systemUsers')) {
-            localStorage.setItem('systemUsers', JSON.stringify(defaultUsers));
-        }
-
-        function showRegister() {
-            document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('registerBox').style.display = 'inline-block';
-        }
-
-        function showLogin() {
-            document.getElementById('registerBox').style.display = 'none';
-            document.getElementById('loginBox').style.display = 'inline-block';
-        }
-
-        function handleRegister() {
-            const name = document.getElementById('regName').value;
-            const phone = document.getElementById('regPhone').value;
-            const password = document.getElementById('regPassword').value;
-            const role = document.getElementById('regRole').value;
-
-            if (!name || !phone || !password) {
-                alert('الرجاء ملء جميع البيانات.');
-                return;
-            }
-
-            let users = JSON.parse(localStorage.getItem('systemUsers'));
-            users.push({ name, phone, password, role });
-            localStorage.setItem('systemUsers', JSON.stringify(users));
-            alert('تم تسجيل الحساب بنجاح!');
-            showLogin();
-        }
-
-        function handleLogin() {
-            const input = document.getElementById('loginInput').value;
-            const password = document.getElementById('loginPassword').value;
-
-            let users = JSON.parse(localStorage.getItem('systemUsers'));
-            const user = users.find(u => (u.phone === input || u.name === input) && u.password === password);
-
-            if (user) {
-                redirectUser(user.role);
-            } else {
-                alert('خطأ في البيانات أو الرقم السري غير صحيح.');
-            }
-        }
-
-        function redirectUser(role) {
-            if (role === 'client') {
-                window.location.href = 'https://client.oxygen11.com';
-            } else if (role === 'admin') {
-                window.location.href = 'https://admin.oxygen11.com';
-            } else if (role === 'owner') {
-                window.location.href = 'https://owner.oxygen11.com';
-            } else if (role === 'technician') {
-                window.location.href = 'https://technician.oxygen11.com';
-            } else {
-                alert('دور المستخدم غير معروف.');
-            }
-        }
-    </script>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white p-6 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
+    <h1 id="client-name" class="text-xl font-bold text-slate-900">أهلاً بك في لوحة العميل</h1>
+    <p class="text-xs text-slate-500">نطاق العملاء: client.oxygen11.com</p>
+    <button onclick="localStorage.removeItem('motqan_active_session'); window.location.replace('https://oxygen11.com');" class="w-full py-3 bg-red-50 text-red-600 rounded-xl font-bold text-xs">
+      تسجيل الخروج والعودة للرئيسية
+    </button>
+  </div>
+  <script>
+    const session = JSON.parse(localStorage.getItem('motqan_active_session') || '{}');
+    if (!session.role || session.role !== 'client') {
+      window.location.replace('https://oxygen11.com');
+    } else {
+      document.getElementById('client-name').textContent = `أهلاً بك يا ${session.name}`;
+    }
+  </script>
 </body>
 </html>
