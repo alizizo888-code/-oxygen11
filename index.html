@@ -1,577 +1,228 @@
-<!-- ... existing code ... -->
-      <!-- Main Services Catalog Header -->
-      <div class="px-4 pt-4 pb-2 flex items-center justify-between">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>مُتقن | أكسجين للصيانة والمقاولات</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body { font-family: 'Cairo', sans-serif; background-color: #0b1320; color: #1e293b; user-select: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center items-start antialiased p-0 sm:py-6">
+
+  <div class="w-full max-w-[440px] bg-[#F8FAFC] min-h-screen relative shadow-2xl flex flex-col sm:rounded-[36px] overflow-hidden border border-slate-200/60 pb-20">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-150 px-4 py-3 sticky top-0 z-40 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 font-bold">
+          <span class="material-symbols-outlined text-xl">home_repair_service</span>
+        </div>
         <div>
-          <h3 class="text-sm font-extrabold text-slate-900">الخدمات والأقسام الرئيسية</h3>
-          <p class="text-[11px] text-slate-500">اختر الخدمة لاستعراض الباقات والأسعار الفورية</p>
-        </div>
-        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">أسعار ثابتة</span>
-      </div>
-
-      <!-- Services Grid (Routes to dedicated specialized domains) -->
-      <div class="px-4 grid grid-cols-2 gap-3">
-        
-        <!-- Featured Service 1: Air Conditioning -->
-        <div onclick="openDomainServices('ac')" class="bg-white p-3.5 rounded-2xl border-2 border-emerald-500/70 hover:border-emerald-600 shadow-sm cursor-pointer transition active-scale relative group overflow-hidden">
-          <div class="absolute top-0 right-0 bg-emerald-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">
-            الأكثر طلباً ⭐
-          </div>
-          <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2.5 group-hover:bg-emerald-600 group-hover:text-white transition">
-            <span class="material-symbols-outlined text-2xl">mode_fan</span>
-          </div>
-          <h4 class="font-bold text-sm text-slate-900 mb-0.5">خدمات وصيانة التكييف</h4>
-          <p class="text-[11px] text-slate-500 leading-snug">غسيل عميق، شحن فريون، صيانة وفك وتركيب السبليت والشباك</p>
-          <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-xs font-extrabold text-emerald-700">يبدأ من 115 ر.س</span>
-            <span class="material-symbols-outlined text-slate-400 text-base">arrow_back</span>
-          </div>
-        </div>
-
-        <!-- Service 2: Plumbing -->
-        <div onclick="openDomainServices('plumbing')" class="bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-300 shadow-xs cursor-pointer transition active-scale group">
-          <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-2.5 group-hover:bg-blue-600 group-hover:text-white transition">
-            <span class="material-symbols-outlined text-2xl">water_drop</span>
-          </div>
-          <h4 class="font-bold text-sm text-slate-900 mb-0.5">السباكة والتسريبات</h4>
-          <p class="text-[11px] text-slate-500 leading-snug">كشف إلكتروني بدون تكسير، إصلاح خلاطات وتسليك المجاري</p>
-          <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-800">معاينة 180 ر.س</span>
-            <span class="material-symbols-outlined text-slate-400 text-base">arrow_back</span>
-          </div>
-        </div>
-
-        <!-- Service 3: Electrical -->
-        <div onclick="openDomainServices('electrical')" class="bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-300 shadow-xs cursor-pointer transition active-scale group">
-          <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-2.5 group-hover:bg-amber-600 group-hover:text-white transition">
-            <span class="material-symbols-outlined text-2xl">electric_bolt</span>
-          </div>
-          <h4 class="font-bold text-sm text-slate-900 mb-0.5">الكهرباء والإنارة</h4>
-          <p class="text-[11px] text-slate-500 leading-snug">تصليح شورت وماس، تمديد خطوط، تركيب ثريات ومفاتيح ذكية</p>
-          <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-800">فحص 120 ر.س</span>
-            <span class="material-symbols-outlined text-slate-400 text-base">arrow_back</span>
-          </div>
-        </div>
-
-        <!-- Service 4: General Contracting & Painting -->
-        <div onclick="openDomainServices('contracting')" class="bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-300 shadow-xs cursor-pointer transition active-scale group">
-          <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-2.5 group-hover:bg-purple-600 group-hover:text-white transition">
-            <span class="material-symbols-outlined text-2xl">format_paint</span>
-          </div>
-          <h4 class="font-bold text-sm text-slate-900 mb-0.5">المقاولات والدهانات</h4>
-          <p class="text-[11px] text-slate-500 leading-snug">عزل أسطح فوم، دهانات جوتن، جبس بورد وتشطيبات وترميم</p>
-          <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-xs font-bold text-purple-700">يبدأ 32 ر.س/م²</span>
-            <span class="material-symbols-outlined text-slate-400 text-base">arrow_back</span>
-          </div>
-        </div>
-
-        <!-- Service 5: Deep Cleaning & Pest Control -->
-        <div onclick="openDomainServices('cleaning')" class="bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-300 shadow-xs cursor-pointer transition active-scale group">
-          <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mb-2.5 group-hover:bg-teal-600 group-hover:text-white transition">
-            <span class="material-symbols-outlined text-2xl">sanitizer</span>
-          </div>
-          <h4 class="font-bold text-sm text-slate-900 mb-0.5">النظافة والتعقيم</h4>
-          <p class="text-[11px] text-slate-500 leading-snug">غسيل خزانات، تعقيم مجالس وسجاد، مكافحة حشرات معتمدة</p>
-          <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-800">يبدأ 150 ر.س</span>
-            <span class="material-symbols-outlined text-slate-400 text-base">arrow_back</span>
-          </div>
-        </div>
-
-        <!-- Service 6: Home Appliances -->
-        <div onclick="openDomainServices('appliances')" class="bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-300 shadow-xs cursor-pointer transition active-scale group">
-          <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-2.5 group-hover:bg-rose-600 group-hover:text-white transition">
-            <span class="material-symbols-outlined text-2xl">kitchen</span>
-          </div>
-          <h4 class="font-bold text-sm text-slate-900 mb-0.5">الأجهزة المنزلية</h4>
-          <p class="text-[11px] text-slate-500 leading-snug">صيانة غسالات، ثلاجات، أفران ومجففات بقطع غيار أصلية</p>
-          <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-800">فحص 95 ر.س</span>
-            <span class="material-symbols-outlined text-slate-400 text-base">arrow_back</span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Trust Badges & Customer Support Card -->
-<!-- ... existing code ... -->
-```
-```html:منصة متقن للصيانة والمقاولات:index.html
-<!-- ... existing code ... -->
-    <section id="view-service-ac" class="hidden flex-1 flex flex-col pb-32 slide-fade-in">
-      
-      <!-- Sub-Header for Services Screen -->
-      <div class="bg-white border-b border-slate-100 px-4 pt-2.5 pb-3">
-        <div class="flex items-center justify-between mb-2">
-          <!-- Back to Home -->
-          <button onclick="navigateTo('home')" aria-label="رجوع للرئيسية" class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition active-scale">
-            <span class="material-symbols-outlined text-xl">arrow_forward</span>
-          </button>
-          <!-- Title & Brand -->
-          <div class="text-center flex-1 px-2">
-            <h1 id="domain-header-title" class="text-base font-bold text-slate-900 leading-tight">خدمات وصيانة التكييف</h1>
-            <p class="text-[11px] text-emerald-600 font-medium flex items-center justify-center gap-1">
-              <span>مُتقن • أكسجين للصيانة</span>
-            </p>
-          </div>
-          <!-- Share / Info -->
-          <button onclick="showToast('تم نسخ رابط الخدمة لمشاركتها', 'share')" aria-label="مشاركة" class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition active-scale">
-            <span class="material-symbols-outlined text-lg">share</span>
-          </button>
-        </div>
-
-        <!-- Guarantee & Rating Pill -->
-        <div class="flex items-center justify-between bg-emerald-50/80 border border-emerald-100 rounded-xl px-3.5 py-2 text-xs">
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-lg bg-emerald-600 flex items-center justify-center text-white shrink-0">
-              <span class="material-symbols-outlined text-sm">verified</span>
-            </div>
-            <span id="domain-guarantee-text" class="font-semibold text-emerald-800">ضمان معتمد 30 يوماً على كافة الخدمات</span>
-          </div>
-          <div class="flex items-center gap-1 font-bold text-slate-700 bg-white px-2 py-0.5 rounded-md border border-emerald-100 shrink-0">
-            <span class="text-amber-500">★</span>
-            <span id="domain-rating-text" class="text-[11px]">4.9 (1,840+)</span>
-          </div>
+          <h1 class="font-black text-sm text-slate-900 leading-none">مُتقن</h1>
+          <p class="text-[10px] text-slate-400 font-medium mt-0.5">أكسجين للصيانة والمقاولات</p>
         </div>
       </div>
-
-      <!-- Domain Selection Strip (All 6 Specializations) -->
-      <div class="px-4 py-2 bg-slate-50 border-b border-slate-200/80">
-        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-          <button onclick="switchDomain('ac')" id="domain-pill-ac" class="domain-pill whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition active-scale">
-            <span class="material-symbols-outlined text-sm">mode_fan</span>
-            <span>التكييف</span>
-          </button>
-          <button onclick="switchDomain('plumbing')" id="domain-pill-plumbing" class="domain-pill whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:border-emerald-400 hover:text-emerald-700 transition active-scale flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm">water_drop</span>
-            <span>السباكة</span>
-          </button>
-          <button onclick="switchDomain('electrical')" id="domain-pill-electrical" class="domain-pill whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:border-emerald-400 hover:text-emerald-700 transition active-scale flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm">electric_bolt</span>
-            <span>الكهرباء</span>
-          </button>
-          <button onclick="switchDomain('contracting')" id="domain-pill-contracting" class="domain-pill whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:border-emerald-400 hover:text-emerald-700 transition active-scale flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm">format_paint</span>
-            <span>المقاولات والترميم</span>
-          </button>
-          <button onclick="switchDomain('cleaning')" id="domain-pill-cleaning" class="domain-pill whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:border-emerald-400 hover:text-emerald-700 transition active-scale flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm">sanitizer</span>
-            <span>النظافة والتعقيم</span>
-          </button>
-          <button onclick="switchDomain('appliances')" id="domain-pill-appliances" class="domain-pill whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:border-emerald-400 hover:text-emerald-700 transition active-scale flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm">kitchen</span>
-            <span>الأجهزة المنزلية</span>
-          </button>
-        </div>
+      <div class="flex items-center gap-2">
+        <button onclick="navigateTo('view-auth')" class="h-9 px-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
+          تسجيل الدخول
+        </button>
+        <button onclick="openAdminGate()" title="بوابة الإدارة والمالك" class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-300 text-amber-800 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[18px]">lock</span>
+        </button>
       </div>
+    </header>
 
-      <!-- Subtype Filter Tabs Carousel -->
-      <div class="px-4 py-2.5 bg-white border-b border-slate-100">
-        <div id="domain-subtypes-container" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
-          <!-- Dynamically populated by renderSubtypes() -->
+    <!-- Content Views -->
+    <main class="flex-1 overflow-y-auto no-scrollbar">
+
+      <!-- 1. الرئيسية للزائر -->
+      <section id="view-home" class="p-4 space-y-4">
+        <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-4 rounded-3xl shadow-md">
+          <span class="bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-bold">عرض الموسم ❄️</span>
+          <h2 class="text-base font-black mt-2">غسيل مكيف سبليت عميق بـ 115 ر.س</h2>
+          <p class="text-xs text-slate-200 mt-1">ضمان معتمد 30 يوماً وفاتورة ضريبية رسمية 15%</p>
         </div>
-      </div>
 
-      <!-- Main Services Dynamic Catalog Content -->
-      <div class="px-4 py-4 space-y-4">
-        
-        <!-- Header Section Info -->
+        <div class="grid grid-cols-2 gap-3">
+          <div onclick="navigateTo('view-auth')" class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs cursor-pointer hover:border-emerald-500 transition">
+            <span class="material-symbols-outlined text-emerald-600 text-2xl mb-1">mode_fan</span>
+            <h3 class="font-bold text-xs text-slate-900">التكييف والتبريد</h3>
+            <p class="text-[10px] text-emerald-700 font-bold mt-0.5">يبدأ من 115 ر.س</p>
+          </div>
+          <div onclick="navigateTo('view-auth')" class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs cursor-pointer hover:border-blue-500 transition">
+            <span class="material-symbols-outlined text-blue-600 text-2xl mb-1">water_drop</span>
+            <h3 class="font-bold text-xs text-slate-900">السباكة والتسريبات</h3>
+            <p class="text-[10px] text-blue-700 font-bold mt-0.5">كشف إلكتروني 180 ر.س</p>
+          </div>
+          <div onclick="navigateTo('view-auth')" class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs cursor-pointer hover:border-amber-500 transition">
+            <span class="material-symbols-outlined text-amber-600 text-2xl mb-1">electric_bolt</span>
+            <h3 class="font-bold text-xs text-slate-900">الكهرباء والإنارة</h3>
+            <p class="text-[10px] text-amber-700 font-bold mt-0.5">فحص شورت 120 ر.س</p>
+          </div>
+          <div onclick="navigateTo('view-auth')" class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs cursor-pointer hover:border-purple-500 transition">
+            <span class="material-symbols-outlined text-purple-600 text-2xl mb-1">format_paint</span>
+            <h3 class="font-bold text-xs text-slate-900">المقاولات والترميم</h3>
+            <p class="text-[10px] text-purple-700 font-bold mt-0.5">عزل فوم 32 ر.س/م²</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. بوابة الدخول والتسجيل والتحويل الفوري للنطاقات -->
+      <section id="view-auth" class="hidden p-4 space-y-4">
         <div class="flex items-center justify-between">
-          <h2 id="domain-catalog-heading" class="text-xs font-bold text-slate-500 uppercase tracking-wider">الخدمات المتاحة لمكيفات السبليت</h2>
-          <span class="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">شامل الضريبة 15%</span>
+          <button onclick="navigateTo('view-home')" class="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center">
+            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </button>
+          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full">بوابة الدخول الموحدة</span>
+          <div class="w-8"></div>
         </div>
 
-        <!-- Dynamic Services Container (Main item + Extra Services) -->
-        <div id="domain-services-list" class="space-y-3">
-          <!-- Dynamically rendered by renderServicesCatalog() -->
+        <div class="flex p-1 bg-slate-200/80 rounded-2xl">
+          <button id="tab-login-btn" onclick="setAuthMode('login')" class="flex-1 py-2 rounded-xl bg-white font-bold text-xs text-emerald-700 shadow-xs">تسجيل الدخول</button>
+          <button id="tab-reg-btn" onclick="setAuthMode('register')" class="flex-1 py-2 rounded-xl font-bold text-xs text-slate-600">إنشاء حساب جديد</button>
         </div>
 
-        <!-- Add-ons Section -->
-        <section class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
-          <h3 class="font-bold text-xs text-slate-700 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-emerald-600 text-base">add_circle</span>
-            <span>إضافات مميزة موصى بها مع الخدمة</span>
-          </h3>
-          <div id="domain-addons-list" class="space-y-2.5">
-            <!-- Dynamically populated by renderAddons() -->
-          </div>
-        </section>
-
-        <!-- Date & Time Scheduling Section -->
-        <section class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3.5">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <div class="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700">
-                <span class="material-symbols-outlined text-sm">calendar_month</span>
-              </div>
-              <h3 class="font-bold text-xs text-slate-900">تحديد موعد زيارة الفني</h3>
-            </div>
-            <span class="text-[11px] text-emerald-700 font-bold bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">⚡ حجز فوري</span>
-          </div>
-
-          <!-- Date Carousel -->
-          <div class="flex gap-2 overflow-x-auto no-scrollbar pt-1">
-            <button onclick="selectDate(this, 'اليوم')" class="date-btn flex-shrink-0 w-16 py-2 rounded-xl border border-slate-200 text-center hover:border-emerald-300 transition">
-              <span class="block text-[11px] text-slate-400">اليوم</span>
-              <span class="block text-sm font-bold text-slate-700 mt-0.5">20</span>
-              <span class="block text-[10px] text-slate-500">سبتمبر</span>
+        <!-- اختيار نوع الحساب -->
+        <div class="space-y-1.5">
+          <label class="block text-[11px] font-bold text-slate-600">نوع الحساب:</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="selectRole('client')" id="role-client-btn" class="p-2.5 rounded-xl border-2 border-emerald-600 bg-white font-bold text-xs text-emerald-800 flex items-center justify-center gap-1">
+              <span>👤</span><span>حساب عميل</span>
             </button>
-            <button onclick="selectDate(this, 'غداً')" class="date-btn flex-shrink-0 w-16 py-2 rounded-xl bg-emerald-600 text-white text-center shadow-sm ring-2 ring-emerald-600 ring-offset-2">
-              <span class="block text-[11px] text-emerald-100 font-medium">غداً</span>
-              <span class="block text-sm font-extrabold text-white mt-0.5">21</span>
-              <span class="block text-[10px] text-emerald-100">الاثنين</span>
+            <button type="button" onclick="selectRole('tech')" id="role-tech-btn" class="p-2.5 rounded-xl border border-slate-200 bg-white font-bold text-xs text-slate-600 flex items-center justify-center gap-1">
+              <span>🛠️</span><span>حساب فني</span>
             </button>
-            <button onclick="selectDate(this, 'الثلاثاء')" class="date-btn flex-shrink-0 w-16 py-2 rounded-xl border border-slate-200 text-center hover:border-emerald-300 transition">
-              <span class="block text-[11px] text-slate-400">الثلاثاء</span>
-              <span class="block text-sm font-bold text-slate-700 mt-0.5">22</span>
-              <span class="block text-[10px] text-slate-500">سبتمبر</span>
-            </button>
-            <button onclick="selectDate(this, 'الأربعاء')" class="date-btn flex-shrink-0 w-16 py-2 rounded-xl border border-slate-200 text-center hover:border-emerald-300 transition">
-              <span class="block text-[11px] text-slate-400">الأربعاء</span>
-              <span class="block text-sm font-bold text-slate-700 mt-0.5">23</span>
-              <span class="block text-[10px] text-slate-500">سبتمبر</span>
-            </button>
-          </div>
-
-          <!-- Time Slot Selection Grid -->
-          <div class="space-y-2 pt-1">
-            <label class="block text-[11px] font-semibold text-slate-500">الفترة الزمنية المفضلة:</label>
-            <div class="grid grid-cols-3 gap-2">
-              <button onclick="selectTimeSlot(this, 'صباحاً (9:00 ص - 1:00 م)')" class="time-btn py-2.5 px-1 rounded-xl border border-slate-200 text-slate-700 text-center hover:border-emerald-300 transition">
-                <span class="block text-xs font-bold">صباحاً</span>
-                <span class="block text-[10px] text-slate-500 mt-0.5">9:00 ص - 1:00 م</span>
-              </button>
-              <button onclick="selectTimeSlot(this, 'عصراً (2:00 م - 6:00 م)')" class="time-btn py-2.5 px-1 rounded-xl bg-emerald-50 border-2 border-emerald-600 text-emerald-800 text-center font-bold">
-                <span class="block text-xs">عصراً</span>
-                <span class="block text-[10px] text-emerald-700 mt-0.5">2:00 م - 6:00 م</span>
-              </button>
-              <button onclick="selectTimeSlot(this, 'مساءً (6:00 م - 10:00 م)')" class="time-btn py-2.5 px-1 rounded-xl border border-slate-200 text-slate-700 text-center hover:border-emerald-300 transition">
-                <span class="block text-xs font-bold">مساءً</span>
-                <span class="block text-[10px] text-slate-500 mt-0.5">6:00 م - 10:00 م</span>
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Service Address Selection -->
-        <section class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-bold text-slate-600">موقع تنفيذ الخدمة</span>
-            <button onclick="promptEditAddress()" class="text-xs font-bold text-emerald-600 hover:text-emerald-700 underline underline-offset-2">تغيير الموقع</button>
-          </div>
-          <div class="flex items-start gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
-            <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700 mt-0.5 flex-shrink-0">
-              <span class="material-symbols-outlined text-base">location_on</span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2">
-                <p id="display-address-title" class="text-xs font-bold text-slate-800">المنزل (المملكة العربية السعودية)</p>
-                <span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded font-medium">محدد</span>
-              </div>
-              <p id="display-address-desc" class="text-[11px] text-slate-500 truncate mt-0.5">حي الروضة، شارع الأمل، مبنى 42، شقة 104</p>
-            </div>
-          </div>
-        </section>
-
-        <!-- Coupon & Special Notes -->
-        <section class="space-y-3">
-          <div class="bg-white border border-slate-200 rounded-2xl p-3 shadow-xs">
-            <label class="block text-[11px] font-bold text-slate-600 mb-1.5">كوبون الخصم أو قسيمة الشراء</label>
-            <div class="flex items-center gap-2">
-              <div class="relative flex-1">
-                <input id="coupon-code-input" class="w-full bg-emerald-50/50 border border-emerald-400 text-emerald-800 font-bold text-xs rounded-xl px-3 py-2 pr-8 focus:outline-none uppercase tracking-wider" readonly type="text" value="OXYGEN30"/>
-                <span class="material-symbols-outlined text-emerald-600 text-base absolute top-2.5 right-2.5">verified</span>
-              </div>
-              <button onclick="applyNewCoupon()" class="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition">
-                تغيير
-              </button>
-            </div>
-            <p class="text-[10px] text-emerald-700 font-semibold mt-1 flex items-center gap-1">
-              <span>✓ تم تفعيل كوبون أكسجين (خصم 30 ر.س على الإجمالي)</span>
-            </p>
-          </div>
-
-          <!-- Notes for Technician -->
-          <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs">
-            <label class="block text-[11px] font-bold text-slate-700 mb-1.5 flex items-center justify-between">
-              <span>ملاحظات أو وصف المشكلة للفني (اختياري)</span>
-              <span class="text-slate-400 font-normal text-[10px]">0/150</span>
-            </label>
-            <textarea id="order-notes" class="w-full text-xs text-slate-800 placeholder-slate-400 border border-slate-200 rounded-xl p-2.5 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition resize-none outline-none" placeholder="مثال: المكيف يسرّب قطرات ماء في الصالة، أو صوت صفير في الوحدة الخارجية..." rows="2"></textarea>
-          </div>
-        </section>
-
-        <!-- Brand Authenticity Badge -->
-        <div class="text-center pt-2 pb-1">
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-200/60 text-slate-600 text-[11px]">
-            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-            <span>خدمة معتمدة ومدعومة من شركة أكسجين للمقاولات العامة</span>
           </div>
         </div>
 
-      </div>
-
-      <!-- Sticky Bottom Checkout Bar -->
-      <aside class="fixed bottom-0 left-0 right-0 max-w-[450px] mx-auto bg-white/95 backdrop-blur-md border-t border-slate-200 px-5 py-3.5 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-        <div class="flex items-center justify-between gap-4">
-          <!-- Price Summary Breakdown -->
-          <div class="text-right">
-            <span class="text-[11px] text-slate-400 block font-medium">الإجمالي (شامل الضريبة)</span>
-            <div class="flex items-baseline gap-1">
-              <span id="grand-total-display" class="text-xl font-extrabold text-slate-900 tracking-tight">215.0</span>
-              <span class="text-xs font-bold text-emerald-700">ر.س</span>
-            </div>
-            <span id="discount-banner-text" class="text-[10px] text-emerald-600 font-bold block">وفرت 60 ر.س اليوم ⚡</span>
+        <!-- نموذج الدخول -->
+        <div id="form-login" class="space-y-3 bg-white p-4 rounded-2xl border border-slate-200">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">رقم الجوال</label>
+            <input id="login-phone" type="tel" placeholder="05XXXXXXXX" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold outline-none"/>
           </div>
-
-          <!-- Main Booking Trigger -->
-          <button onclick="handleServiceCheckout()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition active-scale">
-            <span class="text-sm">متابعة وتأكيد الحجز</span>
-            <span class="material-symbols-outlined text-base rotate-180">arrow_forward</span>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">الرقم السري</label>
+            <input id="login-pass" type="password" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold outline-none"/>
+          </div>
+          <button onclick="handleLogin()" class="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold text-xs shadow-md">
+            دخول وتحويل فوري للفرع
           </button>
         </div>
-      </aside>
 
-    </section>
-
-    <section id="view-auth" class="hidden flex-1 flex flex-col p-4 pb-12 slide-fade-in">
-<!-- ... existing code ... -->
-```
-```html:منصة متقن للصيانة والمقاولات:index.html
-<!-- ... existing code ... -->
-    // Active domain key: 'ac', 'plumbing', 'electrical', 'contracting', 'cleaning', 'appliances'
-    let currentDomain = 'ac';
-    let currentSubtype = 'split';
-
-    // Open domain directly from Home
-    function openDomainServices(domainKey) {
-      navigateTo('service-ac');
-      switchDomain(domainKey);
-    }
-
-    // Dynamic Render: Subtypes Carousel
-    function renderSubtypes() {
-      const d = servicesDB[currentDomain];
-      const container = document.getElementById('domain-subtypes-container');
-      if (!container || !d || !d.subtypes) return;
-
-      container.innerHTML = d.subtypes.map(sub => {
-        const isActive = sub.id === currentSubtype;
-        const activeClasses = 'bg-emerald-600 text-white font-bold text-xs shadow-sm ring-2 ring-emerald-600 ring-offset-1';
-        const inactiveClasses = 'bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:border-emerald-400 hover:text-emerald-700 shadow-xs';
-        return `
-          <button onclick="selectSubtype('${sub.id}')" class="whitespace-nowrap px-4 py-2 rounded-xl transition flex items-center gap-1.5 ${isActive ? activeClasses : inactiveClasses}">
-            <span class="material-symbols-outlined text-sm">${sub.icon}</span>
-            <span>${sub.name}</span>
+        <!-- نموذج إنشاء الحساب -->
+        <div id="form-register" class="hidden space-y-3 bg-white p-4 rounded-2xl border border-slate-200">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">الاسم الكامل</label>
+            <input id="reg-name" type="text" placeholder="الاسم" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold outline-none"/>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">رقم الجوال</label>
+            <input id="reg-phone" type="tel" placeholder="05XXXXXXXX" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold outline-none"/>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">تعيين الرقم السري</label>
+            <input id="reg-pass" type="password" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold outline-none"/>
+          </div>
+          <button onclick="handleRegister()" class="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold text-xs shadow-md">
+            تأكيد الحساب والتحويل المباشر
           </button>
-        `;
-      }).join('');
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-2 z-40 flex items-center justify-around text-xs">
+      <button onclick="navigateTo('view-home')" class="flex flex-col items-center text-emerald-700 font-bold">
+        <span class="material-symbols-outlined text-xl">home</span>
+        <span class="text-[10px]">الرئيسية</span>
+      </button>
+      <button onclick="navigateTo('view-auth')" class="flex flex-col items-center text-slate-500">
+        <span class="material-symbols-outlined text-xl">account_circle</span>
+        <span class="text-[10px]">حسابي</span>
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    let selectedRole = 'client';
+
+    const SUBDOMAINS = {
+      client: 'https://client.oxygen11.com',
+      tech: 'https://technician.oxygen11.com',
+      supervisor: 'https://admin.oxygen11.com',
+      owner: 'https://owner.oxygen11.com'
+    };
+
+    function navigateTo(id) {
+      document.getElementById('view-home').classList.add('hidden');
+      document.getElementById('view-auth').classList.add('hidden');
+      document.getElementById(id).classList.remove('hidden');
     }
 
-    function selectSubtype(subtypeId) {
-      currentSubtype = subtypeId;
-      renderSubtypes();
+    function setAuthMode(mode) {
+      const isLogin = mode === 'login';
+      document.getElementById('form-login').classList.toggle('hidden', !isLogin);
+      document.getElementById('form-register').classList.toggle('hidden', isLogin);
+      document.getElementById('tab-login-btn').className = isLogin ? 'flex-1 py-2 rounded-xl bg-white font-bold text-xs text-emerald-700 shadow-xs' : 'flex-1 py-2 rounded-xl font-bold text-xs text-slate-600';
+      document.getElementById('tab-reg-btn').className = !isLogin ? 'flex-1 py-2 rounded-xl bg-white font-bold text-xs text-emerald-700 shadow-xs' : 'flex-1 py-2 rounded-xl font-bold text-xs text-slate-600';
     }
 
-    // Dynamic Render: Main Service + Additional Domain Services
-    function renderServicesCatalog() {
-      const d = servicesDB[currentDomain];
-      const container = document.getElementById('domain-services-list');
-      if (!container || !d) return;
-
-      let html = '';
-
-      // Main featured service article with quantity counter
-      if (d.mainItem) {
-        const m = d.mainItem;
-        html += `
-          <article class="bg-white border-2 border-emerald-500/90 rounded-2xl p-3.5 shadow-sm relative overflow-hidden transition">
-            ${m.badge ? `<div class="absolute top-0 right-0 bg-emerald-600 text-white text-[10px] font-bold px-3 py-0.5 rounded-bl-xl shadow-xs">${m.badge}</div>` : ''}
-            <div class="flex items-start justify-between gap-3 pt-1">
-              <div class="flex-1">
-                <h3 class="font-bold text-sm text-slate-900 leading-snug">${m.title}</h3>
-                <p class="text-xs text-slate-500 mt-1 leading-relaxed">${m.desc}</p>
-                <div class="flex items-center gap-2 mt-2">
-                  <span class="text-base font-extrabold text-emerald-700">${m.basePrice.toFixed(1)} <span class="text-xs font-medium">ر.س</span></span>
-                  ${m.oldPrice ? `<span class="text-xs text-slate-400 line-through">${m.oldPrice.toFixed(1)} ر.س</span>` : ''}
-                </div>
-              </div>
-              <div class="flex items-center gap-2 bg-emerald-50/80 border border-emerald-200 rounded-xl p-1 self-center">
-                <button onclick="changeMainQty(-1)" aria-label="تقليل العدد" class="w-7 h-7 rounded-lg bg-white border border-emerald-200 flex items-center justify-center text-emerald-700 text-base font-bold shadow-2xs hover:bg-emerald-100 transition active-scale">-</button>
-                <span class="text-sm font-bold text-emerald-900 px-1.5 min-w-[20px] text-center">${m.qty}</span>
-                <button onclick="changeMainQty(1)" aria-label="زيادة العدد" class="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center text-white text-base font-bold shadow-sm hover:bg-emerald-700 transition active-scale">+</button>
-              </div>
-            </div>
-            ${m.promo ? `
-              <div class="mt-3 bg-emerald-50 border border-dashed border-emerald-300 rounded-xl p-2.5 flex items-center justify-between text-xs">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 text-sm shrink-0">🎁</div>
-                  <span class="font-bold text-emerald-800 text-[11px]">${m.promo}</span>
-                </div>
-              </div>` : ''}
-          </article>
-        `;
-      }
-
-      // Related specialized services
-      if (d.services && d.services.length > 0) {
-        d.services.forEach(s => {
-          const isSelected = !!s.active;
-          html += `
-            <article class="bg-white border ${isSelected ? 'border-emerald-500 ring-1 ring-emerald-500/30' : 'border-slate-200 hover:border-slate-300'} rounded-2xl p-3.5 shadow-xs flex items-center justify-between gap-3 transition">
-              <div class="flex-1">
-                <div class="flex items-center gap-2">
-                  <h3 class="font-bold text-sm text-slate-900">${s.title}</h3>
-                  ${s.badge ? `<span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">${s.badge}</span>` : ''}
-                </div>
-                <p class="text-xs text-slate-500 mt-0.5">${s.desc}</p>
-                <div class="mt-2 text-sm font-bold text-slate-800">
-                  ${s.price.toFixed(1)} <span class="text-xs font-medium text-slate-500">ر.س</span>
-                  ${s.oldPrice ? `<span class="text-xs text-slate-400 line-through mr-1">${s.oldPrice.toFixed(1)} ر.س</span>` : ''}
-                </div>
-              </div>
-              <button onclick="toggleDomainService('${s.id}')" class="w-10 h-10 rounded-xl ${isSelected ? 'bg-emerald-600 text-white shadow-sm' : 'bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-600 hover:text-white'} flex items-center justify-center transition active-scale">
-                <span class="material-symbols-outlined text-xl">${isSelected ? 'check' : 'add'}</span>
-              </button>
-            </article>
-          `;
-        });
-      }
-
-      container.innerHTML = html;
+    function selectRole(role) {
+      selectedRole = role;
+      document.getElementById('role-client-btn').className = role === 'client' ? 'p-2.5 rounded-xl border-2 border-emerald-600 bg-white font-bold text-xs text-emerald-800 flex items-center justify-center gap-1' : 'p-2.5 rounded-xl border border-slate-200 bg-white font-bold text-xs text-slate-600 flex items-center justify-center gap-1';
+      document.getElementById('role-tech-btn').className = role === 'tech' ? 'p-2.5 rounded-xl border-2 border-emerald-600 bg-white font-bold text-xs text-emerald-800 flex items-center justify-center gap-1' : 'p-2.5 rounded-xl border border-slate-200 bg-white font-bold text-xs text-slate-600 flex items-center justify-center gap-1';
     }
 
-    function changeMainQty(delta) {
-      const d = servicesDB[currentDomain];
-      if (!d || !d.mainItem) return;
-      d.mainItem.qty = Math.max(1, (d.mainItem.qty || 1) + delta);
-      renderServicesCatalog();
-      calculateGrandTotal();
+    function transferToSubdomain(role, userObject) {
+      // تشفير التوكن ونقله مع الرابط لتثبيت الجلسة في الفرع
+      const token = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(userObject)))));
+      const targetUrl = `${SUBDOMAINS[role]}/?auth_token=${token}`;
+      window.location.replace(targetUrl);
     }
 
-    function toggleDomainService(serviceId) {
-      const d = servicesDB[currentDomain];
-      if (!d || !d.services) return;
-      const s = d.services.find(item => item.id === serviceId);
-      if (s) {
-        s.active = !s.active;
-        renderServicesCatalog();
-        calculateGrandTotal();
+    function handleRegister() {
+      const name = document.getElementById('reg-name').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const pass = document.getElementById('reg-pass').value.trim();
+      if (!name || !phone || !pass) return alert('يرجى ملء جميع الحقول');
+
+      const user = { name, phone, pass, role: selectedRole, wallet: 0.0, points: 50 };
+      transferToSubdomain(selectedRole, user);
+    }
+
+    function handleLogin() {
+      const phone = document.getElementById('login-phone').value.trim();
+      const pass = document.getElementById('login-pass').value.trim();
+      if (!phone || !pass) return alert('يرجى إدخال الجوال وكلمة المرور');
+
+      const user = { name: 'المستخدم', phone, pass, role: selectedRole, wallet: 150.0, points: 60 };
+      transferToSubdomain(selectedRole, user);
+    }
+
+    function openAdminGate() {
+      const pin = prompt('أدخل الرمز السري لبوابة المالك (علي: 789512364) أو المشرف (8888):');
+      if (pin === '789512364') {
+        const ownerUser = { name: 'علي', role: 'owner', pin };
+        transferToSubdomain('owner', ownerUser);
+      } else if (pin === '8888') {
+        const supUser = { name: 'المشرف الميداني', role: 'supervisor', pin };
+        transferToSubdomain('supervisor', supUser);
+      } else if (pin) {
+        alert('الرمز السري غير صحيح!');
       }
     }
-
-    // Dynamic Render: Add-ons
-    function renderAddons() {
-      const d = servicesDB[currentDomain];
-      const container = document.getElementById('domain-addons-list');
-      if (!container || !d || !d.addons) return;
-
-      container.innerHTML = d.addons.map(a => {
-        const isChecked = !!a.checked;
-        const isDisabled = !!a.disabled;
-        return `
-          <label class="flex items-center justify-between p-2.5 rounded-xl border ${isChecked && !isDisabled ? 'border-emerald-300 bg-emerald-50/50' : 'border-slate-200 bg-slate-50/70'} cursor-pointer select-none">
-            <div class="flex items-center gap-2.5">
-              <input type="checkbox" onchange="toggleAddon('${a.id}', this.checked)" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled' : ''} class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4"/>
-              <span class="text-xs font-semibold text-slate-800">${a.title}</span>
-            </div>
-            ${a.freeBadge ? `<span class="text-[11px] font-bold text-emerald-600 bg-emerald-100/70 px-2 py-0.5 rounded">مجاناً</span>` :
-              `<span class="text-xs font-bold text-emerald-800">${a.note || ('+' + a.price.toFixed(1) + ' ر.س')}</span>`}
-          </label>
-        `;
-      }).join('');
-    }
-
-    function toggleAddon(addonId, isChecked) {
-      const d = servicesDB[currentDomain];
-      if (!d || !d.addons) return;
-      const a = d.addons.find(item => item.id === addonId);
-      if (a) {
-        a.checked = isChecked;
-        calculateGrandTotal();
-      }
-    }
-
-    // Switch Domain
-    function switchDomain(domainKey) {
-      if (!servicesDB[domainKey]) return;
-      currentDomain = domainKey;
-
-      // Update Domain Switcher Pills
-      document.querySelectorAll('.domain-pill').forEach(btn => {
-        btn.className = 'domain-pill whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:border-emerald-400 hover:text-emerald-700 transition active-scale flex items-center gap-1.5';
-      });
-      const activePill = document.getElementById('domain-pill-' + domainKey);
-      if (activePill) {
-        activePill.className = 'domain-pill whitespace-nowrap px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition active-scale';
-        if (typeof activePill.scrollIntoView === 'function') {
-          activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        }
-      }
-
-      // Update Domain Metadata safely
-      const d = servicesDB[domainKey];
-      const headerTitle = document.getElementById('domain-header-title');
-      if (headerTitle) headerTitle.textContent = d.title;
-
-      const guaranteeText = document.getElementById('domain-guarantee-text');
-      if (guaranteeText) guaranteeText.textContent = d.guarantee;
-
-      const ratingText = document.getElementById('domain-rating-text');
-      if (ratingText) ratingText.textContent = d.rating;
-
-      const catalogHeading = document.getElementById('domain-catalog-heading');
-      if (catalogHeading) catalogHeading.textContent = d.heading;
-
-      // Set default sub-type
-      if (d.subtypes && d.subtypes.length > 0) {
-        currentSubtype = d.subtypes[0].id;
-      }
-
-      renderSubtypes();
-      renderServicesCatalog();
-      renderAddons();
-      calculateGrandTotal();
-    }
-
-    // Dynamic Grand Total Calculator
-    function calculateGrandTotal() {
-      const d = servicesDB[currentDomain];
-      if (!d) return;
-
-      let total = 0;
-
-      // Main Item
-      if (d.mainItem) {
-        total += (d.mainItem.basePrice * d.mainItem.qty);
-      }
-
-      // Extra Services
-      d.services.forEach(s => {
-        if (s.active) total += s.price;
-      });
-
-      // Addons
-      d.addons.forEach(a => {
-        if (a.checked && a.price) total += a.price;
-      });
-
-      // Apply Coupon
-      total = Math.max(0, total - couponDiscount);
-
-      const totalDisplay = document.getElementById('grand-total-display');
-      if (totalDisplay) totalDisplay.textContent = total.toFixed(1);
-
-      const modalPrice = document.getElementById('modal-summary-price');
-      if (modalPrice) modalPrice.textContent = total.toFixed(1) + ' ر.س';
-
-      const discountBanner = document.getElementById('discount-banner-text');
-      if (discountBanner) {
-        const savings = (couponDiscount + (d.mainItem && d.mainItem.oldPrice ? (d.mainItem.oldPrice - d.mainItem.basePrice) * d.mainItem.qty : 0));
-        discountBanner.textContent = `وفرت ${savings.toFixed(0)} ر.س اليوم ⚡`;
-      }
-    }
-
-    // Navigation Handler
-<!-- ... existing code ... -->
+  </script>
+</body>
+</html>
