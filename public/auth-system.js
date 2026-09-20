@@ -1,15 +1,17 @@
 /**
  * auth-system.js
- * نظام إدارة الجلسات والتوجيه التلقائي عبر النطاقات الفرعية (Subdomains)
+ * محرك الجلسات والتوجيه الصحيح لكل نطاق فرعي (Subdomain) بشكل مستقل
  */
 const MotqanAuthSystem = (function () {
   const STORAGE_SESSION_KEY = 'motqan_active_session';
   const STORAGE_USERS_KEY = 'motqan_registered_users';
 
-  // الروابط والنطاقات الفرعية المخصصة لكل دور
+  // جدول التوجيه الدقيق لكل دور إلى نطاقه الفرعي المخصص حصرياً
   const REDIRECT_DOMAINS = {
     client: 'https://client.oxygen11.com',
-    tech: 'https://technician.oxygen11.com'
+    tech: 'https://technician.oxygen11.com',
+    supervisor: 'https://admin.oxygen11.com',
+    owner: 'https://owner.oxygen11.com'
   };
 
   function getRegisteredUsers() {
@@ -25,77 +27,77 @@ const MotqanAuthSystem = (function () {
   }
 
   return {
-    // 1. فحص الجلسة التلقائي (يُستدعى فور فتح الموقع الرئيسي)
+    // 1. التحقق التلقائي عند فتح الموقع الرئيسي وتوجيه كل فرع لمكانه الصحيح
     autoRedirectIfLoggedIn: function () {
       try {
         const session = localStorage.getItem(STORAGE_SESSION_KEY);
         if (session) {
           const user = JSON.parse(session);
           if (user && user.role && REDIRECT_DOMAINS[user.role]) {
-            // التحويل الفوري للنطاق الفرعي الخاص بالعميل أو الفني
-            window.location.replace(REDIRECT_DOMAINS[user.role]);
-            return true;
+            // منع إعادة التوجيه اللانهائي إذا كان المستخدم موجوداً بالفعل في نفس النطاق الفرعي الخاص به
+            const currentHost = window.location.hostname;
+            const targetDomain = new URL(REDIRECT_DOMAINS[user.role]).hostname;
+            
+            if (currentHost !== targetDomain) {
+              window.location.replace(REDIRECT_DOMAINS[user.role]);
+              return true;
+            }
           }
         }
       } catch (err) {
-        console.error("Auth Session Error:", err);
+        console.error("Auth Error:", err);
       }
-      return false; // يظل الزائر في الصفحة الرئيسية
+      return false;
     },
 
-    // 2. إنشاء حساب جديد والتوجيه للنطاق الفرعي
+    // 2. تسجيل حساب جديد وتوجيهه للنطاق الفرعي الخاص به فوراً
     register: function ({ name, phone, password, role }) {
-      if (!phone || !password) {
-        throw new Error('يرجى كتابة رقم الجوال وكلمة المرور');
-      }
+      if (!phone || !password) throw new Error('يرجى إدخال الجوال وكلمة المرور');
 
       const users = getRegisteredUsers();
       const cleanPhone = phone.trim();
+
+      const assignedRole = ['client', 'tech', 'supervisor', 'owner'].includes(role) ? role : 'client';
 
       const newUser = {
         name: (name || '').trim(),
         phone: cleanPhone,
         password: password.trim(),
-        role: role === 'tech' ? 'tech' : 'client',
-        createdAt: new Date().toISOString()
+        role: assignedRole
       };
 
       users[cleanPhone] = newUser;
       saveRegisteredUsers(users);
-
-      // حفظ الجلسة النشطة
       localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(newUser));
 
-      // التحويل الفوري للنطاق الفرعي
-      window.location.replace(REDIRECT_DOMAINS[newUser.role]);
+      // التحويل للنطاق الفرعي الدقيق
+      window.location.replace(REDIRECT_DOMAINS[assignedRole]);
     },
 
-    // 3. تسجيل الدخول والتحقق ثم التوجيه بالنطاق الفرعي
+    // 3. تسجيل الدخول والتوجيه للنطاق الفرعي الخاص بالدور
     login: function ({ phone, password }) {
-      if (!phone || !password) {
-        throw new Error('يرجى إدخال الجوال وكلمة المرور');
-      }
+      if (!phone || !password) throw new Error('يرجى إدخال الجوال وكلمة المرور');
 
       const users = getRegisteredUsers();
-      const cleanPhone = phone.trim();
-      const user = users[cleanPhone];
+      const user = users[phone.trim()];
 
       if (!user || user.password !== password.trim()) {
         throw new Error('بيانات الدخول غير صحيحة');
       }
 
-      // حفظ الجلسة والتوجيه للنطاق الفرعي
       localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(user));
+      
+      // التحويل للنطاق الفرعي الدقيق
       window.location.replace(REDIRECT_DOMAINS[user.role]);
     },
 
-    // 4. تسجيل الخروج والعودة للرئيسية
-    logout: function (returnUrl = 'https://oxygen11.com') {
+    // 4. تسجيل الخروج والعودة للموقع الرئيسي (www.oxygen11.com)
+    logout: function () {
       localStorage.removeItem(STORAGE_SESSION_KEY);
-      window.location.replace(returnUrl);
+      window.location.replace('https://www.oxygen11.com');
     }
   };
 })();
 
-// تشغيل التحقق اللحظي فور تحميل السكربت
+// تشغيل الفحص اللحظي فور التحميل
 MotqanAuthSystem.autoRedirectIfLoggedIn();
