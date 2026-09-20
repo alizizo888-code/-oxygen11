@@ -21,7 +21,15 @@
         window.location.replace('https://oxygen11.com');
         return;
       }
-
+<!-- استدعاء المنظومة المركزية من المجلد المشترك -->
+<script src="https://www.oxygen11.com/oxygen_core/auth-system.js"></script>
+<script src="https://www.oxygen11.com/oxygen_core/motqan-database.js"></script>
+<script src="https://www.oxygen11.com/oxygen_core/motqan-orders-engine.js"></script>
+<script src="https://www.oxygen11.com/oxygen_core/motqan-points-wallet.js"></script>
+<script src="https://www.oxygen11.com/oxygen_core/motqan-client-admin-bridge.js"></script>
+<script src="https://www.oxygen11.com/oxygen_core/motqan-comm-engine.js"></script>
+<script src="https://www.oxygen11.com/oxygen_core/motqan-ai-engine.js"></script>
+<script src="https://www.oxygen11.com/oxygen_core/motqan-wallet-geo.js"></script>
       const isVerified = sessionStorage.getItem('admin_auth');
       if (isVerified !== 'true') {
         const pin = prompt(session.role === 'owner' ? 'أدخل رمز المالك (علي): 789512364' : 'أدخل رمز المشرف: 8888');
