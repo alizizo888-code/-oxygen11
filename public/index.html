@@ -1,64 +1,40 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <script src="/sovereign-trigger.js" defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة مُتقن | الخدمات المهنية المتكاملة</title>
+    <title>تسجيل الدخول - تطبيق مُتقن</title>
     <style>
-        body { 
-            font-family: Tahoma, sans-serif; 
-            background-color: #f4f7f6; 
-            margin: 0; 
-            padding: 40px; 
-            color: #333; 
-        }
-        .container { 
-            max-width: 800px; 
-            margin: auto; 
-            background: white; 
-            padding: 40px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
-            text-align: center;
-        }
-        h1 { 
-            color: #162447; 
-            margin-bottom: 10px;
-        }
-        p { 
-            color: #64748b; 
-            font-size: 15px; 
-        }
-        .welcome-box {
-            margin-top: 30px;
-            padding: 25px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-        }
-        .sovereign-footer { 
-            font-size: 12px; 
-            color: #94a3b8; 
-            margin-top: 30px; 
-        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0f172a; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-box { background: #1e293b; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; width: 320px; border: 1px solid #334155; }
+        h1 { color: #38bdf8; margin-bottom: 20px; font-size: 1.4rem; }
+        input[type="password"] { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; text-align: center; font-size: 1.2rem; box-sizing: border-box; }
+        button { width: 100%; background: #0284c7; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.2s; }
+        button:hover { background: #0369a1; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h1>منصة مُتقن (Mutqan Platform)</h1>
-    <p>بوابة الخدمات المهنية وصيانة التكييفات وغرف التبريد</p>
-
-    <div class="welcome-box">
-        <h2>أهلاً بك في الصفحة الرئيسية المباشرة</h2>
-        <p>تم إزالة شاشات التسجيل المعقدة بنجاح لتتمكن من تصفح النظام واختباره بسلاسة.</p>
+    <div class="login-box">
+        <h1>بوابة تسجيل الدخول</h1>
+        <input type="password" id="passInput" placeholder="أدخل رقم الصلاحية (1 إلى 4)" autofocus>
+        <button onclick="routeUser()">دخول النظام</button>
     </div>
 
-    <div class="sovereign-footer">
-        تحت الإدارة السيادية والتحكم الكامل | مرخصة برقم: SAIP-CR-2024-8891
-    </div>
-</div>
-
+    <script>
+        function routeUser() {
+            const val = document.getElementById('passInput').value.trim();
+            if (val === '1') {
+                window.location.href = 'client/index.html';
+            } else if (val === '2') {
+                window.location.href = 'admin/index.html';
+            } else if (val === '3') {
+                window.location.href = 'owner/index.html';
+            } else if (val === '4') {
+                window.location.href = 'channel/index.html';
+            } else {
+                alert('رمز الدخول غير صحيح! الرجاء إدخال رقم من 1 إلى 4.');
+            }
+        }
+    </script>
 </body>
 </html>
