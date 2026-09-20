@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --brand-primary: #006948;
+  --brand-primary-hover: #005238;
+  --brand-accent: #059669;
+  --brand-gold-bg: #fffbeb;
+  --brand-gold-border: #fde68a;
+  --brand-gold-text: #92400e;
+  --bg-app: #f8fafc;
+  --surface-card: #ffffff;
+}
+
+* {
+  font-family: 'Cairo', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #0b1320;
+  margin: 0;
+  padding: 0;
+}
+
+/* تنقل سريع وتلاشي ناعم بين الصفحات والتبويبات */
+.view-container {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* تأثير الضغط على الكروت والأزرار */
+.press-scale {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.press-scale:active {
+  transform: scale(0.96);
+  opacity: 0.9;
+}
+
+/* شريط التنقل السفلي المثبت */
+.bottom-nav-bar {
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
