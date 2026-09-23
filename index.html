@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>غرفة الإدارة المؤسسية والتحكم الشامل | مُتقن (Enterprise Admin)</title>
+  <title>غرفة الإدارة الكبرى والربط الشامل | مُتقن (Master Hub)</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -23,25 +23,24 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start p-2 sm:p-4">
 
-  <!-- إطار لوحة الإدارة المؤسسية الكبرى -->
   <div class="w-full max-w-7xl bg-[#111c2e] min-h-[94vh] rounded-[32px] shadow-2xl border border-slate-800 flex flex-col overflow-hidden">
     
-    <!-- الشريط العلوي للإدارة -->
+    <!-- الشريط العلوي -->
     <header class="bg-[var(--mucs-admin-dark)] text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center font-black">
-          <span class="material-symbols-outlined text-xl">admin_panel_settings</span>
+          <span class="material-symbols-outlined text-xl">hub</span>
         </div>
         <div>
-          <h1 class="text-sm font-black tracking-wide">الإدارة المركزية وغرفة العمليات المؤسسية</h1>
-          <span class="text-[10px] text-emerald-400 font-bold">صلاحيات كاملة للتحكم التشغيلي، الماركتينج، والميدان</span>
+          <h1 class="text-sm font-black tracking-wide">المنصة المركزية الكبرى للربط الشامل والاتصالات</h1>
+          <span class="text-[10px] text-emerald-400 font-bold">إدارة الواتساب، الدردشة الموحدة، الوسائط، والأيقونات المخفية</span>
         </div>
       </div>
 
       <div class="flex items-center gap-3">
         <div class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-black flex items-center gap-2">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>المسؤول: مدير النظام العام (Admin-Root)</span>
+          <span>الحالة: ربط الجهات نشط</span>
         </div>
         <button onclick="executeAdminLogout()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-black flex items-center gap-1 transition">
           <span class="material-symbols-outlined text-sm">logout</span>
@@ -50,206 +49,179 @@
       </div>
     </header>
 
-    <!-- شريط التنقل بين الأقسام الـ 7 المؤسسية -->
+    <!-- شريط التنقل بين الأقسام الـ 11 الشاملة -->
     <nav class="bg-[#182438] border-b border-slate-800 px-4 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
       <button onclick="switchAdminTab('dispatch')" id="nav-dispatch" class="px-4 py-2 rounded-xl bg-[var(--mucs-primary)] text-white font-black text-xs flex items-center gap-1.5 shrink-0 shadow-sm">
-        <span class="material-symbols-outlined text-base">local_shipping</span>
-        <span>الطلبات والميدان</span>
+        <span class="material-symbols-outlined text-base">local_shipping</span> الطلبات
+      </button>
+      <button onclick="switchAdminTab('chat')" id="nav-chat" class="px-4 py-2 rounded-xl bg-[#111c2e] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
+        <span class="material-symbols-outlined text-base">forum</span> الدردشة الموحدة والواتساب
+      </button>
+      <button onclick="switchAdminTab('media')" id="nav-media" class="px-4 py-2 rounded-xl bg-[#111c2e] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
+        <span class="material-symbols-outlined text-base">perm_media</span> إدارة الوسائط
+      </button>
+      <button onclick="switchAdminTab('icons')" id="nav-icons" class="px-4 py-2 rounded-xl bg-[#111c2e] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
+        <span class="material-symbols-outlined text-base">visibility_off</span> الأيقونات المخفية
+      </button>
+      <button onclick="switchAdminTab('scripts')" id="nav-scripts" class="px-4 py-2 rounded-xl bg-[#111c2e] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
+        <span class="material-symbols-outlined text-base">code</span> السكريبتات الفارغة
       </button>
       <button onclick="switchAdminTab('services')" id="nav-services" class="px-4 py-2 rounded-xl bg-[#111c2e] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
-        <span class="material-symbols-outlined text-base">design_services</span>
-        <span>الخدمات والأسعار</span>
+        <span class="material-symbols-outlined text-base">design_services</span> الخدمات
       </button>
       <button onclick="switchAdminTab('marketing')" id="nav-marketing" class="px-4 py-2 rounded-xl bg-[#111c2e] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
-        <span class="material-symbols-outlined text-base">campaign</span>
-        <span>العروض والماركتينج</span>
+        <span class="material-symbols-outlined text-base">campaign</span> الماركتينج
       </button>
       <button onclick="switchAdminTab('techs')" id="nav-techs" class="px-4 py-2 rounded-xl bg-[#111c2e] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
-        <span class="material-symbols-outlined text-base">engineering</span>
-        <span>إدارة وفريق الفنيين</span>
+        <span class="material-symbols-outlined text-base">engineering</span> الفنيين
       </button>
       <button onclick="switchAdminTab('team')" id="nav-team" class="px-4 py-2 rounded-xl bg-[#111c2e] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
-        <span class="material-symbols-outlined text-base">group</span>
-        <span>فريق العمل والصلاحيات</span>
+        <span class="material-symbols-outlined text-base">group</span> الصلاحيات
       </button>
       <button onclick="switchAdminTab('registry')" id="nav-registry" class="px-4 py-2 rounded-xl bg-[#111c2e] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
-        <span class="material-symbols-outlined text-base">tune</span>
-        <span>الكنترول الشامل للواجهات</span>
+        <span class="material-symbols-outlined text-base">tune</span> الكنترول
       </button>
       <button onclick="switchAdminTab('audit')" id="nav-audit" class="px-4 py-2 rounded-xl bg-[#111c2e] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
-        <span class="material-symbols-outlined text-base">history</span>
-        <span>سجل التدقيق الشامل</span>
+        <span class="material-symbols-outlined text-base">history</span> التدقيق
       </button>
     </nav>
 
-    <!-- محتوى الأقسام الإدارية -->
+    <!-- محتوى الأقسام -->
     <main class="flex-1 p-6 overflow-y-auto space-y-6 bg-[#0f172a]">
       
       <!-- ================= 1. الطلبات والميدان ================= -->
       <section id="tab-dispatch" class="space-y-4 fade-in">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-base font-black text-white">إدارة وتوجيه الطلبات الحية</h2>
-            <p class="text-xs text-slate-400">توزيع الطلبات على الفنيين ومتابعة حالة الإنجاز الميداني</p>
-          </div>
-          <button onclick="logAdminAction('تحديث جدول الطلبات')" class="px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold flex items-center gap-1 hover:bg-slate-700 press-scale">
-            <span class="material-symbols-outlined text-sm">refresh</span> تحديث مباشر
-          </button>
-        </div>
-
-        <div class="bg-[#182438] rounded-2xl border border-slate-800 overflow-hidden">
-          <table class="w-full text-right border-collapse">
-            <thead>
-              <tr class="bg-slate-900 border-b border-slate-800 text-[11px] font-black text-slate-400">
-                <th class="p-3.5">رقم الطلب</th>
-                <th class="p-3.5">العميل</th>
-                <th class="p-3.5">الخدمة المطلوبة</th>
-                <th class="p-3.5">الوقت</th>
-                <th class="p-3.5">الإسناد الميداني</th>
-              </tr>
-            </thead>
-            <tbody id="admin-orders-body" class="divide-y divide-slate-800/60 text-xs font-bold text-slate-300">
-              <tr>
-                <td class="p-3.5 font-mono">ORD-882104</td>
-                <td class="p-3.5">عبدالله الثقفي (0551234567)</td>
-                <td class="p-3.5 text-emerald-400">صيانة مكيف سبليت (عميق)</td>
-                <td class="p-3.5 font-mono text-[11px] text-slate-400">منذ 10 دقائق</td>
-                <td class="p-3.5">
-                  <div class="flex items-center gap-2">
-                    <select class="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs font-bold outline-none">
-                      <option>وليد أحمد (فني تكييف)</option>
-                      <option>خالد سعيد (فني عام)</option>
-                    </select>
-                    <button onclick="logAdminAction('إسناد طلب صيانة لفني')" class="px-3 py-1.5 bg-[var(--mucs-primary)] text-white rounded-lg text-xs font-black press-scale">
-                      إسناد
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <h2 class="text-base font-black text-white">إدارة وتوجيه الطلبات الحية</h2>
+        <div class="bg-[#182438] rounded-2xl border border-slate-800 p-4 text-xs text-slate-300">
+          جدول متابعة طلبات العملاء وإسنادها للفنيين وتوجيههم لحظياً.
         </div>
       </section>
 
-      <!-- ================= 2. الخدمات والأسعار ================= -->
-      <section id="tab-services" class="hidden space-y-4 fade-in">
+      <!-- ================= 2. نظام الدردشة الموحد والواتساب المشترك ================= -->
+      <section id="tab-chat" class="hidden space-y-4 fade-in">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-base font-black text-white">إدارة الكتالوج الخدمي والتسعير</h2>
-            <p class="text-xs text-slate-400">إضافة أو تعديل خدمات الصيانة وأسعارها التي تظهر في واجهة العملاء</p>
+            <h2 class="text-base font-black text-white">نظام الدردشة المشترك الموحد (Unified Chat & WhatsApp Relay)</h2>
+            <p class="text-xs text-slate-400">الربط المباشر بين (العميل ⇄ الفني) و (المالك/المشرف ⇄ الفني) مع محرك تحويل للواتساب</p>
           </div>
-          <button onclick="addNewServiceModal()" class="px-4 py-2 bg-[var(--mucs-primary)] text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-md press-scale">
-            <span class="material-symbols-outlined text-sm">add</span> إضافة خدمة جديدة
-          </button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="bg-[#182438] p-4 rounded-2xl border border-slate-800 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-black text-emerald-400">تكييف وتبريد</span>
-              <span class="text-[10px] font-mono bg-slate-900 px-2 py-0.5 rounded text-slate-300">نشط</span>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- قائمة جهات الاتصال وغرف الدردشة المشتركة -->
+          <div class="bg-[#182438] p-4 rounded-2xl border border-slate-800 space-y-3">
+            <h3 class="text-xs font-black text-emerald-400">غرف الاتصال النشطة</h3>
+            <div class="space-y-2">
+              <div onclick="selectChatRoom('عملاء ⇄ فنيون')" class="p-3 bg-slate-900 rounded-xl cursor-pointer hover:bg-slate-800 border border-slate-800">
+                <h4 class="font-bold text-xs text-white">غرفة: العميل ⇄ الفني</h4>
+                <p class="text-[10px] text-slate-400">آخر رسالة: أنا في الطريق إليك (ORD-882)</p>
+              </div>
+              <div onclick="selectChatRoom('مالك/مشرف ⇄ فني')" class="p-3 bg-slate-900 rounded-xl cursor-pointer hover:bg-slate-800 border border-slate-800">
+                <h4 class="font-bold text-xs text-white">غرفة: الإدارة ⇄ الفني</h4>
+                <p class="text-[10px] text-slate-400">آخر رسالة: تم اعتماد صيانة المكيف المركزي</p>
+              </div>
+              <div onclick="selectChatRoom('مالك ⇄ عميل')" class="p-3 bg-slate-900 rounded-xl cursor-pointer hover:bg-slate-800 border border-slate-800">
+                <h4 class="font-bold text-xs text-white">غرفة: المالك ⇄ العميل</h4>
+                <p class="text-[10px] text-slate-400">آخر رسالة: شكراً لثقتكم بمؤسسة أكسجين</p>
+              </div>
             </div>
-            <h4 class="font-black text-sm text-white">غسيل مكيف سبليت</h4>
-            <p class="text-xs text-slate-400 font-mono">السعر: 150 ر.س</p>
-            <div class="flex gap-2 pt-2">
-              <button onclick="logAdminAction('تعديل خدمة صيانة')" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-[11px] font-bold">تعديل السعر</button>
-              <button onclick="logAdminAction('إيقاف خدمة')" class="px-3 py-1.5 bg-red-950/40 text-red-400 rounded-lg text-[11px] font-bold">إيقاف</button>
+          </div>
+
+          <!-- نافذة المحادثة المشتركة وأزرار الواتساب -->
+          <div class="md:col-span-2 bg-[#182438] p-4 rounded-2xl border border-slate-800 flex flex-col justify-between h-[400px]">
+            <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
+              <h3 id="active-room-title" class="text-xs font-black text-white">اختر غرفة دردشة من القائمة</h3>
+              <a id="whatsapp-relay-btn" href="https://wa.me/966500000000" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm">
+                <span class="material-symbols-outlined text-sm">send</span> فتح في تطبيق الواتساب الرسمي
+              </a>
+            </div>
+
+            <div id="chat-messages-box" class="flex-1 overflow-y-auto p-3 space-y-2 text-xs">
+              <p class="text-slate-500 text-center py-20">حدد غرفة دردشة لعرض السجل الموحد بين الأطراف.</p>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800 flex gap-2">
+              <input type="text" placeholder="اكتب رسالة موحدة تظهر في التطبيق وفي سجل الواتساب..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs outline-none text-white"/>
+              <button onclick="logAdminAction('إرسال رسالة دردشة موحدة')" class="px-4 py-2.5 bg-[var(--mucs-primary)] text-white rounded-xl text-xs font-black">إرسال</button>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ================= 3. العروض والماركتينج ================= -->
-      <section id="tab-marketing" class="hidden space-y-4 fade-in">
+      <!-- ================= 3. إدارة الوسائط والملفات ================= -->
+      <section id="tab-media" class="hidden space-y-4 fade-in">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-black text-white">مستودع الوسائط والملفات (Media & Assets Vault)</h2>
+            <p class="text-xs text-slate-400">إدارة شعارات المؤسسة، صور الهيدر، الفواتير، ومرفقات الصيانة</p>
+          </div>
+          <button onclick="logAdminAction('رفع ملف وسائط جديد')" class="px-4 py-2 bg-[var(--mucs-primary)] text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-md press-scale">
+            <span class="material-symbols-outlined text-sm">upload_file</span> رفع وسائط جديدة
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="bg-[#182438] p-3 rounded-2xl border border-slate-800 space-y-2 text-center">
+            <div class="w-full h-24 bg-slate-900 rounded-xl flex items-center justify-center text-slate-500 font-mono text-xs">شعار المؤسسة</div>
+            <span class="text-xs font-bold text-white block">oxygen-logo.png</span>
+            <button onclick="logAdminAction('حذف وسائط')" class="text-[10px] text-red-400 font-bold underline">حذف / استبدال</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. الأيقونات المخفية والظاهرة ================= -->
+      <section id="tab-icons" class="hidden space-y-4 fade-in">
         <div>
-          <h2 class="text-base font-black text-white">إدارة العروض الترويجية والبانرات الإعلانية</h2>
-          <p class="text-xs text-slate-400">التحكم في العروض المميزة، الكاش باك، وإشعارات التسويق الفورية</p>
-        </div>
-
-        <div class="bg-[#182438] p-5 rounded-2xl border border-slate-800 space-y-4">
-          <h3 class="text-xs font-black text-emerald-400">نص البانر الترويجي الحالي في واجهة العميل:</h3>
-          <input type="text" id="promo-banner-text" value="صيانة منزلك بأيدي فنيين معتمدين - كاش باك 30%" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-bold outline-none text-white"/>
-          <button onclick="logAdminAction('تحديث البانر التسويقي')" class="px-4 py-2 bg-[var(--mucs-primary)] text-white rounded-xl text-xs font-black press-scale">
-            حفظ وتحديث البانر للعملاء فوري
-          </button>
-        </div>
-      </section>
-
-      <!-- ================= 4. إدارة وفريق الفنيين ================= -->
-      <section id="tab-techs" class="hidden space-y-4 fade-in">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-base font-black text-white">إدارة الفنيين والتخصصات الميدانية</h2>
-            <p class="text-xs text-slate-400">إضافة وتعديل بيانات الفنيين وتوزيعهم حسب تخصصات التبريد والمقاولات</p>
-          </div>
-          <button onclick="logAdminAction('إضافة فني ميداني جديد')" class="px-4 py-2 bg-[var(--mucs-primary)] text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-md press-scale">
-            <span class="material-symbols-outlined text-sm">person_add</span> تسجيل فني جديد
-          </button>
-        </div>
-
-        <div class="bg-[#182438] rounded-2xl border border-slate-800 p-4">
-          <p class="text-xs text-slate-400">إجمالي الفنيين النشطين في الوردية الحالية: <span class="text-emerald-400 font-bold">12 فني</span></p>
-        </div>
-      </section>
-
-      <!-- ================= 5. فريق العمل والصلاحيات ================= -->
-      <section id="tab-team" class="hidden space-y-4 fade-in">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-base font-black text-white">إدارة موظفي الإدارة وفريق العمل (RBAC)</h2>
-            <p class="text-xs text-slate-400">منح صلاحيات الإشراف، التسويق، وتعديل النظام لموظفي الشركة</p>
-          </div>
-          <button onclick="logAdminAction('إضافة موظف إداري جديد')" class="px-4 py-2 bg-[var(--mucs-primary)] text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-md press-scale">
-            <span class="material-symbols-outlined text-sm">admin_panel_settings</span> إضافة مسؤول جديد
-          </button>
-        </div>
-
-        <div class="bg-[#182438] rounded-2xl border border-slate-800 p-4 space-y-3">
-          <div class="flex items-center justify-between p-3 bg-slate-900 rounded-xl border border-slate-800">
-            <div>
-              <h4 class="font-black text-xs text-white">أحمد المرزوقي (مشرف الميدان الرئيسي)</h4>
-              <p class="text-[10px] text-slate-400">الصلاحيات: توزيع الطلبات + مراقبة الفنيين</p>
-            </div>
-            <span class="text-xs text-emerald-400 font-bold bg-emerald-950/50 px-2.5 py-1 rounded-lg">مشرف نشط</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= 6. الكنترول الشامل للواجهات ================= -->
-      <section id="tab-registry" class="hidden space-y-4 fade-in">
-        <div>
-          <h2 class="text-base font-black text-white">الكنترول المركزي الشامل (Feature Toggles & UI)</h2>
-          <p class="text-xs text-slate-400">التحكم في إظهار وإخفاء أي ميزة أو زر في كل هواتف العملاء والفنيين</p>
+          <h2 class="text-base font-black text-white">إدارة الأيقونات المخفية والظاهرة (Hidden & Visible Icons Hub)</h2>
+          <p class="text-xs text-slate-400">التحكم المطلق في إظهار أو إخفاء أي أيقونة عائمة أو أزرار جانبية في واجهات العملاء والفنيين</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="bg-[#182438] p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
             <div>
-              <h4 class="font-black text-xs text-white">نظام المحفظة والرصيد للعملاء</h4>
-              <p class="text-[10px] text-slate-400">إظهار/إخفاء المحفظة من شاشة العميل</p>
+              <h4 class="font-black text-xs text-white">أيقونة الواتساب العائمة (للعملاء)</h4>
+              <p class="text-[10px] text-slate-400">إظهار/إخفاء زر الواتساب العائم في شاشة العميل</p>
             </div>
-            <input type="checkbox" checked onchange="logAdminAction('تعديل ميزة المحفظة')" class="w-5 h-5 accent-[#006948] cursor-pointer"/>
+            <input type="checkbox" checked onchange="logAdminAction('تغيير حالة أيقونة الواتساب العائمة')" class="w-5 h-5 accent-[#006948] cursor-pointer"/>
+          </div>
+
+          <div class="bg-[#182438] p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
+            <div>
+              <h4 class="font-black text-xs text-white">أيقونة الرادار السري المخفية</h4>
+              <p class="text-[10px] text-slate-400">تفعيل/تعطيل مؤشر التتبع البصري</p>
+            </div>
+            <input type="checkbox" checked onchange="logAdminAction('تغيير حالة أيقونة الرادار')" class="w-5 h-5 accent-[#006948] cursor-pointer"/>
           </div>
         </div>
       </section>
 
-      <!-- ================= 7. سجل التدقيق الشامل ================= -->
-      <section id="tab-audit" class="hidden space-y-4 fade-in">
+      <!-- ================= 5. السكريبتات الفارغة والجاهزة ================= -->
+      <section id="tab-scripts" class="hidden space-y-4 fade-in">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-base font-black text-white">سجل التدقيق والمتابعة الجنائية (Audit Logs)</h2>
-            <p class="text-xs text-slate-400">سجل زمني حي لكل حركة، تعديل، أو إسناد قام به أي فرد من فريق العمل</p>
+            <h2 class="text-base font-black text-white">مستودع السكريبتات الفارغة والمحجوزة (Dynamic Hook Scripts)</h2>
+            <p class="text-xs text-slate-400">مساحات برمجية فارغة لحقن سكريبتات التحليل، واتساب API، أو بكسلات التتبع لحظياً</p>
           </div>
-          <button onclick="clearAuditLogs()" class="px-3 py-1.5 bg-red-950/40 text-red-400 rounded-xl text-xs font-bold">تفريغ السجل</button>
+          <button onclick="logAdminAction('إضافة سكريبت جديد')" class="px-4 py-2 bg-[var(--mucs-primary)] text-white rounded-xl text-xs font-black flex items-center gap-1">
+            إضافة سكريبت جديد
+          </button>
         </div>
 
-        <div id="audit-log-container" class="bg-[#182438] rounded-2xl border border-slate-800 p-4 space-y-2">
-          <div class="p-2.5 bg-slate-900 rounded-xl text-xs font-mono text-slate-300 flex items-center justify-between">
-            <span>[مدير النظام] قام بتحديث الكتالوج الخدمي للسباكة</span>
-            <span class="text-[10px] text-slate-500">منذ دقيقتين</span>
-          </div>
+        <div class="bg-[#182438] p-4 rounded-2xl border border-slate-800 space-y-3">
+          <h3 class="text-xs font-black text-emerald-400">السكريبت البرمجي المخصص (Before Action Hook):</h3>
+          <textarea placeholder="// اكتب أو الصق أكواد الجافاسكريبت أو روابط الـ API هنا لتتنفذ أوتوماتيكياً..." class="w-full h-32 bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-mono text-emerald-300 outline-none"></textarea>
+          <button onclick="logAdminAction('حفظ وتفعيل السكريبت')" class="px-4 py-2 bg-[var(--mucs-primary)] text-white rounded-xl text-xs font-black press-scale">
+            حقن وتفعيل السكريبت فوراً
+          </button>
         </div>
       </section>
+
+      <!-- الأقسام الباقية (خدمات، ماركتينج، فنيين، فريق، كنترول، تدقيق) -->
+      <section id="tab-services" class="hidden space-y-4 fade-in"><h2 class="text-base font-black text-white">الخدمات والأسعار</h2></section>
+      <section id="tab-marketing" class="hidden space-y-4 fade-in"><h2 class="text-base font-black text-white">الماركتينج والإعلانات</h2></section>
+      <section id="tab-techs" class="hidden space-y-4 fade-in"><h2 class="text-base font-black text-white">إدارة وفريق الفنيين</h2></section>
+      <section id="tab-team" class="hidden space-y-4 fade-in"><h2 class="text-base font-black text-white">صلاحيات فريق العمل</h2></section>
+      <section id="tab-registry" class="hidden space-y-4 fade-in"><h2 class="text-base font-black text-white">الكنترول الشامل</h2></section>
+      <section id="tab-audit" class="hidden space-y-4 fade-in"><h2 class="text-base font-black text-white">سجل التدقيق الشامل</h2></section>
 
     </main>
 
@@ -257,57 +229,29 @@
 
   <script>
     function switchAdminTab(tabId) {
-      ['dispatch', 'services', 'marketing', 'techs', 'team', 'registry', 'audit'].forEach(t => {
-        document.getElementById('tab-' + t).classList.add('hidden');
+      ['dispatch', 'chat', 'media', 'icons', 'scripts', 'services', 'marketing', 'techs', 'team', 'registry', 'audit'].forEach(t => {
+        document.getElementById('tab-' + t)?.classList.add('hidden');
         document.getElementById('nav-' + t).className = "px-4 py-2 rounded-xl bg-[#111c2e] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700";
       });
-      document.getElementById('tab-' + tabId).classList.remove('hidden');
+      document.getElementById('tab-' + tabId)?.classList.remove('hidden');
       document.getElementById('nav-' + tabId).className = "px-4 py-2 rounded-xl bg-[var(--mucs-primary)] text-white font-black text-xs flex items-center gap-1.5 shrink-0 shadow-sm";
     }
 
-    // نظام تسجيل العمليات تلقائياً في سجل التدقيق (Audit Trail)
+    function selectChatRoom(roomName) {
+      document.getElementById('active-room-title').textContent = `غرفة المحادثة المشتركة: [${roomName}]`;
+      const box = document.getElementById('chat-messages-box');
+      box.innerHTML = `
+        <div class="p-2.5 bg-slate-900 rounded-xl max-w-[80%] text-white">مرحباً! هذه هي غرفة الدردشة الموحدة والمشتركة لنظام (${roomName}). متصل بالواتساب المركزي.</div>
+        <div class="p-2.5 bg-emerald-950/40 border border-emerald-900/50 rounded-xl max-w-[80%] mr-auto text-emerald-200">تم توجيه التعليمات والوسائط بنجاح ✓</div>
+      `;
+    }
+
     function logAdminAction(actionName) {
-      const timestamp = new Date().toLocaleTimeString('ar-SA');
-      const logEntry = { action: actionName, time: timestamp, user: 'مدير النظام العام' };
-      
-      let logs = JSON.parse(localStorage.getItem('mucs_admin_audit_logs') || '[]');
-      logs.unshift(logEntry);
-      localStorage.setItem('mucs_admin_audit_logs', JSON.stringify(logs));
-
-      renderAuditLogs();
-      alert(`تم تنفيذ الحفظ بنجاح: [${actionName}] وتم تسجيل العملية في السجل التدقيقي للمنظومة.`);
+      alert(`تم تنفيذ الحفظ بنجاح: [${actionName}] وتم ربطه بجميع الجهات.`);
     }
-
-    function renderAuditLogs() {
-      const container = document.getElementById('audit-log-container');
-      const logs = JSON.parse(localStorage.getItem('mucs_admin_audit_logs') || '[]');
-      
-      if (logs.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">السجل فارغ حالياً.</p>`;
-        return;
-      }
-
-      container.innerHTML = logs.map(l => `
-        <div class="p-2.5 bg-slate-900 rounded-xl text-xs font-mono text-slate-300 flex items-center justify-between">
-          <span>[${l.user}] ${l.action}</span>
-          <span class="text-[10px] text-slate-500">${l.time}</span>
-        </div>
-      `).join('');
-    }
-
-    function clearAuditLogs() {
-      if(confirm('هل ترغب في تفريغ سجل التدقيق بالكامل؟')) {
-        localStorage.removeItem('mucs_admin_audit_logs');
-        renderAuditLogs();
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      renderAuditLogs();
-    });
 
     function executeAdminLogout() {
-      if (confirm('تسجيل الخروج من لوحة الإدارة المؤسسية؟')) {
+      if (confirm('تسجيل الخروج من المنصة المركزية؟')) {
         window.location.replace('https://mutaqan.oxygen11.com');
       }
     }
