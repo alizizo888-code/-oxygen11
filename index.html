@@ -2,50 +2,198 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>لوحة المالك السيادية | مُتقن</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>اللوحة السيادية الكبرى للمالك | مُتقن (God-Mode Master)</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <script>
-    (function checkOwner() {
-      const pin = prompt('أدخل الرمز السري للمالك (علي: 789512364):');
-      if (pin !== '789512364') {
-        alert('غير مصرح لك بالدخول!');
-        window.location.replace('https://client.oxygen11.com');
-      }
-    })();
-  </script>
+  <style>
+    :root {
+      --mucs-primary: #006948;
+      --mucs-owner-dark: #050b14;
+    }
+    body { font-family: 'Cairo', sans-serif; background-color: #070d18; color: #f8fafc; user-select: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .press-scale:active { transform: scale(0.98); transition: 0.1s; }
+    .fade-in { animation: fadeIn 0.25s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
 </head>
-<body class="min-h-screen bg-[#070d18] flex justify-center items-start p-0 sm:py-6 text-white font-['Cairo']">
-  <div class="w-full max-w-4xl bg-slate-900 rounded-3xl p-5 space-y-4 shadow-2xl border border-amber-500/30">
-    <header class="flex items-center justify-between border-b border-slate-800 pb-3">
-      <div class="flex items-center gap-2.5">
-        <div class="w-10 h-10 bg-amber-500/20 text-amber-400 rounded-xl flex items-center justify-center font-black text-xl border border-amber-500/30">👑</div>
+<body class="min-h-screen flex flex-col items-center justify-start p-2 sm:p-4">
+
+  <div class="w-full max-w-7xl bg-[#0b1320] min-h-[94vh] rounded-[32px] shadow-2xl border border-amber-500/30 flex flex-col overflow-hidden">
+    
+    <!-- الشريط العلوي السيادي -->
+    <header class="bg-[var(--mucs-owner-dark)] text-white px-6 py-4 flex items-center justify-between border-b border-amber-500/20">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/50 text-amber-400 flex items-center justify-center font-black shadow-inner">
+          <span class="material-symbols-outlined text-xl">verified_user</span>
+        </div>
         <div>
-          <h1 class="font-black text-sm">لوحة تحكم المالك (علي)</h1>
-          <p class="text-[10px] text-amber-400">owner.oxygen11.com • صلاحيات سيادية كاملة</p>
+          <h1 class="text-sm font-black tracking-wide text-amber-300">اللوحة السيادية الكبرى للمالك (God-Mode)</h1>
+          <span class="text-[10px] text-slate-400 font-bold">السيطرة المطلقة على النظام، الخزينة، والصلاحيات العليا</span>
         </div>
       </div>
-      <button onclick="window.location.replace('https://client.oxygen11.com')" class="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-xl text-xs font-bold border border-red-500/30">
-        قفل الجلسة
-      </button>
+
+      <div class="flex items-center gap-3">
+        <!-- زر طوارئ المالك الكبرى -->
+        <button onclick="toggleOwnerEmergency()" id="owner-emergency-btn" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs flex items-center gap-1.5 transition press-scale shadow-md">
+          <span class="material-symbols-outlined text-sm">security</span>
+          <span id="owner-emergency-label">حالة المنصة: التشغيل السيادي الآمن</span>
+        </button>
+        <button onclick="executeOwnerLogout()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-black flex items-center gap-1 transition">
+          <span class="material-symbols-outlined text-sm">logout</span>
+          <span>خروج السيادة</span>
+        </button>
+      </div>
     </header>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-        <span class="text-xs text-slate-400 font-bold block">إيقاف استقبال الطلبات</span>
-        <button onclick="alert('تم تجميد المنظومة كلياً')" class="mt-2 w-full py-2 bg-red-600 text-white font-bold text-xs rounded-xl">
-          إيقاف الطوارئ كلياً
-        </button>
-      </div>
-      <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-        <span class="text-xs text-slate-400 font-bold block">الانتقال لفرع المشرفين</span>
-        <button onclick="window.location.replace('https://admin.oxygen11.com')" class="mt-2 w-full py-2 bg-[#006948] text-white font-bold text-xs rounded-xl">
-          فتح لوحة المشرف admin
-        </button>
-      </div>
-    </div>
+    <!-- شريط التنقل بين الأقسام السيادية الكبرى -->
+    <nav class="bg-[#111c2e] border-b border-slate-800 px-4 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
+      <button onclick="switchOwnerTab('overview')" id="nav-overview" class="px-4 py-2 rounded-xl bg-[var(--mucs-primary)] text-white font-black text-xs flex items-center gap-1.5 shrink-0 shadow-sm">
+        <span class="material-symbols-outlined text-base">dashboard</span> نظرة عامة
+      </button>
+      <button onclick="switchOwnerTab('finance')" id="nav-finance" class="px-4 py-2 rounded-xl bg-[#0b1320] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
+        <span class="material-symbols-outlined text-base">account_balance_wallet</span> الخزينة والأرباح
+      </button>
+      <button onclick="switchOwnerTab('staff')" id="nav-staff" class="px-4 py-2 rounded-xl bg-[#0b1320] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
+        <span class="material-symbols-outlined text-base">badge</span> تعيين وصلاحيات الإدارة
+      </button>
+      <button onclick="switchOwnerTab('branding')" id="nav-branding" class="px-4 py-2 rounded-xl bg-[#0b1320] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
+        <span class="material-symbols-outlined text-base">palette</span> الهوية والألوان
+      </button>
+      <button onclick="switchOwnerTab('masterscripts')" id="nav-masterscripts" class="px-4 py-2 rounded-xl bg-[#0b1320] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
+        <span class="material-symbols-outlined text-base">terminal</span> السكريبتات السيادية
+      </button>
+      <button onclick="switchOwnerTab('auditlogs')" id="nav-auditlogs" class="px-4 py-2 rounded-xl bg-[#0b1320] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700">
+        <span class="material-symbols-outlined text-base">gavel</span> الرقابة القانونية
+      </button>
+    </nav>
+
+    <!-- محتوى الأقسام السيادية -->
+    <main class="flex-1 p-6 overflow-y-auto space-y-6 bg-[#070d18]">
+      
+      <!-- ================= 1. نظرة عامة السيادية ================= -->
+      <section id="tab-overview" class="space-y-4 fade-in">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-[#111c2e] p-5 rounded-2xl border border-slate-800 space-y-2">
+            <span class="text-xs text-slate-400 font-bold">إجمالي أرباح المنصة اليوم</span>
+            <h3 class="text-2xl font-black text-emerald-400">4,850.00 ر.س</h3>
+            <p class="text-[10px] text-emerald-500 font-bold">↑ 18% عن الأسبوع الماضي</p>
+          </div>
+          <div class="bg-[#111c2e] p-5 rounded-2xl border border-slate-800 space-y-2">
+            <span class="text-xs text-slate-400 font-bold">الطلبات المنجزة بالميدان</span>
+            <h3 class="text-2xl font-black text-white">34 طلب نشط</h3>
+            <p class="text-[10px] text-slate-400">موزعة على مكة وجدة</p>
+          </div>
+          <div class="bg-[#111c2e] p-5 rounded-2xl border border-slate-800 space-y-2">
+            <span class="text-xs text-slate-400 font-bold">مديرو النظام والمشرفون</span>
+            <h3 class="text-2xl font-black text-amber-400">5 مسؤولين مفوضين</h3>
+            <p class="text-[10px] text-slate-400">تحت الإشراف المباشر</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 2. الخزينة والأرباح ================= -->
+      <section id="tab-finance" class="hidden space-y-4 fade-in">
+        <h2 class="text-base font-black text-white">إدارة الخزينة والنسب المالية السيادية</h2>
+        <div class="bg-[#111c2e] p-5 rounded-2xl border border-slate-800 space-y-3">
+          <label class="block text-xs font-bold text-slate-300">نسبة اقتطاع المؤسسة من عقود الفنيين (%):</label>
+          <div class="flex gap-2">
+            <input type="number" value="15" class="w-32 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs font-black text-white outline-none"/>
+            <button onclick="logOwnerAction('تحديث النسبة المالية للمؤسسة')" class="px-4 py-2 bg-[var(--mucs-primary)] text-white rounded-xl text-xs font-black press-scale">حفظ التعديل السيادي</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 3. الصلاحيات العليا ================= -->
+      <section id="tab-staff" class="hidden space-y-4 fade-in">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-black text-white">تفويض وتعيين مديري الإدارة الكبرى</h2>
+          <button onclick="logOwnerAction('منح صلاحية إدارية جديدة')" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-slate-950 font-black text-xs rounded-xl shadow-md press-scale">
+            تعيين مشرف عام جديد
+          </button>
+        </div>
+        <div class="bg-[#111c2e] p-4 rounded-2xl border border-slate-800 text-xs text-slate-300">
+          التحكم الكامل في منح صلاحيات الإدارة الكاملة لمديري النظام (Admin-Root).
+        </div>
+      </section>
+
+      <!-- ================= 4. الهوية والألوان ================= -->
+      <section id="tab-branding" class="hidden space-y-4 fade-in">
+        <h2 class="text-base font-black text-white">تعديل الهوية البصرية السيادية (Global Branding)</h2>
+        <div class="bg-[#111c2e] p-5 rounded-2xl border border-slate-800 space-y-3">
+          <label class="block text-xs font-bold text-slate-300">اللون الأساسي للمنظومة بالكامل:</label>
+          <input type="color" value="#006948" onchange="logOwnerAction('تغيير اللون السيادي للمنصة')" class="w-16 h-10 rounded-xl bg-transparent cursor-pointer border border-slate-700"/>
+        </div>
+      </section>
+
+      <!-- ================= 5. السكريبتات السيادية ================= -->
+      <section id="tab-masterscripts" class="hidden space-y-4 fade-in">
+        <h2 class="text-base font-black text-white">محرك السكريبتات السيادية العظمى (Master Script Injector)</h2>
+        <div class="bg-[#111c2e] p-5 rounded-2xl border border-slate-800 space-y-3">
+          <textarea placeholder="// اكتب أكواد الجافاسكريبت العامة التي ستنفذ على جميع فروع المنظومة..." class="w-full h-32 bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-mono text-amber-300 outline-none"></textarea>
+          <button onclick="logOwnerAction('حقن سكريبت سيادي عام')" class="px-4 py-2 bg-amber-600 text-slate-950 font-black text-xs rounded-xl press-scale">
+            حقن وتعميم السكريبت السيادي
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= 6. الرقابة القانونية ================= -->
+      <section id="tab-auditlogs" class="hidden space-y-4 fade-in">
+        <h2 class="text-base font-black text-white">سجل التدقيق السيادي والقانوني (Audit Vault)</h2>
+        <div class="bg-[#111c2e] p-4 rounded-2xl border border-slate-800 space-y-2 text-xs font-mono text-slate-300">
+          <div class="p-2.5 bg-slate-900 rounded-xl flex items-center justify-between">
+            <span>[المالك السيادي] قام بتعديل النسبة المالية وإعدادات الطوارئ</span>
+            <span class="text-[10px] text-slate-500">منذ دقيقة</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
   </div>
+
+  <script>
+    let isOwnerEmergency = false;
+
+    function switchOwnerTab(tabId) {
+      ['overview', 'finance', 'staff', 'branding', 'masterscripts', 'auditlogs'].forEach(t => {
+        document.getElementById('tab-' + t)?.classList.add('hidden');
+        document.getElementById('nav-' + t).className = "px-4 py-2 rounded-xl bg-[#0b1320] hover:bg-slate-800 text-slate-300 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-700";
+      });
+      document.getElementById('tab-' + tabId)?.classList.remove('hidden');
+      document.getElementById('nav-' + tabId).className = "px-4 py-2 rounded-xl bg-[var(--mucs-primary)] text-white font-black text-xs flex items-center gap-1.5 shrink-0 shadow-sm";
+    }
+
+    function toggleOwnerEmergency() {
+      isOwnerEmergency = !isOwnerEmergency;
+      localStorage.setItem('mucs_global_emergency_lock', isOwnerEmergency);
+      
+      const btn = document.getElementById('owner-emergency-btn');
+      const label = document.getElementById('owner-emergency-label');
+      if (isOwnerEmergency) {
+        btn.className = "px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs flex items-center gap-1.5 transition press-scale shadow-md animate-pulse";
+        label.textContent = "⚠️ الطوارئ السيادية مُفعلة (المنصة مقفلة بالكامل)";
+        alert("⚠️ تنبيه سيادي خطير: تم قفل المنصة بالكامل في جميع الفروع بأمر مباشر من المالك!");
+      } else {
+        btn.className = "px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs flex items-center gap-1.5 transition press-scale shadow-md";
+        label.textContent = "حالة المنصة: التشغيل السيادي الآمن";
+        alert("✅ تم إلغاء الطوارئ السيادية وعودة التشغيل الطبيعي لجميع الفروع.");
+      }
+    }
+
+    function logOwnerAction(actionName) {
+      alert(`[السيادة المطلقة] تم اعتماد وتعميم التعديل: (${actionName}) بنجاح.`);
+    }
+
+    function executeOwnerLogout() {
+      if (confirm('الخروج من اللوحة السيادية الكبرى للمالك؟')) {
+        window.location.replace('https://mutaqan.oxygen11.com');
+      }
+    }
+  </script>
 </body>
 </html>
