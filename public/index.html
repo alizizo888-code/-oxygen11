@@ -137,6 +137,30 @@
   </div>
 
   <script>
+    /**
+     * نظام اعتراض الأوامر المدمج (MUCS Hooks Engine)
+     */
+    const MUCS_Hooks = (function() {
+      const registeredHooks = {
+        before_otp_send: [],
+        after_login_success: []
+      };
+
+      return {
+        executeBefore: async function(actionName, data) {
+          const hooks = registeredHooks[`before_${actionName}`];
+          if (!hooks || hooks.length === 0) return true;
+          console.log(`[MUCS Hooks] تنفيذ أوامر قبل: ${actionName}`);
+          return true;
+        },
+        executeAfter: function(actionName, data) {
+          const hooks = registeredHooks[`after_${actionName}`];
+          if (!hooks || hooks.length === 0) return;
+          console.log(`[MUCS Hooks] تنفيذ أوامر بعد: ${actionName}`);
+        }
+      };
+    })();
+
     // إعدادات فايربيز المركزية
     const firebaseConfig = {
       apiKey: "AIzaSyCJnFR_cALYeWvPHroEqdCHbnhlcREdjPI",
@@ -185,11 +209,15 @@
       setTimeout(() => toast.classList.add('hidden'), 4000);
     }
 
-    function sendOTP() {
+    async function sendOTP() {
       let rawPhone = document.getElementById('phoneNumber').value.trim();
       if (!rawPhone || rawPhone.length < 8) return showToast("الرجاء إدخال رقم جوال صحيح", true);
 
       let phone = rawPhone.startsWith('+') ? rawPhone : '+966' + (rawPhone.startsWith('0') ? rawPhone.substring(1) : rawPhone);
+
+      // تمرير النظام عبر خطافات الأوامر (MUCS Hooks) قبل التنفيذ
+      if (!await MUCS_Hooks.executeBefore('otp_send', phone)) return;
+
       const btn = document.getElementById('btn-send-otp');
       btn.disabled = true; btn.innerText = "جاري الإرسال...";
 
@@ -207,7 +235,7 @@
         });
     }
 
-    function verifyOTP() {
+    async function verifyOTP() {
       const code = document.getElementById('otpCode').value.trim();
       if (code.length < 6) return showToast("أدخل 6 أرقام", true);
 
@@ -219,6 +247,8 @@
           const user = result.user;
           const role = document.getElementById('selected-role').value;
           
+          MUCS_Hooks.executeAfter('login_success', { user, role });
+
           const userData = { phone: user.phoneNumber, role: role, uid: user.uid };
           const token = encodeURIComponent(btoa(JSON.stringify(userData)));
           
