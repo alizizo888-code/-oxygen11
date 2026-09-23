@@ -2,38 +2,243 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>لوحة المشرف الميداني | مُتقن</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>غرفة العمليات المركزية للمشرف والمالك | مُتقن</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --mucs-primary: #006948;
+      --mucs-admin-dark: #0b1320;
+    }
+    body { font-family: 'Cairo', sans-serif; background-color: #f1f5f9; color: #1e293b; user-select: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .press-scale:active { transform: scale(0.98); transition: 0.1s; }
+    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
 </head>
-<body class="min-h-screen bg-[#0b1320] flex justify-center items-start p-0 sm:py-6 text-slate-800">
-  <div class="w-full max-w-4xl bg-[#F8FAFC] min-h-screen rounded-3xl p-5 space-y-4 shadow-xl border border-slate-200">
+<body class="min-h-screen flex flex-col items-center justify-start p-2 sm:p-6">
+
+  <!-- إطار لوحة التحكم الرئيسية -->
+  <div class="w-full max-w-6xl bg-white min-h-[90vh] rounded-[32px] shadow-xl border border-slate-200 flex flex-col overflow-hidden">
     
-    <header class="flex items-center justify-between border-b pb-3 bg-white p-4 rounded-2xl">
-      <div>
-        <h1 class="font-black text-sm text-slate-900">لوحة تحكم المشرف الميداني</h1>
-        <p class="text-[10px] text-[#006948] font-bold">admin.oxygen11.com</p>
+    <!-- شريط القيادة العلوي -->
+    <header class="bg-[var(--mucs-admin-dark)] text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center font-black">
+          <span class="material-symbols-outlined text-xl">admin_panel_settings</span>
+        </div>
+        <div>
+          <h1 class="text-sm font-black tracking-wide">غرفة عمليات مُتقن (MUCS Master Console)</h1>
+          <span class="text-[10px] text-slate-400 font-bold">صلاحيات مطلقة للإدارة والمالك</span>
+        </div>
       </div>
-      <button onclick="window.location.replace('https://client.oxygen11.com')" class="px-3 py-1.5 bg-red-50 text-red-600 rounded-xl text-xs font-bold">
-        خروج لصفحة متقن
-      </button>
+
+      <div class="flex items-center gap-3">
+        <!-- مفتاح الطوارئ العام -->
+        <button onclick="toggleGlobalEmergency()" id="emergency-btn" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs flex items-center gap-1.5 transition press-scale">
+          <span class="material-symbols-outlined text-sm">security</span>
+          <span id="emergency-label">المنصة مستقرة وآمنة</span>
+        </button>
+        <button onclick="executeAdminLogout()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-black flex items-center gap-1.5 transition">
+          <span class="material-symbols-outlined text-sm">logout</span>
+          <span>خروج</span>
+        </button>
+      </div>
     </header>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
-      <div class="bg-white p-3.5 rounded-2xl border border-slate-200">
-        <span class="text-[10px] text-slate-400 font-bold block">طلبات قيد التوزيع</span>
-        <span class="text-xl font-black text-slate-900 mt-1 block">5</span>
-      </div>
-      <div class="bg-white p-3.5 rounded-2xl border border-slate-200">
-        <span class="text-[10px] text-[#006948] font-bold block">الفنيون النشطون</span>
-        <span class="text-xl font-black text-[#006948] mt-1 block">14</span>
-      </div>
-      <div class="bg-white p-3.5 rounded-2xl border border-slate-200 col-span-2 sm:col-span-1">
-        <span class="text-[10px] text-amber-600 font-bold block">المشرف المسؤول</span>
-        <span class="text-xs font-black text-slate-800 mt-1 block">ميدان مكة وجدة</span>
-      </div>
-    </div>
+    <!-- شريط التنقل بين أقسام الإدارة -->
+    <nav class="bg-slate-50 border-b border-slate-200 px-6 py-2 flex items-center gap-3 overflow-x-auto no-scrollbar">
+      <button onclick="switchAdminTab('dispatch')" id="nav-dispatch" class="px-4 py-2 rounded-xl bg-[var(--mucs-primary)] text-white font-black text-xs flex items-center gap-1.5 shrink-0 shadow-sm">
+        <span class="material-symbols-outlined text-base">local_shipping</span>
+        <span>توزيع وتوجيه المهام</span>
+      </button>
+      <button onclick="switchAdminTab('radar')" id="nav-radar" class="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-200">
+        <span class="material-symbols-outlined text-base">radar</span>
+        <span>رادار الفنيين الحي (GPS)</span>
+      </button>
+      <button onclick="switchAdminTab('registry')" id="nav-registry" class="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-200">
+        <span class="material-symbols-outlined text-base">settings_accessibility</span>
+        <span>السجل المركزي (التحكم بالواجهات)</span>
+      </button>
+    </nav>
+
+    <!-- محتوى الأقسام الإدارية -->
+    <main class="flex-1 p-6 overflow-y-auto bg-slate-50/50">
+      
+      <!-- ================= 1. قسم توزيع وتوجيه المهام ================= -->
+      <section id="tab-dispatch" class="space-y-4 fade-in">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-black text-slate-900">الطلبات الواردة من العملاء</h2>
+            <p class="text-xs text-slate-500">قم بإسناد الطلبات يدوياً للفني المناسب أو تفعيل التوجيه التلقائي</p>
+          </div>
+          <button onclick="refreshOrdersList()" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold flex items-center gap-1 hover:bg-slate-50">
+            <span class="material-symbols-outlined text-sm">refresh</span> تحديث القائمة
+          </button>
+        </div>
+
+        <!-- جدول الطلبات -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs">
+          <table class="w-full text-right border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-black text-slate-600">
+                <th class="p-3.5">رقم الطلب</th>
+                <th class="p-3.5">العميل</th>
+                <th class="p-3.5">الخدمة المطلوبة</th>
+                <th class="p-3.5">الموقع</th>
+                <th class="p-3.5">الإجراء الإداري / الإسناد</th>
+              </tr>
+            </thead>
+            <tbody id="admin-orders-table" class="divide-y divide-slate-100 text-xs font-bold text-slate-700">
+              <tr>
+                <td class="p-3.5 font-mono">ORD-984210</td>
+                <td class="p-3.5">محمد العمري (0501234567)</td>
+                <td class="p-3.5 text-emerald-700">غسيل مكيف سبليت (3 أجهزة)</td>
+                <td class="p-3.5">مكة المكرمة - العزيزية</td>
+                <td class="p-3.5">
+                  <div class="flex items-center gap-2">
+                    <select id="select-tech-ORD-984210" class="bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs font-bold outline-none">
+                      <option value="">اختر الفني للإسناد...</option>
+                      <option value="tech_01">وليد أحمد (فني تكييف)</option>
+                      <option value="tech_02">خالد سعيد (فني عام)</option>
+                    </select>
+                    <button onclick="assignOrderToTech('ORD-984210')" class="px-3 py-1.5 bg-[var(--mucs-primary)] text-white rounded-lg text-xs font-black shadow-xs press-scale">
+                      إسناد وتوجيه
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= 2. قسم رادار الفنيين الحي (GPS) ================= -->
+      <section id="tab-radar" class="hidden space-y-4 fade-in">
+        <div>
+          <h2 class="text-base font-black text-slate-900">خريطة ورادار الميدان الحية</h2>
+          <p class="text-xs text-slate-500">تتبع مواقع الفنيين لحظياً وحالة استجابتهم للمهام</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- بطاقة فني 1 -->
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black">ميداني نشط</span>
+              <span class="text-[10px] font-bold text-slate-400 font-mono">آخر تحديث: منذ لحظات</span>
+            </div>
+            <div>
+              <h4 class="font-black text-sm text-slate-900">وليد أحمد محمد</h4>
+              <p class="text-[11px] text-slate-500 mt-0.5">التخصص: تكييف وتبريد مركزى</p>
+              <p class="text-[11px] text-emerald-700 font-bold mt-1">📍 الموقع: مكة المكرمة (العزيزية)</p>
+            </div>
+            <button onclick="sendDirectDirective('0500000000')" class="w-full py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined text-sm">campaign</span> إرسال توجيه عاجل للفني
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 3. السجل المركزي (التحكم بالواجهات) ================= -->
+      <section id="tab-registry" class="hidden space-y-4 fade-in">
+        <div>
+          <h2 class="text-base font-black text-slate-900">السجل المركزي للوحدات (Registry Control)</h2>
+          <p class="text-xs text-slate-500">إدارة ظهور الأزرار، تفعيل الميزات، وتعديل إعدادات الثيمات للعملاء والفنيين فوراً</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center justify-between">
+            <div>
+              <h4 class="font-black text-xs text-slate-900">ميزة الرادار السري للعملاء</h4>
+              <p class="text-[10px] text-slate-500 mt-0.5">تتبع إحداثيات وموقع العميل عند إرسال الطلب</p>
+            </div>
+            <input type="checkbox" checked onchange="toggleFeatureControl('stealth_radar', this.checked)" class="w-5 h-5 accent-[#006948] cursor-pointer"/>
+          </div>
+
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center justify-between">
+            <div>
+              <h4 class="font-black text-xs text-slate-900">نظام المحفظة والخصومات</h4>
+              <p class="text-[10px] text-slate-500 mt-0.5">إظهار رصيد المحفظة في واجهة العميل</p>
+            </div>
+            <input type="checkbox" checked onchange="toggleFeatureControl('wallet_system', this.checked)" class="w-5 h-5 accent-[#006948] cursor-pointer"/>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
   </div>
+
+  <script>
+    let isGlobalEmergencyActive = false;
+
+    // التنقل بين تبويبات لوحة التحكم
+    function switchAdminTab(tabId) {
+      ['dispatch', 'radar', 'registry'].forEach(t => {
+        document.getElementById('tab-' + t).classList.add('hidden');
+        document.getElementById('nav-' + t).className = "px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1.5 shrink-0 border border-slate-200";
+      });
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+      document.getElementById('nav-' + tabId).className = "px-4 py-2 rounded-xl bg-[var(--mucs-primary)] text-white font-black text-xs flex items-center gap-1.5 shrink-0 shadow-sm";
+    }
+
+    // تفعيل / إلغاء الطوارئ العامة
+    function toggleGlobalEmergency() {
+      isGlobalEmergencyActive = !isGlobalEmergencyActive;
+      localStorage.setItem('mucs_global_emergency_lock', isGlobalEmergencyActive);
+      
+      const btn = document.getElementById('emergency-btn');
+      const label = document.getElementById('emergency-label');
+      if (isGlobalEmergencyActive) {
+        btn.className = "px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs flex items-center gap-1.5 transition press-scale animate-pulse";
+        label.textContent = "⚠️ حالة الطوارئ مُفعلة (الطلبات مُعطلة)";
+        alert("تم تفعيل قفل الطوارئ العام! تم إيقاف استقبال الطلبات في تطبيق العميل مؤقتاً لحين إشعار آخر.");
+      } else {
+        btn.className = "px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs flex items-center gap-1.5 transition press-scale";
+        label.textContent = "المنصة مستقرة وآمنة";
+        alert("تم إلغاء حالة الطوارئ واستئناف العمل الطبيعي للمنصة.");
+      }
+    }
+
+    // إسناد الطلب لفني معين
+    function assignOrderToTech(orderId) {
+      const select = document.getElementById(`select-tech-${orderId}`);
+      const techVal = select.value;
+      if (!techVal) {
+        alert("يرجى اختيار الفني أولاً.");
+        return;
+      }
+      alert(`تم إسناد الطلب [${orderId}] إلى الفني الميداني بنجاح وتحويله لشاشته التنفيذية.`);
+    }
+
+    function refreshOrdersList() {
+      alert("تم تحديث قائمة الطلبات وجلب أحدث السجلات.");
+    }
+
+    function sendDirectDirective(techPhone) {
+      const msg = prompt("أدخل نص التوجيه العاجل للفني في الميدان:");
+      if (msg) {
+        const directive = { action: 'FORCE_ALERT', message: msg, time: new Date().toISOString() };
+        localStorage.setItem(`mucs_directive_to_${techPhone}`, JSON.stringify(directive));
+        alert("تم إرسال التوجيه العاجل لشاشة الفني بنجاح.");
+      }
+    }
+
+    function toggleFeatureControl(featureKey, isEnabled) {
+      localStorage.setItem(`mucs_feature_${featureKey}`, isEnabled);
+      alert(`تم تحديث حالة الميزة [${featureKey}] في السجل المركزي إلى: ${isEnabled ? 'مفعل' : 'معطل'}`);
+    }
+
+    function executeAdminLogout() {
+      if (confirm('تسجيل الخروج من لوحة التحكم العليا؟')) {
+        window.location.replace('https://mutaqan.oxygen11.com');
+      }
+    }
+  </script>
 </body>
 </html>
