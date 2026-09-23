@@ -3,528 +3,295 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>مُتقن | أكسجين للصيانة والمقاولات</title>
+  <title>مُتقن | البوابة الرئيسية للصيانة والمقاولات</title>
   
-  <!-- استدعاء نظام المصادقة والجلسات والنطاقات الفرعية المستقل (auth-system.js) -->
-  <script src="auth-system.js"></script>
-
-  <!-- Google Fonts: Cairo & Tajawal -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+  <!-- الخطوط والأيقونات -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-  
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#ecfdf5',
-              100: '#d1fae5',
-              200: '#a7f3d0',
-              400: '#34d399',
-              500: '#10b981',
-              600: '#059669',
-              700: '#047857',
-              800: '#065f46',
-              900: '#064e3b',
-            }
-          },
-          fontFamily: {
-            sans: ['Cairo', 'Tajawal', 'sans-serif'],
-          }
-        }
-      }
-    };
-  </script>
+
+  <!-- مكتبات فايربيز للـ OTP (النواة المركزية) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
   <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      -webkit-tap-highlight-color: rgba(16, 185, 129, 0.15);
-      user-select: none;
-      background-color: #0b1320;
-    }
+    body { font-family: 'Cairo', sans-serif; background-color: #0b1320; color: #1e293b; user-select: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .press-scale { transition: transform 0.1s ease; }
+    .press-scale:active { transform: scale(0.96); }
     
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-
-    .active-scale {
-      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
-                  box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
-                  background-color 0.15s ease, 
-                  border-color 0.15s ease, 
-                  filter 0.15s ease;
-    }
-    .active-scale:active {
-      transform: scale(0.96);
-      box-shadow: 0 4px 14px -2px rgba(16, 185, 129, 0.28), 
-                  0 0 0 3px rgba(16, 185, 129, 0.18) !important;
-      filter: brightness(0.97);
-    }
-
-    button:active:not(:disabled),
-    [role="button"]:active {
-      box-shadow: 0 3px 10px -1px rgba(16, 185, 129, 0.2), 
-                  inset 0 1px 2px rgba(0, 0, 0, 0.04);
-      background-color: rgba(236, 253, 245, 0.65);
-    }
-
-    .nav-tab {
-      border-radius: 16px;
-      padding: 4px 6px;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .nav-tab:active {
-      transform: scale(0.92);
-      background-color: rgba(16, 185, 129, 0.12) !important;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
-    }
-
-    .domain-pill:active {
-      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25) !important;
-    }
-
-    .date-btn:active, .time-btn:active {
-      transform: scale(0.95);
-      background-color: #ecfdf5 !important;
-      border-color: #34d399 !important;
-      box-shadow: 0 3px 10px rgba(16, 185, 129, 0.18) !important;
-    }
-
-    article.active-scale:active, .role-card:active {
-      background-color: #f0fdf4 !important;
-      border-color: #10b981 !important;
-      box-shadow: 0 6px 18px -4px rgba(16, 185, 129, 0.22) !important;
-    }
-
-    .carousel-slide {
-      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-    }
-    .carousel-slide.active {
-      opacity: 1;
-      transform: translateX(0);
-      pointer-events: auto;
-      position: relative;
-    }
-    .carousel-slide.inactive {
-      opacity: 0;
-      transform: translateX(20px);
-      pointer-events: none;
-      position: absolute;
-      inset: 0;
+    /* أنيميشن الظهور السلس للواجهات */
+    .fade-in { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
+<body class="min-h-screen flex justify-center items-start p-0 sm:py-4">
 
-<body class="bg-slate-950 min-h-screen flex justify-center items-start text-slate-800 antialiased p-0 sm:py-6">
+  <!-- إطار التطبيق الرئيسي -->
+  <div class="w-full max-w-[440px] bg-[#F8FAFC] min-h-screen relative shadow-2xl flex flex-col sm:rounded-[36px] overflow-hidden">
 
-  <!-- Mobile Viewport Container (Max 440px) -->
-  <div class="w-full max-w-[440px] bg-[#F8FAFC] min-h-screen sm:min-h-[880px] relative shadow-2xl flex flex-col sm:rounded-[36px] overflow-hidden border border-slate-200/60 pb-20">
-
-    <!-- Top Universal Header Bar with Lock on Far Left for Owner & Admin -->
-    <header class="bg-white border-b border-slate-150 px-4 py-2.5 sticky top-0 z-40 flex items-center justify-between shadow-2xs">
-      
-      <!-- Right Side: Platform Identity / Back Navigation -->
+    <!-- شريط الرأس -->
+    <header class="bg-white border-b border-slate-150 px-4 py-3 flex items-center justify-between shadow-2xs relative z-40">
       <div class="flex items-center gap-2">
-        <button id="global-back-btn" onclick="navigateTo('view-home')" class="hidden w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-100 transition active-scale">
-          <span class="material-symbols-outlined text-lg">arrow_forward</span>
-        </button>
-
-        <!-- Brand SVG Emblem -->
-        <div onclick="navigateTo('view-home')" class="flex items-center gap-2 cursor-pointer select-none">
-          <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 font-bold shadow-2xs">
-            <svg class="w-6 h-6" viewBox="0 0 48 48" fill="none">
-              <circle cx="24" cy="24" r="22" fill="#059669" fill-opacity="0.12"/>
-              <path d="M14 26L22 34L35 17" stroke="#059669" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M12 18L24 10L36 18" stroke="#10B981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div>
-            <div class="flex items-center gap-1.5">
-              <span class="font-extrabold text-base text-slate-900 tracking-tight leading-none">مُتقن</span>
-              <span class="text-[9px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded">معتمد</span>
-            </div>
-            <p class="text-[10px] text-slate-400 font-medium leading-tight">أكسجين للصيانة والمقاولات</p>
-          </div>
+        <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 text-[#006948] flex items-center justify-center font-black shadow-sm">
+          <span class="material-symbols-outlined text-lg">home_repair_service</span>
+        </div>
+        <div>
+          <span class="text-sm font-black text-slate-900 block leading-tight tracking-wide">مُتقن</span>
+          <span class="text-[10px] font-bold text-slate-400 block leading-tight">البوابة المركزية</span>
         </div>
       </div>
-
-      <!-- Center & Left: User Status & Far Left Lock Icon for Owner/Admin -->
-      <div class="flex items-center gap-1.5">
-        
-        <!-- AI Consultant Trigger in Header -->
-        <button onclick="openAiConsultantModal()" title="مستشار الصيانة الذكي" class="h-9 px-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 flex items-center gap-1.5 transition active-scale text-xs font-bold shadow-2xs">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="material-symbols-outlined text-[16px] text-emerald-600">smart_toy</span>
-          <span class="hidden sm:inline">فني الاستشارات</span>
-        </button>
-
-        <!-- Offers Quick Trigger -->
-        <button onclick="navigateTo('view-offers')" title="العروض والخصومات" class="h-9 px-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 flex items-center gap-1 transition active-scale text-xs font-bold shadow-2xs">
-          <span class="material-symbols-outlined text-[16px] text-amber-600">local_offer</span>
-          <span class="hidden sm:inline">عروض</span>
-        </button>
-
-        <!-- User Quick Status / Register Indicator -->
-        <button onclick="handleUserPillClick()" class="h-9 px-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-700 flex items-center gap-1.5 transition active-scale text-xs font-bold">
-          <span class="material-symbols-outlined text-[17px] text-emerald-600">person</span>
-          <span id="user-status-pill">دخول</span>
-        </button>
-
-        <!-- FAR LEFT: Lock Button for Owner & Supervisor -->
-        <button onclick="openSecurityGateModal()" title="دخول المالك والمشرف" class="w-9 h-9 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 flex items-center justify-center transition active-scale shadow-2xs relative group">
-          <span class="material-symbols-outlined text-[18px]">lock</span>
-          <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-500 rounded-full border-2 border-white"></span>
-        </button>
-
-      </div>
+      <button onclick="openAuthModal()" class="h-9 px-4 rounded-xl bg-[#006948] text-white text-xs font-black flex items-center gap-1.5 press-scale shadow-md hover:bg-[#00553a] transition">
+        <span class="material-symbols-outlined text-sm">login</span>
+        <span>دخول / تسجيل</span>
+      </button>
     </header>
 
-    <!-- VIEW 1: HOME -->
-    <main id="view-home" class="flex-1 flex flex-col slide-fade-in overflow-y-auto no-scrollbar">
-      <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white px-4 py-2.5 shadow-sm flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-amber-300 text-lg">verified</span>
-          <span class="text-xs font-bold">ضمان ذهبي 30 يوماً معتمد بفاتورة ضريبية 15%</span>
-        </div>
-        <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-bold">100% موثوق</span>
-      </div>
-
-      <!-- DYNAMIC ROTATING HERO BANNER -->
-      <div class="px-4 pt-3.5 pb-2">
-        <div class="relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-4 text-white shadow-lg overflow-hidden min-h-[175px] flex flex-col justify-between">
-          <div class="absolute -left-10 -bottom-10 w-36 h-36 bg-emerald-500/25 rounded-full blur-2xl pointer-events-none"></div>
+    <main class="flex-1 overflow-y-auto no-scrollbar relative z-10">
+      
+      <!-- ================= 1. واجهة عرض الخدمات (للزوار) ================= -->
+      <section id="tab-home" class="p-4 space-y-4 fade-in">
+        
+        <!-- البانر الترويجي الذكي (سيتم التحكم به من لوحة المالك لاحقاً) -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-l from-[#006948] via-[#047857] to-[#065f46] text-white p-5 min-h-[160px] flex flex-col justify-between shadow-lg border border-emerald-800">
+          <!-- شكل هندسي جمالي للخلفية -->
+          <div class="absolute -left-10 -bottom-10 w-40 h-40 rounded-full bg-emerald-400/10 blur-2xl pointer-events-none"></div>
           
-          <div id="carousel-slide-0" class="carousel-slide active flex flex-col justify-between h-full">
-            <div class="flex items-start justify-between">
-              <div>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold mb-1.5">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                  <span>عرض الموسم الحصري ❄️</span>
+          <span class="self-start inline-flex items-center gap-1 bg-amber-500 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm z-10">
+            منصة مُتقن الرسمية
+          </span>
+          
+          <div class="z-10 mt-2">
+            <h2 class="text-lg font-black leading-tight">صيانة منزلك بأيدي فنيين معتمدين</h2>
+            <p class="text-xs text-emerald-100 mt-1 opacity-90">ضمان 30 يوماً وتخفيضات تصل لـ 30%</p>
+          </div>
+          
+          <div class="pt-4 z-10">
+            <button onclick="openAuthModal()" class="w-full py-2.5 rounded-xl bg-white text-[#006948] font-black text-xs press-scale shadow-md hover:bg-slate-50 transition">
+              ابدأ الآن وحدد موقعك
+            </button>
+          </div>
+        </div>
+
+        <!-- شريط الضمان -->
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-[#fffbeb] border border-[#fde68a] text-[#92400e] shadow-sm">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+            <span class="text-xs font-black">ضمان أكسجين الذهبي المعتمد</span>
+          </div>
+        </div>
+
+        <!-- شبكة الخدمات الترحيبية -->
+        <div class="grid grid-cols-2 gap-3 pb-6">
+          <div onclick="openAuthModal()" class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm hover:border-[#006948] cursor-pointer press-scale text-center transition-colors">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-[#006948] flex items-center justify-center mx-auto mb-3"><span class="material-symbols-outlined text-3xl">mode_fan</span></div>
+            <h3 class="font-black text-xs text-slate-900">صيانة وتكييف</h3>
+          </div>
+          <div onclick="openAuthModal()" class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm hover:border-blue-500 cursor-pointer press-scale text-center transition-colors">
+            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3"><span class="material-symbols-outlined text-3xl">faucet</span></div>
+            <h3 class="font-black text-xs text-slate-900">سباكة وتسريبات</h3>
+          </div>
+          <div onclick="openAuthModal()" class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm hover:border-amber-500 cursor-pointer press-scale text-center transition-colors">
+            <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center mx-auto mb-3"><span class="material-symbols-outlined text-3xl">electric_bolt</span></div>
+            <h3 class="font-black text-xs text-slate-900">كهرباء وإنارة</h3>
+          </div>
+          <div onclick="openAuthModal()" class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm hover:border-purple-500 cursor-pointer press-scale text-center transition-colors">
+            <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mx-auto mb-3"><span class="material-symbols-outlined text-3xl">format_paint</span></div>
+            <h3 class="font-black text-xs text-slate-900">مقاولات وعزل</h3>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 2. بوابة الفرز والدخول (OTP Gateway) ================= -->
+      <section id="tab-auth-modal" class="hidden p-4 space-y-4 fade-in">
+        <div class="flex items-center justify-between mb-2">
+          <button onclick="closeAuthModal()" class="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 press-scale">
+            <span class="material-symbols-outlined text-base">arrow_forward</span>
+          </button>
+          <span class="text-xs font-black text-[#006948] bg-emerald-50 px-3 py-1 rounded-full">بوابة الدخول الموحدة</span>
+          <div class="w-9"></div>
+        </div>
+
+        <div class="space-y-5 bg-white p-6 rounded-[32px] border border-slate-200 shadow-lg text-center relative overflow-hidden">
+          
+          <div class="w-14 h-14 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mx-auto font-black border-2 border-emerald-100 shadow-sm">
+            <span class="material-symbols-outlined text-2xl">lock_open</span>
+          </div>
+          
+          <div>
+            <h2 class="text-sm font-black text-slate-900">تسجيل الدخول أو إنشاء حساب</h2>
+            <p class="text-[11px] text-slate-500 mt-1">المصادقة تتم بأمان تام عبر رسالة نصية (OTP)</p>
+          </div>
+
+          <!-- خطوة 1: اختيار الدور وإدخال الهاتف -->
+          <div id="step-phone" class="space-y-4 pt-2 text-right">
+            <div class="space-y-1.5">
+              <label class="block text-[11px] font-bold text-slate-700">تحديد نوع الحساب:</label>
+              <div class="relative">
+                <select id="user-role" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold outline-none focus:border-[#006948] appearance-none">
+                  <option value="client">طالب خدمة (عميل)</option>
+                  <option value="tech">مقدم خدمة (فني ميداني)</option>
+                </select>
+                <span class="material-symbols-outlined absolute left-3 top-3 text-slate-400 pointer-events-none text-lg">expand_more</span>
+              </div>
+            </div>
+            
+            <div class="space-y-1.5">
+              <label class="block text-[11px] font-bold text-slate-700">رقم الجوال الفعال:</label>
+              <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 h-12 focus-within:border-[#006948] transition-colors" dir="ltr">
+                <span class="text-xs font-black text-slate-500 border-r border-slate-300 pr-2 mr-2 flex items-center gap-1">
+                  🇸🇦 <span class="tracking-wider">+966</span>
                 </span>
-                <h2 class="text-base font-black leading-snug">غسيل مكيفات سبليت عميق<br/>بـ 115 ر.س فقط للجهاز</h2>
-                <p class="text-[11px] text-slate-300 mt-1">ضخ ماء بضغط عالي وغلاف حماية الجدران والأثاث</p>
-              </div>
-              <div class="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
-                <span class="material-symbols-outlined text-2xl">mode_fan</span>
+                <input id="phoneNumber" type="tel" placeholder="5XXXXXXXX" class="w-full bg-transparent text-sm font-black outline-none text-left tracking-widest text-slate-800 placeholder:text-slate-300 placeholder:font-normal"/>
               </div>
             </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-700/60 flex items-center justify-between">
-              <span class="text-xs font-bold text-amber-300">وفّر 30 ر.س على كل مكيف</span>
-              <button onclick="openDomainServices('ac')" class="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition active-scale">
-                <span>احجز الآن</span>
-                <span class="material-symbols-outlined text-sm rotate-180">arrow_forward</span>
-              </button>
-            </div>
+            
+            <button onclick="handleSendOTP()" id="btn-send-otp" class="w-full py-3.5 bg-[#006948] hover:bg-[#00553a] text-white rounded-xl font-black text-xs transition shadow-md press-scale flex items-center justify-center gap-2 mt-2">
+              <span>إرسال الرمز السري</span>
+              <span class="material-symbols-outlined text-sm">send</span>
+            </button>
           </div>
 
-          <div id="carousel-slide-1" class="carousel-slide inactive flex flex-col justify-between h-full">
-            <div class="flex items-start justify-between">
-              <div>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-bold mb-1.5">
-                  <span class="w-2 h-2 rounded-full bg-blue-400 animate-ping"></span>
-                  <span>تقنية النيتروجين والصوت 💧</span>
-                </span>
-                <h2 class="text-base font-black leading-snug">كشف تسريب المياه إلكترونياً<br/>بدون أي تكسير للجدران</h2>
-                <p class="text-[11px] text-slate-300 mt-1">تقرير معتمد لشركة المياه الوطنية لتخفيض الفاتورة</p>
-              </div>
-              <div class="w-11 h-11 rounded-2xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400">
-                <span class="material-symbols-outlined text-2xl">water_drop</span>
-              </div>
+          <!-- خطوة 2: إدخال الكود للتحقق -->
+          <div id="step-verify" class="hidden space-y-4 pt-2 text-center">
+            <div class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 px-3 py-1.5 rounded-lg border border-emerald-100 text-[10px] font-bold mb-2">
+              <span class="material-symbols-outlined text-sm">mark_email_read</span>
+              <span>تم إرسال الرمز لهاتفك</span>
             </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-700/60 flex items-center justify-between">
-              <span class="text-xs font-bold text-blue-300">تقرير رسمي معتمد مجاني</span>
-              <button onclick="openDomainServices('plumbing')" class="py-1.5 px-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center gap-1 transition active-scale">
-                <span>طلب فحص</span>
-                <span class="material-symbols-outlined text-sm rotate-180">arrow_forward</span>
-              </button>
+            
+            <div class="space-y-1.5">
+              <label class="block text-[11px] font-bold text-slate-700">أدخل الكود المكوّن من 6 أرقام:</label>
+              <input id="otpCode" type="tel" maxlength="6" placeholder="••••••" class="w-full bg-slate-50 border border-slate-300 rounded-2xl py-3.5 text-center text-2xl font-mono font-black tracking-[0.5em] outline-none focus:border-[#006948] focus:bg-white transition-colors text-[#006948]"/>
+            </div>
+            
+            <button onclick="handleVerifyAndRoute()" id="btn-verify-otp" class="w-full py-3.5 bg-[#006948] hover:bg-[#00553a] text-white rounded-xl font-black text-xs transition shadow-md press-scale flex items-center justify-center gap-2">
+              <span>تأكيد الدخول</span>
+              <span class="material-symbols-outlined text-sm">verified_user</span>
+            </button>
+            
+            <div class="pt-2">
+              <button onclick="location.reload()" class="text-[10px] text-slate-500 font-bold hover:text-[#006948] transition">تعديل رقم الجوال؟</button>
             </div>
           </div>
 
-          <div id="carousel-slide-2" class="carousel-slide inactive flex flex-col justify-between h-full">
-            <div class="flex items-start justify-between">
-              <div>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold mb-1.5">
-                  <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-                  <span>طوارئ أكسجين السريعة ⚡</span>
-                </span>
-                <h2 class="text-base font-black leading-snug">إصلاح الشورت وقواطع الكهرباء<br/>وصول فني خلال 60 دقيقة</h2>
-                <p class="text-[11px] text-slate-300 mt-1">فريق استجابة سريعة معتمد في جميع الأحياء</p>
-              </div>
-              <div class="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400">
-                <span class="material-symbols-outlined text-2xl">bolt</span>
-              </div>
-            </div>
-            <div class="mt-3 pt-2.5 border-t border-slate-700/60 flex items-center justify-between">
-              <span class="text-xs font-bold text-amber-400">متاح 24 ساعة بالميدان</span>
-              <button onclick="openDomainServices('electrical')" class="py-1.5 px-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-extrabold flex items-center gap-1 transition active-scale">
-                <span>طلب طارئ</span>
-                <span class="material-symbols-outlined text-sm rotate-180">arrow_forward</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-center gap-1.5 pt-2">
-            <button onclick="setCarouselSlide(0)" id="dot-0" class="w-5 h-1.5 rounded-full bg-emerald-500 transition-all"></button>
-            <button onclick="setCarouselSlide(1)" id="dot-1" class="w-1.5 h-1.5 rounded-full bg-slate-600 transition-all"></button>
-            <button onclick="setCarouselSlide(2)" id="dot-2" class="w-1.5 h-1.5 rounded-full bg-slate-600 transition-all"></button>
-          </div>
+          <!-- عنصر ريكابتشا المخفي -->
+          <div id="recaptcha-container"></div>
         </div>
-      </div>
-
-      <!-- Quick Action Strip -->
-      <div class="px-4 py-2 flex items-center gap-2">
-        <button onclick="navigateTo('view-offers')" class="flex-1 py-2.5 px-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs rounded-2xl shadow-xs flex items-center justify-center gap-1.5 transition active-scale">
-          <span class="material-symbols-outlined text-base">percent</span>
-          <span>صفحة العروض والخصومات المتاحة</span>
-        </button>
-        <button onclick="openDomainServices('electrical')" class="py-2.5 px-3 bg-rose-50 border border-rose-200 text-rose-700 font-bold text-xs rounded-2xl flex items-center justify-center gap-1 transition active-scale">
-          <span class="material-symbols-outlined text-base text-rose-600">e911_emergency</span>
-          <span>طوارئ 60 دقيقة</span>
-        </button>
-      </div>
-
-      <!-- Services Grid Header -->
-      <div class="px-4 pt-3 pb-1 flex items-center justify-between">
-        <div>
-          <h3 class="text-sm font-extrabold text-slate-900">الأقسام والخدمات التخصصية</h3>
-          <p class="text-[11px] text-slate-500">اختر المجال لاستعراض الفئات الفرعية وجداول الأسعار</p>
-        </div>
-        <button onclick="navigateTo('view-service-detail')" class="text-[11px] font-bold text-emerald-700 hover:underline">عرض الكل</button>
-      </div>
-
-      <!-- 6 Domains Grid -->
-      <div class="px-4 py-2 grid grid-cols-2 gap-3">
-        <div onclick="openDomainServices('ac')" class="bg-white p-3.5 rounded-2xl border-2 border-emerald-500/80 shadow-sm cursor-pointer transition active-scale relative group">
-          <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2">
-            <span class="material-symbols-outlined text-2xl">mode_fan</span>
-          </div>
-          <h4 class="font-bold text-sm text-slate-900 leading-tight">التكييف والتبريد</h4>
-          <p class="text-[11px] text-slate-500 leading-snug mt-1">غسيل عميق، شحن فريون، صيانة السبليت والشباك</p>
-        </div>
-
-        <div onclick="openDomainServices('plumbing')" class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs cursor-pointer transition active-scale">
-          <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-2">
-            <span class="material-symbols-outlined text-2xl">water_drop</span>
-          </div>
-          <h4 class="font-bold text-sm text-slate-900 leading-tight">السباكة والتسريبات</h4>
-          <p class="text-[11px] text-slate-500 leading-snug mt-1">كشف إلكتروني بدون تكسير ومضخات مياه</p>
-        </div>
-
-        <div onclick="openDomainServices('electrical')" class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs cursor-pointer transition active-scale">
-          <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-2">
-            <span class="material-symbols-outlined text-2xl">electric_bolt</span>
-          </div>
-          <h4 class="font-bold text-sm text-slate-900 leading-tight">الكهرباء والإنارة</h4>
-          <p class="text-[11px] text-slate-500 leading-snug mt-1">إصلاح الشورت والماس وتركيب الثريات</p>
-        </div>
-
-        <div onclick="openDomainServices('contracting')" class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs cursor-pointer transition active-scale">
-          <div class="w-11 h-11 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-2">
-            <span class="material-symbols-outlined text-2xl">format_paint</span>
-          </div>
-          <h4 class="font-bold text-sm text-slate-900 leading-tight">المقاولات والترميم</h4>
-          <p class="text-[11px] text-slate-500 leading-snug mt-1">عزل أسطح فوم ودهانات جوتن معتمدة</p>
-        </div>
-      </div>
+      </section>
+      
     </main>
-
-    <!-- VIEW 5: AUTHENTICATION (بوابة الدخول والتسجيل) -->
-    <section id="view-auth" class="hidden flex-1 flex flex-col p-4 pb-28 slide-fade-in overflow-y-auto no-scrollbar">
-      <div class="flex items-center justify-between pb-2">
-        <button onclick="navigateTo('view-home')" class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition active-scale shadow-2xs">
-          <span class="material-symbols-outlined text-lg">arrow_forward</span>
-        </button>
-        <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-100">
-          <span class="material-symbols-outlined text-sm text-emerald-600">verified</span>
-          <span>بوابة الدخول الموحدة</span>
-        </div>
-        <div class="w-10"></div>
-      </div>
-
-      <div class="flex flex-col items-center justify-center pt-2 pb-4 text-center">
-        <h2 id="auth-main-heading" class="text-xl font-black text-slate-900 tracking-tight">أهلاً بك في مُتقن 👋</h2>
-        <p id="auth-main-subtext" class="text-xs text-slate-500 mt-0.5">سجل دخولك أو أنشئ حساباً جديداً للتحويل المباشر للفرع</p>
-      </div>
-
-      <!-- Mode Selector -->
-      <div class="flex items-center p-1 bg-slate-200/80 rounded-2xl mb-4">
-        <button id="auth-tab-login" onclick="toggleAuthMode('login')" class="flex-1 py-2 rounded-xl bg-white shadow-xs text-emerald-700 font-bold text-xs transition-all">
-          تسجيل الدخول
-        </button>
-        <button id="auth-tab-register" onclick="toggleAuthMode('register')" class="flex-1 py-2 rounded-xl text-slate-600 font-bold text-xs transition-all">
-          إنشاء حساب جديد
-        </button>
-      </div>
-
-      <!-- Role Selector -->
-      <div class="flex flex-col gap-2 mb-4">
-        <div id="role-client" onclick="selectRole('client')" class="role-card relative flex items-center justify-between p-3 rounded-2xl bg-white border-2 border-emerald-600 shadow-xs cursor-pointer transition-all active-scale">
-          <div class="flex items-center gap-2.5">
-            <span class="material-symbols-outlined text-xl text-emerald-600">home_repair_service</span>
-            <div>
-              <span class="text-xs font-bold text-slate-900">حساب عميل</span>
-              <p class="text-[10px] text-slate-500">يحولك إلى: client.oxygen11.com</p>
-            </div>
-          </div>
-          <span class="material-symbols-outlined text-emerald-600 text-base">check_circle</span>
-        </div>
-
-        <div id="role-tech" onclick="selectRole('tech')" class="role-card relative flex items-center justify-between p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer transition-all active-scale">
-          <div class="flex items-center gap-2.5">
-            <span class="material-symbols-outlined text-xl text-slate-500">handyman</span>
-            <div>
-              <span class="text-xs font-bold text-slate-900">حساب فني / مزود خدمة</span>
-              <p class="text-[10px] text-slate-500">يحولك إلى: technician.oxygen11.com</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- FORM: LOGIN -->
-      <div id="form-login-container" class="bg-white rounded-3xl p-4 border border-slate-200 shadow-xs mb-4 space-y-3">
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 mb-1">رقم الجوال المسجل</label>
-          <input id="login-identifier" type="text" placeholder="05XXXXXXXX" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 h-[48px] text-xs font-bold outline-none"/>
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 mb-1">الرقم السري</label>
-          <input id="login-password" type="password" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 h-[48px] text-xs font-bold outline-none"/>
-        </div>
-        <button onclick="handleExecuteLogin()" class="w-full h-[48px] rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition active-scale">
-          دخول وتحويل تلقائي للنطاق الفرعي
-        </button>
-      </div>
-
-      <!-- FORM: REGISTER -->
-      <div id="form-register-container" class="hidden bg-white rounded-3xl p-4 border border-slate-200 shadow-xs mb-4 space-y-3">
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 mb-1">الاسم الكامل</label>
-          <input id="reg-name" type="text" placeholder="الاسم" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 h-[48px] text-xs font-bold outline-none"/>
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 mb-1">رقم الجوال</label>
-          <input id="reg-phone" type="tel" placeholder="05XXXXXXXX" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 h-[48px] text-xs font-bold outline-none"/>
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 mb-1">تعيين الرقم السري</label>
-          <input id="reg-password" type="password" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 h-[48px] text-xs font-bold outline-none"/>
-        </div>
-        <button onclick="handleExecuteRegister()" class="w-full h-[48px] rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition active-scale">
-          إنشاء الحساب والتحويل الفوري للفرع
-        </button>
-      </div>
-
-      <button onclick="navigateTo('view-home')" class="w-full h-[44px] rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs">
-        المتابعة كزائر واستعراض الخدمات
-      </button>
-    </section>
-
-    <!-- FIXED BOTTOM NAVIGATION BAR -->
-    <nav class="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white/98 backdrop-blur-lg border-t border-slate-200/90 px-2 py-2 z-40 flex items-center justify-around">
-      <button onclick="navigateTo('view-home')" id="nav-btn-home" class="nav-tab flex flex-col items-center justify-center text-emerald-700 font-bold w-14">
-        <span class="material-symbols-outlined text-2xl">home</span>
-        <span class="text-[10px] mt-0.5">الرئيسية</span>
-      </button>
-      <button onclick="navigateTo('view-auth')" id="nav-btn-profile" class="nav-tab flex flex-col items-center justify-center text-slate-500 w-14">
-        <span class="material-symbols-outlined text-2xl">account_circle</span>
-        <span class="text-[10px] mt-0.5">الحساب</span>
-      </button>
-    </nav>
-
+    
+    <!-- إشعارات النظام السريعة (Toast) -->
+    <div id="statusMessage" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[90%] max-w-[380px] hidden p-3 rounded-2xl text-xs font-black text-center shadow-2xl z-50 transition-all"></div>
   </div>
 
-  <!-- JAVASCRIPT ENGINE -->
+  <!-- سكربت التحكم المركزي (MUCS Logic) -->
   <script>
-    let activeRole = 'client';
-    let currentCarouselIndex = 0;
-
-    function navigateTo(viewId) {
-      document.querySelectorAll('main, section').forEach(el => el.classList.add('hidden'));
-      const target = document.getElementById(viewId);
-      if (target) target.classList.remove('hidden');
-
-      const backBtn = document.getElementById('global-back-btn');
-      if (backBtn) {
-        viewId === 'view-home' ? backBtn.classList.add('hidden') : backBtn.classList.remove('hidden');
-      }
-    }
-
-    function toggleAuthMode(mode) {
-      const isLogin = mode === 'login';
-      document.getElementById('form-login-container').classList.toggle('hidden', !isLogin);
-      document.getElementById('form-register-container').classList.toggle('hidden', isLogin);
-      document.getElementById('auth-tab-login').className = isLogin ? 'flex-1 py-2 rounded-xl bg-white shadow-xs text-emerald-700 font-bold text-xs' : 'flex-1 py-2 rounded-xl text-slate-600 font-bold text-xs';
-      document.getElementById('auth-tab-register').className = !isLogin ? 'flex-1 py-2 rounded-xl bg-white shadow-xs text-emerald-700 font-bold text-xs' : 'flex-1 py-2 rounded-xl text-slate-600 font-bold text-xs';
-    }
-
-    function selectRole(role) {
-      activeRole = role;
-      document.getElementById('role-client').className = role === 'client' ? 'role-card relative flex items-center justify-between p-3 rounded-2xl bg-white border-2 border-emerald-600 shadow-xs cursor-pointer' : 'role-card relative flex items-center justify-between p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer';
-      document.getElementById('role-tech').className = role === 'tech' ? 'role-card relative flex items-center justify-between p-3 rounded-2xl bg-white border-2 border-emerald-600 shadow-xs cursor-pointer' : 'role-card relative flex items-center justify-between p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer';
-    }
-
-    // دوال الربط مع النظام المستقل auth-system.js
-    function handleExecuteRegister() {
-      try {
-        MotqanAuthSystem.register({
-          name: document.getElementById('reg-name').value,
-          phone: document.getElementById('reg-phone').value,
-          password: document.getElementById('reg-password').value,
-          role: activeRole // 'client' أو 'tech'
-        });
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    function handleExecuteLogin() {
-      try {
-        MotqanAuthSystem.login({
-          phone: document.getElementById('login-identifier').value,
-          password: document.getElementById('login-password').value
-        });
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-
-    function openSecurityGateModal() {
-      const pin = prompt('أدخل الرمز السري لبوابة الإدارة (المالك علي: 789512364):');
-      if (pin === '789512364') {
-        alert('مرحباً بك يا أستاذ علي - يتم التوجيه لفرع الإدارة...');
-        window.location.replace('https://admin.oxygen11.com');
-      } else if (pin) {
-        alert('الرمز غير صحيح');
-      }
-    }
-
-    function openAiConsultantModal() {
-      alert('مرحباً بك في مستشار الصيانة الذكي.');
-    }
-
-    function setCarouselSlide(index) {
-      currentCarouselIndex = index;
-      for (let i = 0; i < 3; i++) {
-        const slide = document.getElementById('carousel-slide-' + i);
-        const dot = document.getElementById('dot-' + i);
-        if (slide) slide.className = (i === index) ? 'carousel-slide active flex flex-col justify-between h-full' : 'carousel-slide inactive flex flex-col justify-between h-full';
-        if (dot) dot.className = (i === index) ? 'w-5 h-1.5 rounded-full bg-emerald-500 transition-all' : 'w-1.5 h-1.5 rounded-full bg-slate-600 transition-all';
-      }
-    }
-
-    window.onload = function() {
-      setInterval(() => setCarouselSlide((currentCarouselIndex + 1) % 3), 3500);
+    // 1. إعدادات قاعدة بيانات فايربيز المركزية
+    const firebaseConfig = {
+      apiKey: "AIzaSyCJnFR_cALYeWvPHroEqdCHbnhlcREdjPI",
+      authDomain: "mutqn-opt.firebaseapp.com",
+      projectId: "mutqn-opt",
+      storageBucket: "mutqn-opt.firebasestorage.app",
+      messagingSenderId: "290720043173",
+      appId: "1:290720043173:web:72167db99e1b801e31fd4c"
     };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
+
+    // 2. التحكم في الواجهة
+    function switchTab(tabId) {
+      document.getElementById('tab-home').classList.add('hidden');
+      document.getElementById('tab-auth-modal').classList.add('hidden');
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+    }
+
+    function openAuthModal() { switchTab('auth-modal'); }
+    function closeAuthModal() { switchTab('home'); }
+
+    function showMessage(text, isError = false) {
+      const msgDiv = document.getElementById('statusMessage');
+      msgDiv.className = `fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[90%] max-w-[380px] p-3 rounded-2xl text-xs font-black text-center shadow-2xl z-50 fade-in ${isError ? 'bg-red-600 text-white border border-red-700' : 'bg-emerald-600 text-white border border-emerald-700'}`;
+      msgDiv.innerText = text;
+      msgDiv.classList.remove('hidden');
+      setTimeout(() => msgDiv.classList.add('hidden'), 4000);
+    }
+
+    // 3. إرسال كود الـ OTP
+    function handleSendOTP() {
+      let rawPhone = document.getElementById('phoneNumber').value.trim();
+      if (!rawPhone || rawPhone.length < 8) {
+        return showMessage("الرجاء إدخال رقم الجوال بشكل صحيح", true);
+      }
+      
+      // توحيد صيغة الرقم للسعودية
+      let phone = rawPhone.startsWith('+') ? rawPhone : '+966' + (rawPhone.startsWith('0') ? rawPhone.substring(1) : rawPhone);
+
+      const btn = document.getElementById('btn-send-otp');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">sync</span><span>جاري الإرسال...</span>';
+
+      firebase.auth().signInWithPhoneNumber(phone, window.recaptchaVerifier)
+        .then((confirmationResult) => {
+          window.confirmationResult = confirmationResult;
+          document.getElementById('step-phone').classList.add('hidden');
+          document.getElementById('step-verify').classList.remove('hidden');
+          showMessage("تم إرسال كود التحقق بنجاح ✓", false);
+        }).catch((error) => {
+          showMessage("فشل الإرسال، يرجى المحاولة لاحقاً", true);
+          btn.disabled = false;
+          btn.innerHTML = '<span>إرسال الرمز السري</span><span class="material-symbols-outlined text-sm">send</span>';
+          if (window.recaptchaVerifier) window.recaptchaVerifier.render().then(id => grecaptcha.reset(id));
+        });
+    }
+
+    // 4. التحقق والتوجيه المركزي (The Routing Engine)
+    function handleVerifyAndRoute() {
+      const code = document.getElementById('otpCode').value.trim();
+      if (code.length < 6) return showMessage("الرجاء إدخال الرمز المكون من 6 أرقام", true);
+
+      const btn = document.getElementById('btn-verify-otp');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">sync</span><span>جاري التحقق...</span>';
+
+      window.confirmationResult.confirm(code)
+        .then((result) => {
+          const user = result.user;
+          const role = document.getElementById('user-role').value; // 'client' أو 'tech'
+          
+          // في المعمارية الجديدة، سنسأل السجل المركزي (الـ Registry) هل المستخدم مكتمل البيانات؟
+          // مؤقتاً نحاكيها بـ LocalStorage للتوضيح:
+          const allUsers = JSON.parse(localStorage.getItem('motqan_unified_registry') || '{}');
+          
+          if (allUsers[user.phoneNumber] && allUsers[user.phoneNumber].isProfileComplete) {
+            // مستخدم قديم ومكتمل -> اصدار Token وتوجيه للدومين الفرعي
+            const token = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(allUsers[user.phoneNumber])))));
+            const targetDomain = role === 'client' ? 'https://client.oxygen11.com' : 'https://technician.oxygen11.com';
+            
+            showMessage("نجاح! جاري تحويلك لحسابك...", false);
+            setTimeout(() => window.location.replace(`${targetDomain}/?auth_token=${token}`), 1000);
+            
+          } else {
+            // مستخدم جديد -> توجيه لصفحة الـ Onboarding المركزية لتسجيل الاسم/الخريطة
+            const tempSession = { phone: user.phoneNumber, role: role, uid: user.uid };
+            localStorage.setItem('motqan_temp_setup', JSON.stringify(tempSession));
+            
+            showMessage("تم التحقق! جاري توجيهك لاستكمال البيانات...", false);
+            setTimeout(() => window.location.replace(`onboarding.html?role=${role}`), 1000);
+          }
+        }).catch((error) => {
+          showMessage("الكود غير صحيح أو منتهي الصلاحية", true);
+          btn.disabled = false;
+          btn.innerHTML = '<span>تأكيد الدخول</span><span class="material-symbols-outlined text-sm">verified_user</span>';
+        });
+    }
   </script>
 </body>
 </html>
