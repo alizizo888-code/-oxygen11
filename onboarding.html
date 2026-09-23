@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>استكمال البيانات الشخصية | مُتقن</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <style> body { font-family: 'Cairo', sans-serif; background-color: #0b1320; color: #1e293b; } </style>
+</head>
+<body class="min-h-screen flex justify-center items-center p-4">
+
+  <div class="w-full max-w-[420px] bg-white rounded-[32px] p-6 shadow-2xl space-y-4">
+    
+    <div class="text-center">
+      <div class="w-14 h-14 bg-emerald-50 text-[#006948] rounded-full flex items-center justify-center mx-auto mb-2 font-black border border-emerald-100">
+        <span class="material-symbols-outlined text-2xl">how_to_reg</span>
+      </div>
+      <h2 class="text-base font-black text-slate-900">استكمال الملف الشخصي</h2>
+      <p class="text-[11px] text-slate-500 mt-0.5">خطوة أخيرة لتفعيل حسابك في منظومة مُتقن</p>
+    </div>
+
+    <!-- نموذج العميل -->
+    <div id="onboarding-form" class="space-y-3.5">
+      <div>
+        <label class="block text-[11px] font-bold text-slate-700 mb-1">الاسم الكريم:</label>
+        <input id="user-full-name" type="text" placeholder="الاسم ثلاثي" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold outline-none focus:border-[#006948]"/>
+      </div>
+
+      <!-- نظام اختيار الموقع الجغرافي ثلاثي المستويات -->
+      <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+        <h3 class="text-[11px] font-black text-[#006948] flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">map</span> النطاق الجغرافي
+        </h3>
+        
+        <select id="region-select" onchange="updateCities()" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-bold outline-none">
+          <option value="">اختر المنطقة</option>
+          <option value="makkah">منطقة مكة المكرمة</option>
+          <option value="riyadh">منطقة الرياض</option>
+        </select>
+
+        <select id="city-select" onchange="updateDistricts()" disabled class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-bold outline-none disabled:bg-slate-100 disabled:text-slate-400">
+          <option value="">اختر المدينة</option>
+        </select>
+
+        <select id="district-select" disabled class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-bold outline-none disabled:bg-slate-100 disabled:text-slate-400">
+          <option value="">اختر الحي</option>
+        </select>
+      </div>
+
+      <!-- زر التقاط الـ GPS الدقيق -->
+      <button onclick="captureGPS()" class="w-full py-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition">
+        <span class="material-symbols-outlined text-base">my_location</span>
+        <span id="gps-status-text">تحديد إحداثيات موقعي الدقيق (GPS)</span>
+      </button>
+
+      <button onclick="saveProfileAndEnter()" class="w-full py-3.5 bg-[#006948] hover:bg-[#00553a] text-white rounded-xl font-black text-xs shadow-md transition">
+        حفظ وبدء الخدمة
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    const locationsDB = {
+      makkah: {
+        cities: {
+          makkah_city: { name: 'مكة المكرمة', districts: ['العزيزية', 'الشوقية', 'الشرائع', 'بطحاء قريش', 'العوالي', 'النزهة'] },
+          jeddah: { name: 'جدة', districts: ['الروضة', 'الصفا', 'المروة', 'الحمدانية', 'الملقا', 'البساتين'] }
+        }
+      },
+      riyadh: {
+        cities: {
+          riyadh_city: { name: 'الرياض', districts: ['العليا', 'الملقا', 'الياسمين', 'النرجس', 'الصحافة'] }
+        }
+      }
+    };
+
+    let userGpsCoords = null;
+    let tempSession = {};
+
+    window.onload = function() {
+      try {
+        tempSession = JSON.parse(localStorage.getItem('motqan_temp_setup') || '{}');
+        if(!tempSession.phone) {
+          window.location.replace('https://mutaqan.oxygen11.com');
+        }
+      } catch(e) {
+        window.location.replace('https://mutaqan.oxygen11.com');
+      }
+    };
+
+    function updateCities() {
+      const region = document.getElementById('region-select').value;
+      const citySelect = document.getElementById('city-select');
+      const distSelect = document.getElementById('district-select');
+      
+      citySelect.innerHTML = '<option value="">اختر المدينة</option>';
+      distSelect.innerHTML = '<option value="">اختر الحي</option>';
+      distSelect.disabled = true;
+
+      if (region && locationsDB[region]) {
+        citySelect.disabled = false;
+        Object.keys(locationsDB[region].cities).forEach(cityKey => {
+          const opt = document.createElement('option');
+          opt.value = cityKey;
+          opt.textContent = locationsDB[region].cities[cityKey].name;
+          citySelect.appendChild(opt);
+        });
+      } else {
+        citySelect.disabled = true;
+      }
+    }
+
+    function updateDistricts() {
+      const region = document.getElementById('region-select').value;
+      const city = document.getElementById('city-select').value;
+      const distSelect = document.getElementById('district-select');
+      
+      distSelect.innerHTML = '<option value="">اختر الحي</option>';
+
+      if (region && city && locationsDB[region].cities[city]) {
+        distSelect.disabled = false;
+        locationsDB[region].cities[city].districts.forEach(dist => {
+          const opt = document.createElement('option');
+          opt.value = dist;
+          opt.textContent = dist;
+          distSelect.appendChild(opt);
+        });
+      } else {
+        distSelect.disabled = true;
+      }
+    }
+
+    function captureGPS() {
+      const btnText = document.getElementById('gps-status-text');
+      if (!navigator.geolocation) {
+        alert("متصفحك لا يدعم تحديد الموقع الجغرافي.");
+        return;
+      }
+      btnText.textContent = "جاري التقاط الإحداثيات...";
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userGpsCoords = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            link: `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`
+          };
+          btnText.textContent = "تم تحديد الموقع بدقة ✓";
+        },
+        (err) => {
+          btnText.textContent = "تعذر التحديد، تأكد من الصلاحيات";
+          alert("يرجى السماح للمتصفح بالوصول إلى موقعك الجغرافي.");
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+
+    function saveProfileAndEnter() {
+      const name = document.getElementById('user-full-name').value.trim();
+      const district = document.getElementById('district-select').value;
+
+      if (!name || !district) {
+        return alert("يرجى إدخال الاسم وتحديد الحي السكني كحد أدنى.");
+      }
+
+      // تجهيز الكائن الكامل وحفظه في السجل المركزي المعتمد
+      const fullUserData = {
+        uid: tempSession.uid,
+        phone: tempSession.phone,
+        role: tempSession.role || 'client',
+        name: name,
+        isProfileComplete: true,
+        location: { district, gps: userGpsCoords },
+        wallet: 150.00
+      };
+
+      // حفظه في قاعدة بيانات السجل المركزي للتسجيل الدائم
+      const allUsers = JSON.parse(localStorage.getItem('motqan_unified_registry') || '{}');
+      allUsers[tempSession.phone] = fullUserData;
+      localStorage.setItem('motqan_unified_registry', JSON.stringify(allUsers));
+      localStorage.setItem('motqan_client_session', JSON.stringify(fullUserData));
+
+      // التوجيه للفرع النهائي
+      alert("تم استكمال البيانات وتفعيل الحساب بنجاح!");
+      const token = encodeURIComponent(btoa(JSON.stringify(fullUserData)));
+      window.location.replace(`https://client.oxygen11.com/?auth_token=${token}`);
+    }
+  </script>
+</body>
+</html>
