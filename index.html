@@ -1,188 +1,62 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>بوابة العميل المعتمدة | مُتقن</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    :root {
-      --mucs-primary: #006948;
-      --mucs-primary-hover: #00553a;
-      --mucs-bg: #0b1320;
+/**
+ * MUCS Advanced Service Request Engine (صلاحيات جبارة للعميل)
+ * هذه الدالة تتحكم في تنفيذ الطلب، اعتراضه، فحصه، وتنفيذ السكريبتات المرتبطة به ديناميكياً
+ */
+async function requestNewService(serviceName) {
+  try {
+    // 1. فحص حالة الطوارئ العامة للنظام (Global System Lock)
+    const isSystemLocked = localStorage.getItem('mucs_global_emergency_lock') === 'true';
+    if (isSystemLocked) {
+      alert("عذراً، منصة مُتقن تخضع لصيانة طارئة حالياً. نرجو المحاولة لاحقاً.");
+      return;
     }
-    body { font-family: 'Cairo', sans-serif; background-color: var(--mucs-bg); color: #1e293b; user-select: none; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .press-scale:active { transform: scale(0.96); transition: 0.1s; }
-    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  </style>
 
-  <!-- استقبال فك التوكن وتثبيت الجلسة فوراً لمنع أي ارتداد -->
-  <script>
-    (function initClientSession() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('auth_token');
-      if (token) {
-        try {
-          const raw = decodeURIComponent(escape(atob(decodeURIComponent(token))));
-          localStorage.setItem('motqan_client_session', raw);
-          window.history.replaceState({}, document.title, window.location.pathname);
-        } catch(e) { console.error("Session Token Error:", e); }
-      }
-    })();
-  </script>
-</head>
-<body class="min-h-screen flex justify-center items-start p-0 sm:py-4">
-
-  <div class="w-full max-w-[440px] bg-[#F8FAFC] min-h-screen relative shadow-2xl flex flex-col sm:rounded-[36px] overflow-hidden pb-20">
-
-    <!-- شريط رأس العميل -->
-    <header class="bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-40 flex items-center justify-between shadow-2xs">
-      <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('home')">
-        <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 text-[var(--mucs-primary)] flex items-center justify-center font-black">
-          <span class="material-symbols-outlined text-lg">person</span>
-        </div>
-        <div>
-          <span id="client-header-name" class="text-xs font-black text-slate-900 block leading-tight">حساب العميل</span>
-          <span class="text-[9px] font-bold text-slate-400 block leading-tight">client.oxygen11.com</span>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-1.5">
-        <button onclick="executeLogout()" title="تسجيل الخروج" class="h-8 px-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-black flex items-center gap-1 press-scale">
-          <span class="material-symbols-outlined text-sm">logout</span>
-          <span>خروج</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- المحتوى الداخلي -->
-    <main class="flex-1 overflow-y-auto no-scrollbar">
-
-      <!-- 1. الرئيسية للعميل -->
-      <section id="tab-home" class="p-4 space-y-4 fade-in">
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-l from-[var(--mucs-primary)] to-[#065f46] text-white p-4 min-h-[140px] flex flex-col justify-between shadow-md">
-          <span class="self-start inline-flex items-center gap-1 bg-amber-500 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full">
-            عضوية عميل معتمد
-          </span>
-          <div>
-            <h2 class="text-base font-black leading-tight mt-1">طلب صيانة فوري مخصص لك</h2>
-            <p class="text-[11px] text-emerald-100">فنيون معتمدون في مكة المكرمة وجدة</p>
-          </div>
-          <button onclick="requestNewService('صيانة عامة')" class="py-2.5 rounded-xl bg-white text-[var(--mucs-primary)] font-black text-xs press-scale shadow-sm">
-            اطلب فنيك الآن
-          </button>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div onclick="requestNewService('غسيل مكيف سبليت')" class="p-3.5 rounded-2xl bg-white border border-[var(--mucs-primary)] shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-[var(--mucs-primary)] text-2xl">mode_fan</span>
-            <h3 class="font-black text-xs text-slate-900 mt-1">صيانة وتكييف</h3>
-            <p class="text-[10px] text-emerald-700 font-bold">خصم خاص للعملاء</p>
-          </div>
-          <div onclick="requestNewService('كشف تسريب مياه')" class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-blue-600 text-2xl">faucet</span>
-            <h3 class="font-black text-xs text-slate-900 mt-1">سباكة وتسريبات</h3>
-            <p class="text-[10px] text-blue-700 font-bold">كشف إلكتروني</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- 2. سجل الطلبات -->
-      <section id="tab-orders" class="hidden p-4 space-y-3 fade-in">
-        <h2 class="text-sm font-black text-slate-900">طلباتي النشطة والسابقة</h2>
-        <div id="orders-list" class="space-y-2">
-          <div class="p-3.5 rounded-2xl bg-white border border-slate-200 text-xs shadow-2xs">
-            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">قيد التنفيذ ⚡</span>
-            <h4 class="font-bold text-slate-900 mt-1.5">غسيل مكيف سبليت (عميق)</h4>
-            <p class="text-[10px] text-slate-500 mt-0.5">الحي: العزيزية • الموعد: اليوم</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- 3. المحفظة والحساب -->
-      <section id="tab-profile" class="hidden p-4 space-y-3 fade-in">
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 text-center space-y-2 shadow-2xs">
-          <div class="w-12 h-12 rounded-full bg-emerald-50 text-[var(--mucs-primary)] flex items-center justify-center font-black mx-auto">
-            <span class="material-symbols-outlined text-2xl">account_circle</span>
-          </div>
-          <h3 id="prof-name" class="font-black text-xs text-slate-900">عميل مُتقن</h3>
-          <p id="prof-phone" class="text-[10px] text-slate-500 font-mono">05XXXXXXXX</p>
-          <div class="p-2.5 bg-emerald-50 rounded-xl text-xs font-bold text-emerald-800 border border-emerald-100">
-            رصيد المحفظة: <span id="prof-wallet">150.00</span> ر.س
-          </div>
-        </div>
-      </section>
-
-    </main>
-
-    <!-- شريط التنقل السفلي -->
-    <nav class="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white/95 border-t border-slate-200 px-2 py-2 z-40 flex items-center justify-around text-[10px]">
-      <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center text-[var(--mucs-primary)] font-black">
-        <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">home</span>
-        <span>الرئيسية</span>
-      </button>
-      <button onclick="switchTab('orders')" id="nav-orders" class="flex flex-col items-center text-slate-500 font-bold">
-        <span class="material-symbols-outlined text-xl">receipt_long</span>
-        <span>الطلبات</span>
-      </button>
-      <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-slate-500 font-bold">
-        <span class="material-symbols-outlined text-xl">person</span>
-        <span>حسابي</span>
-      </button>
-    </nav>
-
-  </div>
-
-  <script>
-    let clientSession = {};
-
-    window.addEventListener('DOMContentLoaded', () => {
-      loadClientData();
-    });
-
-    function loadClientData() {
-      try {
-        clientSession = JSON.parse(localStorage.getItem('motqan_client_session') || '{}');
-        if (clientSession.name) {
-          document.getElementById('client-header-name').textContent = clientSession.name;
-          document.getElementById('prof-name').textContent = clientSession.name;
-        }
-        if (clientSession.phone) {
-          document.getElementById('prof-phone').textContent = clientSession.phone;
-        }
-      } catch(e) {
-        console.error(e);
+    // 2. فحص الـ Hooks المسبقة (Before-Action Hook) التي وضعها المالك أو المشرف
+    if (typeof MUCS_ClientEngine !== 'undefined' && MUCS_ClientEngine.executeHookBeforeAction) {
+      const canProceed = await MUCS_ClientEngine.executeHookBeforeAction('service_request', { service: serviceName });
+      if (!canProceed) {
+        alert("عذراً، تم إلغاء أو إيقاف هذا الإجراء مؤقتاً بواسطة الإدارة المركزية.");
+        return;
       }
     }
 
-    function switchTab(tabId) {
-      ['home', 'orders', 'profile'].forEach(t => {
-        document.getElementById('tab-' + t)?.classList.add('hidden');
-        const navBtn = document.getElementById('nav-' + t);
-        if (navBtn) navBtn.className = 'flex flex-col items-center text-slate-500 font-bold';
-      });
-      document.getElementById('tab-' + tabId)?.classList.remove('hidden');
-      const activeNav = document.getElementById('nav-' + tabId);
-      if (activeNav) activeNav.className = 'flex flex-col items-center text-[var(--mucs-primary)] font-black';
+    // 3. جلب بيانات الجلسة الحالية لتوثيق الطلب قانونياً ومالياً
+    const sessionData = JSON.parse(localStorage.getItem('motqan_client_session') || '{}');
+    if (!sessionData.phone) {
+      alert("انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً.");
+      window.location.replace('https://mutaqan.oxygen11.com');
+      return;
     }
 
-    function requestNewService(serviceName) {
-      alert(`تم استلام طلبك لخدمة (${serviceName}) بنجاح. جاري توجيه أقرب فني إليك!`);
-      switchTab('orders');
+    // 4. إنشاء هيكل الطلب الموحد وتحويله للسجل المركزي (Registry Payload)
+    const orderPayload = {
+      orderId: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
+      clientPhone: sessionData.phone,
+      clientName: sessionData.name || 'عميل مُتقن',
+      serviceRequested: serviceName,
+      timestamp: new Date().toISOString(),
+      status: 'pending_dispatch',
+      sourceDomain: 'client.oxygen11.com'
+    };
+
+    // حفظ الطلب محلياً وفي السجل المشترك لحل أي نزاعات قانونية مستقبلية
+    const allOrders = JSON.parse(localStorage.getItem('motqan_global_orders_registry') || '[]');
+    allOrders.unshift(orderPayload);
+    localStorage.setItem('motqan_global_orders_registry', JSON.stringify(allOrders));
+
+    // 5. التنفيذ الناجح وإشعار المستخدم
+    alert(`تم استلام طلبك (${serviceName}) بنجاح برقم مرجعي [${orderPayload.orderId}]. جاري توجيه أقرب فني معتمد لموقعك!`);
+    
+    // 6. تشغيل الـ Hooks اللاحقة (After-Action Hook) في الخلفية دون تعطيل الواجهة
+    if (typeof MUCS_ClientEngine !== 'undefined' && MUCS_ClientEngine.executeHookAfterAction) {
+      MUCS_ClientEngine.executeHookAfterAction('service_request_success', orderPayload);
     }
 
-    function executeLogout() {
-      if (confirm('هل ترغب في تسجيل الخروج من حساب العميل؟')) {
-        localStorage.removeItem('motqan_client_session');
-        window.location.replace('https://mutaqan.oxygen11.com');
-      }
-    }
-  </script>
-</body>
-</html>
+    // الانتقال أوتوماتيكياً لصفحة تتبع الطلبات
+    switchTab('orders');
+
+  } catch (error) {
+    console.error("Critical error in requestNewService:", error.message);
+    alert("حدث خطأ غير متوقع أثناء معالجة طلبك. تم تسجيل المشكلة للإدارة.");
+  }
+}
