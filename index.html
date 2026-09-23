@@ -3,22 +3,28 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>مُتقن | أكسجين للصيانة والمقاولات</title>
+  <title>بوابة العميل المعتمدة | مُتقن</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    body { font-family: 'Cairo', sans-serif; background-color: #0b1320; color: #1e293b; user-select: none; }
+    :root {
+      --mucs-primary: #006948;
+      --mucs-primary-hover: #00553a;
+      --mucs-bg: #0b1320;
+    }
+    body { font-family: 'Cairo', sans-serif; background-color: var(--mucs-bg); color: #1e293b; user-select: none; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .press-scale:active { transform: scale(0.96); }
+    .press-scale:active { transform: scale(0.96); transition: 0.1s; }
+    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 
-  <!-- فك التوكن وتثبيته محلياً بدون أي توجيه خارجي -->
+  <!-- استقبال فك التوكن وتثبيت الجلسة فوراً لمنع أي ارتداد -->
   <script>
-    (function initClient() {
+    (function initClientSession() {
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get('auth_token');
       if (token) {
@@ -26,7 +32,7 @@
           const raw = decodeURIComponent(escape(atob(decodeURIComponent(token))));
           localStorage.setItem('motqan_client_session', raw);
           window.history.replaceState({}, document.title, window.location.pathname);
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("Session Token Error:", e); }
       }
     })();
   </script>
@@ -35,159 +41,98 @@
 
   <div class="w-full max-w-[440px] bg-[#F8FAFC] min-h-screen relative shadow-2xl flex flex-col sm:rounded-[36px] overflow-hidden pb-20">
 
-    <!-- شريط الرأس الموحد -->
-    <header class="bg-white border-b border-slate-150 px-4 py-2.5 sticky top-0 z-40 flex items-center justify-between shadow-2xs">
+    <!-- شريط رأس العميل -->
+    <header class="bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-40 flex items-center justify-between shadow-2xs">
       <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('home')">
-        <div class="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200 text-[#006948] flex items-center justify-center font-black">
-          <span class="material-symbols-outlined text-lg">home_repair_service</span>
+        <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 text-[var(--mucs-primary)] flex items-center justify-center font-black">
+          <span class="material-symbols-outlined text-lg">person</span>
         </div>
         <div>
-          <span class="text-xs font-black text-slate-900 block leading-tight">مُتقن</span>
+          <span id="client-header-name" class="text-xs font-black text-slate-900 block leading-tight">حساب العميل</span>
           <span class="text-[9px] font-bold text-slate-400 block leading-tight">client.oxygen11.com</span>
         </div>
       </div>
 
       <div class="flex items-center gap-1.5">
-        <button id="auth-action-btn" onclick="handleAuthButtonClick()" class="h-8 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-[#006948] text-xs font-black flex items-center gap-1 press-scale">
-          <span class="material-symbols-outlined text-sm">person</span>
-          <span id="auth-btn-label">دخول</span>
-        </button>
-
-        <!-- القفل السري للمالك والمشرف (باسوورد مشفر تماماً) -->
-        <button onclick="openSecurityGate()" title="بوابة الإدارة والمالك" class="w-8 h-8 rounded-xl bg-amber-50 border border-amber-300 text-amber-800 flex items-center justify-center press-scale">
-          <span class="material-symbols-outlined text-[17px]">lock</span>
+        <button onclick="executeLogout()" title="تسجيل الخروج" class="h-8 px-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-black flex items-center gap-1 press-scale">
+          <span class="material-symbols-outlined text-sm">logout</span>
+          <span>خروج</span>
         </button>
       </div>
     </header>
 
-    <!-- المحتوى -->
+    <!-- المحتوى الداخلي -->
     <main class="flex-1 overflow-y-auto no-scrollbar">
 
-      <!-- 1. الرئيسية -->
-      <section id="tab-home" class="p-3.5 space-y-3.5">
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-l from-[#006948] via-[#047857] to-[#065f46] text-white p-4 min-h-[150px] flex flex-col justify-between shadow-md">
+      <!-- 1. الرئيسية للعميل -->
+      <section id="tab-home" class="p-4 space-y-4 fade-in">
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-l from-[var(--mucs-primary)] to-[#065f46] text-white p-4 min-h-[140px] flex flex-col justify-between shadow-md">
           <span class="self-start inline-flex items-center gap-1 bg-amber-500 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full">
-            عروض باقات التوفير الكبرى
+            عضوية عميل معتمد
           </span>
-          <h2 class="text-base font-black leading-tight mt-1">كاش باك 30% على كل طلب صيانة</h2>
-          <p class="text-[11px] text-emerald-100">غسيل مكيف سبليت عميق بـ 115 ر.س فقط للجهاز</p>
-          <div class="flex items-center justify-between pt-2">
-            <button onclick="checkAuthAndOrder('صيانة وتكييف', 115)" class="px-3.5 py-2 rounded-xl bg-white text-[#006948] font-black text-xs press-scale">
-              احجز فنيك الآن
-            </button>
-            <span class="text-[10px] bg-emerald-900/60 text-emerald-200 px-2 py-1 rounded-lg border border-emerald-500/40 font-bold">كود: OXYGEN30</span>
+          <div>
+            <h2 class="text-base font-black leading-tight mt-1">طلب صيانة فوري مخصص لك</h2>
+            <p class="text-[11px] text-emerald-100">فنيون معتمدون في مكة المكرمة وجدة</p>
           </div>
+          <button onclick="requestNewService('صيانة عامة')" class="py-2.5 rounded-xl bg-white text-[var(--mucs-primary)] font-black text-xs press-scale shadow-sm">
+            اطلب فنيك الآن
+          </button>
         </div>
 
-        <div class="flex items-center justify-between p-3 rounded-2xl bg-[#fffbeb] border border-[#fde68a] text-[#92400e]">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">verified</span>
-            <span class="text-xs font-black">ضمان أكسجين الذهبي المعتمد 30 يوماً</span>
-          </div>
-          <span class="text-[10px] font-bold">100% موثوق</span>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2.5">
-          <div onclick="checkAuthAndOrder('غسيل مكيف سبليت', 115)" class="p-3 rounded-2xl bg-white border border-[#006948] shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-[#006948] text-2xl">mode_fan</span>
+        <div class="grid grid-cols-2 gap-3">
+          <div onclick="requestNewService('غسيل مكيف سبليت')" class="p-3.5 rounded-2xl bg-white border border-[var(--mucs-primary)] shadow-2xs cursor-pointer press-scale">
+            <span class="material-symbols-outlined text-[var(--mucs-primary)] text-2xl">mode_fan</span>
             <h3 class="font-black text-xs text-slate-900 mt-1">صيانة وتكييف</h3>
-            <p class="text-[10px] text-emerald-700 font-bold">يبدأ 115 ر.س</p>
+            <p class="text-[10px] text-emerald-700 font-bold">خصم خاص للعملاء</p>
           </div>
-          <div onclick="checkAuthAndOrder('كشف تسريب مياه', 180)" class="p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer press-scale">
+          <div onclick="requestNewService('كشف تسريب مياه')" class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer press-scale">
             <span class="material-symbols-outlined text-blue-600 text-2xl">faucet</span>
             <h3 class="font-black text-xs text-slate-900 mt-1">سباكة وتسريبات</h3>
-            <p class="text-[10px] text-blue-700 font-bold">كشف إلكتروني 180 ر.س</p>
-          </div>
-          <div onclick="checkAuthAndOrder('فحص كهرباء', 120)" class="p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-amber-600 text-2xl">bolt</span>
-            <h3 class="font-black text-xs text-slate-900 mt-1">كهرباء وإنارة</h3>
-            <p class="text-[10px] text-amber-700 font-bold">فحص شورت 120 ر.س</p>
-          </div>
-          <div onclick="checkAuthAndOrder('عزل فوم وترميم', 32)" class="p-3 rounded-2xl bg-white border border-slate-200 shadow-2xs cursor-pointer press-scale">
-            <span class="material-symbols-outlined text-purple-600 text-2xl">format_paint</span>
-            <h3 class="font-black text-xs text-slate-900 mt-1">مقاولات وعزل</h3>
-            <p class="text-[10px] text-purple-700 font-bold">32 ر.س/م²</p>
+            <p class="text-[10px] text-blue-700 font-bold">كشف إلكتروني</p>
           </div>
         </div>
       </section>
 
-      <!-- 2. صفحة تسجيل الدخول / إنشاء حساب داخل الفرع نفسه -->
-      <section id="tab-auth-modal" class="hidden p-4 space-y-4">
-        <div class="flex items-center justify-between">
-          <button onclick="switchTab('home')" class="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center">
-            <span class="material-symbols-outlined text-sm">arrow_forward</span>
-          </button>
-          <span class="text-xs font-bold text-[#006948]">تسجيل حساب المنظومة</span>
-          <div class="w-8"></div>
-        </div>
-
-        <div class="space-y-3 bg-white p-4 rounded-2xl border border-slate-200">
-          <div>
-            <label class="block text-[11px] font-bold text-slate-600 mb-1">الاسم</label>
-            <input id="in-name" type="text" placeholder="الاسم الكريم" class="w-full bg-slate-50 border rounded-xl p-2.5 text-xs font-bold outline-none"/>
-          </div>
-          <div>
-            <label class="block text-[11px] font-bold text-slate-600 mb-1">رقم الجوال</label>
-            <input id="in-phone" type="tel" placeholder="05XXXXXXXX" class="w-full bg-slate-50 border rounded-xl p-2.5 text-xs font-bold outline-none"/>
-          </div>
-          <div>
-            <label class="block text-[11px] font-bold text-slate-600 mb-1">نوع الحساب</label>
-            <select id="in-role" class="w-full bg-slate-50 border rounded-xl p-2.5 text-xs font-bold outline-none">
-              <option value="client">عميل (client.oxygen11.com)</option>
-              <option value="tech">فني ميداني (technician.oxygen11.com)</option>
-            </select>
-          </div>
-          <button onclick="executeLoginOrRegister()" class="w-full py-3 bg-[#006948] text-white rounded-xl font-bold text-xs shadow-md press-scale">
-            دخول مباشر وتفعيل الحساب
-          </button>
-        </div>
-      </section>
-
-      <!-- 3. تبويب الطلبات -->
-      <section id="tab-orders" class="hidden p-3.5 space-y-3">
-        <h2 class="text-sm font-black text-slate-900">سجل طلباتي الجارية</h2>
-        <div id="orders-box" class="space-y-2">
-          <div class="p-3 rounded-2xl bg-white border border-slate-200 text-xs">
-            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">فني في الطريق 🚗</span>
-            <h4 class="font-bold text-slate-900 mt-1">غسيل مكيف سبليت (جهازين)</h4>
-            <p class="text-[10px] text-slate-500">الفني: ريان العمري • وصول خلال 15 دقيقة</p>
+      <!-- 2. سجل الطلبات -->
+      <section id="tab-orders" class="hidden p-4 space-y-3 fade-in">
+        <h2 class="text-sm font-black text-slate-900">طلباتي النشطة والسابقة</h2>
+        <div id="orders-list" class="space-y-2">
+          <div class="p-3.5 rounded-2xl bg-white border border-slate-200 text-xs shadow-2xs">
+            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">قيد التنفيذ ⚡</span>
+            <h4 class="font-bold text-slate-900 mt-1.5">غسيل مكيف سبليت (عميق)</h4>
+            <p class="text-[10px] text-slate-500 mt-0.5">الحي: العزيزية • الموعد: اليوم</p>
           </div>
         </div>
       </section>
 
-      <!-- 4. تبويب الحساب والإعدادات -->
-      <section id="tab-profile" class="hidden p-3.5 space-y-3">
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 text-center space-y-2">
-          <div class="w-12 h-12 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center font-black mx-auto">
-            <span class="material-symbols-outlined text-2xl">person</span>
+      <!-- 3. المحفظة والحساب -->
+      <section id="tab-profile" class="hidden p-4 space-y-3 fade-in">
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 text-center space-y-2 shadow-2xs">
+          <div class="w-12 h-12 rounded-full bg-emerald-50 text-[var(--mucs-primary)] flex items-center justify-center font-black mx-auto">
+            <span class="material-symbols-outlined text-2xl">account_circle</span>
           </div>
-          <h3 id="prof-name" class="font-black text-xs text-slate-900">زائر</h3>
-          <p id="prof-phone" class="text-[10px] text-slate-500 font-mono">غير مسجل</p>
-          <div class="p-2 bg-emerald-50 rounded-xl text-xs font-bold text-emerald-800">
-            رصيد المحفظة: <span id="prof-wallet">0.00</span> ر.س
+          <h3 id="prof-name" class="font-black text-xs text-slate-900">عميل مُتقن</h3>
+          <p id="prof-phone" class="text-[10px] text-slate-500 font-mono">05XXXXXXXX</p>
+          <div class="p-2.5 bg-emerald-50 rounded-xl text-xs font-bold text-emerald-800 border border-emerald-100">
+            رصيد المحفظة: <span id="prof-wallet">150.00</span> ر.س
           </div>
         </div>
-
-        <button onclick="executeLogout()" class="w-full py-3 rounded-2xl bg-red-50 text-red-600 font-bold text-xs border border-red-200 flex items-center justify-center gap-1.5 press-scale">
-          <span class="material-symbols-outlined text-sm">logout</span>
-          <span>تسجيل الخروج والعودة كزائر</span>
-        </button>
       </section>
 
     </main>
 
-    <!-- شريط التنقل السفلي المعتمد 100% داخل النطاقات الفرعية -->
-    <nav class="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white/95 border-t border-slate-200 px-2 py-1.5 z-40 flex items-center justify-around text-[10px]">
-      <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center text-[#006948] font-black">
+    <!-- شريط التنقل السفلي -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white/95 border-t border-slate-200 px-2 py-2 z-40 flex items-center justify-around text-[10px]">
+      <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center text-[var(--mucs-primary)] font-black">
         <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">home</span>
         <span>الرئيسية</span>
       </button>
-      <button onclick="switchTab('orders')" id="nav-orders" class="flex flex-col items-center text-slate-500">
+      <button onclick="switchTab('orders')" id="nav-orders" class="flex flex-col items-center text-slate-500 font-bold">
         <span class="material-symbols-outlined text-xl">receipt_long</span>
         <span>الطلبات</span>
       </button>
-      <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-slate-500">
-        <span class="material-symbols-outlined text-xl">account_circle</span>
+      <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-slate-500 font-bold">
+        <span class="material-symbols-outlined text-xl">person</span>
         <span>حسابي</span>
       </button>
     </nav>
@@ -195,104 +140,47 @@
   </div>
 
   <script>
-    let currentSession = null;
+    let clientSession = {};
 
     window.addEventListener('DOMContentLoaded', () => {
-      checkUserSession();
+      loadClientData();
     });
 
-    function checkUserSession() {
+    function loadClientData() {
       try {
-        currentSession = JSON.parse(localStorage.getItem('motqan_client_session'));
-      } catch(e) { currentSession = null; }
-
-      const authBtn = document.getElementById('auth-action-btn');
-      const authLabel = document.getElementById('auth-btn-label');
-
-      if (currentSession && currentSession.phone) {
-        authLabel.textContent = `خروج (${(currentSession.name || 'حسابي').split(' ')[0]})`;
-        authBtn.className = "h-8 px-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-black flex items-center gap-1 press-scale";
-        
-        document.getElementById('prof-name').textContent = currentSession.name || 'عميل معتمد';
-        document.getElementById('prof-phone').textContent = currentSession.phone;
-        document.getElementById('prof-wallet').textContent = (currentSession.wallet || 0).toFixed(2);
-      } else {
-        authLabel.textContent = "دخول";
-        authBtn.className = "h-8 px-3 rounded-xl bg-emerald-50 border border-emerald-200 text-[#006948] text-xs font-black flex items-center gap-1 press-scale";
+        clientSession = JSON.parse(localStorage.getItem('motqan_client_session') || '{}');
+        if (clientSession.name) {
+          document.getElementById('client-header-name').textContent = clientSession.name;
+          document.getElementById('prof-name').textContent = clientSession.name;
+        }
+        if (clientSession.phone) {
+          document.getElementById('prof-phone').textContent = clientSession.phone;
+        }
+      } catch(e) {
+        console.error(e);
       }
     }
 
     function switchTab(tabId) {
-      ['home', 'auth-modal', 'orders', 'profile'].forEach(t => {
+      ['home', 'orders', 'profile'].forEach(t => {
         document.getElementById('tab-' + t)?.classList.add('hidden');
+        const navBtn = document.getElementById('nav-' + t);
+        if (navBtn) navBtn.className = 'flex flex-col items-center text-slate-500 font-bold';
       });
       document.getElementById('tab-' + tabId)?.classList.remove('hidden');
-
-      ['home', 'orders', 'profile'].forEach(n => {
-        const btn = document.getElementById('nav-' + n);
-        if (btn) btn.className = 'flex flex-col items-center text-slate-500';
-      });
       const activeNav = document.getElementById('nav-' + tabId);
-      if (activeNav) activeNav.className = 'flex flex-col items-center text-[#006948] font-black';
+      if (activeNav) activeNav.className = 'flex flex-col items-center text-[var(--mucs-primary)] font-black';
     }
 
-    function handleAuthButtonClick() {
-      if (currentSession && currentSession.phone) {
-        executeLogout();
-      } else {
-        switchTab('auth-modal');
-      }
-    }
-
-    function executeLoginOrRegister() {
-      const name = document.getElementById('in-name').value.trim() || 'عميل';
-      const phone = document.getElementById('in-phone').value.trim();
-      const role = document.getElementById('in-role').value;
-
-      if (!phone) return alert('يرجى إدخال رقم الجوال');
-
-      const userObj = { name, phone, role, wallet: 150.0 };
-
-      if (role === 'tech') {
-        // توجيه الفني إلى نطاق الفني فقط
-        const token = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(userObj)))));
-        window.location.replace(`https://technician.oxygen11.com/?auth_token=${token}`);
-      } else {
-        // البقاء في نطاق العميل
-        localStorage.setItem('motqan_client_session', JSON.stringify(userObj));
-        checkUserSession();
-        switchTab('home');
-        alert('تم تسجيل الدخول بنجاح في فرع العميل ✓');
-      }
-    }
-
-    // تسجيل الخروج الصارم داخل الفرع فقط دون أي خروج للدومين الرئيسي
-    function executeLogout() {
-      if (confirm('هل ترغب في تسجيل الخروج؟')) {
-        localStorage.removeItem('motqan_client_session');
-        sessionStorage.clear();
-        currentSession = null;
-        checkUserSession();
-        // إعادة تحميل نفس صفحة العميل كزائر
-        window.location.replace('https://client.oxygen11.com');
-      }
-    }
-
-    function checkAuthAndOrder(service, price) {
-      alert(`تم حجز خدمة (${service}) بقيمة ${price} ر.س.`);
+    function requestNewService(serviceName) {
+      alert(`تم استلام طلبك لخدمة (${serviceName}) بنجاح. جاري توجيه أقرب فني إليك!`);
       switchTab('orders');
     }
 
-    function openSecurityGate() {
-      const pin = prompt('أدخل الرمز السري لبوابة الإدارة:');
-      if (pin === '789512364') {
-        // المالك -> owner.oxygen11.com فقط
-        window.location.replace('https://owner.oxygen11.com');
-      } else if (pin === '8888') {
-        // المشرف -> admin.oxygen11.com فقط
-        window.location.replace('https://admin.oxygen11.com');
-      } else if (pin) {
-        alert('الرمز السري غير صحيح');
+    function executeLogout() {
+      if (confirm('هل ترغب في تسجيل الخروج من حساب العميل؟')) {
+        localStorage.removeItem('motqan_client_session');
+        window.location.replace('https://mutaqan.oxygen11.com');
       }
     }
   </script>
