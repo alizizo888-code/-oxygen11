@@ -3,15 +3,11 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>مُتقن | البوابة الرئيسية للصيانة والمقاولات</title>
+  <title>بوابة المهام الميدانية للفني | مُتقن</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- مكتبات فايربيز الرسمية -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
   <style>
     :root {
@@ -22,250 +18,195 @@
     body { font-family: 'Cairo', sans-serif; background-color: var(--mucs-bg); color: #1e293b; user-select: none; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .press-scale:active { transform: scale(0.96); transition: 0.1s; }
-    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
+
+  <script>
+    (function initTechSession() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('auth_token');
+      if (token) {
+        try {
+          const raw = decodeURIComponent(escape(atob(decodeURIComponent(token))));
+          localStorage.setItem('motqan_tech_session', raw);
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch(e) { console.error("Tech Token Error:", e); }
+      }
+    })();
+  </script>
 </head>
 <body class="min-h-screen flex justify-center items-start p-0 sm:py-4">
 
-  <div class="w-full max-w-[440px] bg-[#F8FAFC] min-h-screen relative shadow-2xl flex flex-col sm:rounded-[36px] overflow-hidden">
-    
-    <!-- الشريط العلوي -->
-    <header class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm relative z-40">
+  <div class="w-full max-w-[440px] bg-[#F8FAFC] min-h-screen relative shadow-2xl flex flex-col sm:rounded-[36px] overflow-hidden pb-20">
+
+    <!-- رأس لوحة الفني الميداني -->
+    <header class="bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-40 flex items-center justify-between shadow-2xs">
       <div class="flex items-center gap-2">
         <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 text-[var(--mucs-primary)] flex items-center justify-center font-black">
-          <span class="material-symbols-outlined text-lg">home_repair_service</span>
+          <span class="material-symbols-outlined text-lg">engineering</span>
         </div>
         <div>
-          <span class="text-sm font-black text-slate-900 block leading-tight">مُتقن</span>
-          <span class="text-[10px] font-bold text-slate-500 block leading-tight">البوابة المركزية</span>
+          <span id="tech-header-name" class="text-xs font-black text-slate-900 block leading-tight">فني الميدان المعتمد</span>
+          <span class="text-[9px] font-bold text-emerald-600 block leading-tight flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> مربوط بجدول الإدارة المركزي
+          </span>
         </div>
       </div>
-      <button onclick="switchView('auth')" class="h-9 px-4 rounded-xl bg-[var(--mucs-primary)] text-white text-xs font-black flex items-center gap-1.5 press-scale shadow-md">
-        <span class="material-symbols-outlined text-sm">login</span>
-        <span>دخول</span>
+
+      <button onclick="executeTechLogout()" class="h-8 px-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-black flex items-center gap-1 press-scale">
+        <span class="material-symbols-outlined text-sm">logout</span>
+        <span>خروج</span>
       </button>
     </header>
 
-    <main class="flex-1 overflow-y-auto no-scrollbar relative z-10 pb-10">
-      
-      <!-- واجهة الزوار والخدمات -->
-      <section id="view-visitor" class="p-4 space-y-4 fade-in">
-        <div class="rounded-3xl bg-gradient-to-l from-[var(--mucs-primary)] to-[#065f46] text-white p-5 shadow-lg relative overflow-hidden">
-          <span class="inline-block bg-amber-500 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full mb-2">عروض التوفير</span>
-          <h2 class="text-lg font-black leading-tight">صيانة منزلك بأيدي فنيين معتمدين</h2>
-          <p class="text-xs text-emerald-100 mt-1">كاش باك 30% على كل طلب صيانة</p>
-          <button onclick="switchView('auth')" class="mt-4 w-full py-2.5 rounded-xl bg-white text-[var(--mucs-primary)] font-black text-xs press-scale shadow-sm">
-            تسجيل لطلب الخدمة
-          </button>
+    <!-- المحتوى: مهامي الموجهة من المشرف/المالك -->
+    <main class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-4">
+
+      <!-- لوحة الحالة الميدانية للفني -->
+      <div class="bg-white border border-slate-200 p-4 rounded-3xl shadow-2xs flex items-center justify-between">
+        <div>
+          <span class="text-[10px] text-slate-400 font-bold block">حالة جاهزية الوردية</span>
+          <h2 id="tech-status-label" class="text-xs font-black text-emerald-700">متاح لاستقبال المهام الموجهة</h2>
+        </div>
+        <button onclick="toggleDutyStatus()" id="duty-btn" class="px-3 py-1.5 bg-emerald-100 text-emerald-800 rounded-xl font-black text-xs press-scale">
+          في الوردية ✓
+        </button>
+      </div>
+
+      <!-- قائمة المهام المسندة حصرياً لهذا الفني -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <h3 class="text-xs font-black text-slate-900">المهام المسندة إليك من الإدارة 📋</h3>
+          <span class="text-[10px] text-slate-400 font-bold">توجيه مركزي</span>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 mt-4">
-          <div onclick="switchView('auth')" class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm text-center press-scale cursor-pointer">
-            <span class="material-symbols-outlined text-4xl text-emerald-600 mb-2">mode_fan</span>
-            <h3 class="font-black text-xs text-slate-900">صيانة وتكييف</h3>
-          </div>
-          <div onclick="switchView('auth')" class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm text-center press-scale cursor-pointer">
-            <span class="material-symbols-outlined text-4xl text-blue-600 mb-2">faucet</span>
-            <h3 class="font-black text-xs text-slate-900">سباكة وتسريبات</h3>
-          </div>
-          <div onclick="switchView('auth')" class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm text-center press-scale cursor-pointer">
-            <span class="material-symbols-outlined text-4xl text-amber-500 mb-2">electric_bolt</span>
-            <h3 class="font-black text-xs text-slate-900">كهرباء وإنارة</h3>
-          </div>
-          <div onclick="switchView('auth')" class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm text-center press-scale cursor-pointer">
-            <span class="material-symbols-outlined text-4xl text-purple-600 mb-2">format_paint</span>
-            <h3 class="font-black text-xs text-slate-900">مقاولات وعزل</h3>
-          </div>
-        </div>
-      </section>
-
-      <!-- واجهة المصادقة والدخول -->
-      <section id="view-auth" class="hidden p-4 space-y-4 fade-in">
-        <div class="flex items-center justify-between mb-2">
-          <button onclick="switchView('visitor')" class="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 press-scale">
-            <span class="material-symbols-outlined text-base">arrow_forward</span>
-          </button>
-          <span class="text-xs font-black text-[var(--mucs-primary)] bg-emerald-50 px-3 py-1 rounded-full">بوابة المصادقة</span>
-          <div class="w-9"></div>
-        </div>
-
-        <div class="bg-white p-5 rounded-[32px] border border-slate-200 shadow-lg">
-          <div class="mb-5">
-            <label class="block text-[11px] font-bold text-slate-500 mb-2 text-center">أنا أستخدم التطبيق كـ :</label>
-            <div class="flex gap-3">
-              <div id="role-client" onclick="selectRole('client')" class="flex-1 border-2 border-[var(--mucs-primary)] bg-emerald-50 text-[var(--mucs-primary)] rounded-xl text-center cursor-pointer py-3 transition-all">
-                <span class="material-symbols-outlined block text-2xl mb-1">person</span>
-                <span class="text-[10px] font-black">عميل</span>
-              </div>
-              <div id="role-tech" onclick="selectRole('tech')" class="flex-1 border-2 border-slate-200 bg-slate-50 text-slate-500 rounded-xl text-center cursor-pointer py-3 transition-all">
-                <span class="material-symbols-outlined block text-2xl mb-1">engineering</span>
-                <span class="text-[10px] font-black">فني</span>
-              </div>
+        <div id="assigned-tasks-list" class="space-y-3">
+          <!-- مهمة مسندة تجريبية -->
+          <div class="p-4 rounded-2xl bg-white border-2 border-emerald-500/50 shadow-sm space-y-3 relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-[var(--mucs-primary)] text-white text-[9px] font-black px-3 py-0.5 rounded-bl-xl">
+              مهمة مسندة رسمياً
             </div>
-            <input type="hidden" id="selected-role" value="client">
-          </div>
-
-          <div id="step-phone" class="space-y-4">
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-700">رقم الجوال:</label>
-              <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 h-12 focus-within:border-[var(--mucs-primary)]" dir="ltr">
-                <span class="text-xs font-black text-slate-500 border-r border-slate-300 pr-2 mr-2">🇸🇦 +966</span>
-                <input id="phoneNumber" type="tel" placeholder="5XXXXXXXX" class="w-full bg-transparent text-sm font-black outline-none text-left tracking-widest text-slate-800"/>
-              </div>
+            
+            <div class="pt-1">
+              <span class="text-[10px] text-slate-400 font-mono">رقم الطلب: ORD-55210</span>
+              <h4 class="font-black text-sm text-slate-900 mt-0.5">صيانة وصيانة دورية لمكيفات مركزية (مكتب تجاري)</h4>
+              <p class="text-[11px] text-slate-600 mt-1">📍 الموقع: جدة - حي الروضة</p>
+              <p class="text-[11px] text-slate-600">👤 العميل: مؤسسة تجارية (معتمد)</p>
             </div>
-            <button onclick="sendOTP()" id="btn-send-otp" class="w-full py-3.5 bg-[var(--mucs-primary)] text-white rounded-xl font-black text-xs shadow-md press-scale">
-              إرسال كود التحقق (OTP)
-            </button>
-            <div class="flex justify-center mt-2"><div id="recaptcha-container"></div></div>
-          </div>
 
-          <div id="step-verify" class="hidden space-y-4 text-center">
-            <p class="text-[11px] font-bold text-emerald-600 bg-emerald-50 py-1.5 rounded-lg border border-emerald-100">تم إرسال كود لجوّالك</p>
-            <input id="otpCode" type="tel" maxlength="6" placeholder="••••••" class="w-full bg-slate-50 border border-slate-300 rounded-2xl py-3.5 text-center text-2xl font-mono font-black tracking-[0.5em] outline-none focus:border-[var(--mucs-primary)] text-[var(--mucs-primary)]"/>
-            <button onclick="verifyOTP()" id="btn-verify-otp" class="w-full py-3.5 bg-[var(--mucs-primary)] text-white rounded-xl font-black text-xs shadow-md press-scale">
-              تأكيد الدخول
-            </button>
-            <button onclick="resetAuth()" class="text-[10px] text-slate-500 font-bold underline mt-2">تعديل رقم الجوال</button>
+            <!-- أزرار تحديث حالة المهمة في الميدان (تُحدث لوحة المشرف والمالك فوراً) -->
+            <div class="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-100">
+              <button onclick="updateTaskStatus('ORD-55210', 'enroute')" class="py-2 bg-blue-50 text-blue-700 rounded-xl font-bold text-[10px] press-scale">
+                🚗 في الطريق
+              </button>
+              <button onclick="updateTaskStatus('ORD-55210', 'arrived')" class="py-2 bg-amber-50 text-amber-700 rounded-xl font-bold text-[10px] press-scale">
+                📍 وصلت الموقع
+              </button>
+              <button onclick="updateTaskStatus('ORD-55210', 'completed')" class="py-2 bg-emerald-600 text-white rounded-xl font-bold text-[10px] press-scale shadow-xs">
+                ✨ تم الإنجاز
+              </button>
+            </div>
           </div>
         </div>
-      </section>
-      
+      </div>
+
     </main>
-    
-    <div id="mucs-toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[90%] max-w-[380px] hidden p-3 rounded-2xl text-xs font-black text-center shadow-2xl z-50 transition-all"></div>
+
+    <!-- شريط التنقل السفلي -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white/95 border-t border-slate-200 px-2 py-2 z-40 flex items-center justify-around text-[10px]">
+      <button class="flex flex-col items-center text-[var(--mucs-primary)] font-black">
+        <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">assignment</span>
+        <span>مهامي</span>
+      </button>
+      <button class="flex flex-col items-center text-slate-500 font-bold">
+        <span class="material-symbols-outlined text-xl">map</span>
+        <span>الموقع</span>
+      </button>
+      <button class="flex flex-col items-center text-slate-500 font-bold">
+        <span class="material-symbols-outlined text-xl">account_balance_wallet</span>
+        <span>حسابي</span>
+      </button>
+    </nav>
+
   </div>
 
   <script>
-    /**
-     * نظام اعتراض الأوامر المدمج (MUCS Hooks Engine)
-     */
-    const MUCS_Hooks = (function() {
-      const registeredHooks = {
-        before_otp_send: [],
-        after_login_success: []
-      };
-
-      return {
-        executeBefore: async function(actionName, data) {
-          const hooks = registeredHooks[`before_${actionName}`];
-          if (!hooks || hooks.length === 0) return true;
-          console.log(`[MUCS Hooks] تنفيذ أوامر قبل: ${actionName}`);
-          return true;
-        },
-        executeAfter: function(actionName, data) {
-          const hooks = registeredHooks[`after_${actionName}`];
-          if (!hooks || hooks.length === 0) return;
-          console.log(`[MUCS Hooks] تنفيذ أوامر بعد: ${actionName}`);
-        }
-      };
-    })();
-
-    // إعدادات فايربيز المركزية
-    const firebaseConfig = {
-      apiKey: "AIzaSyCJnFR_cALYeWvPHroEqdCHbnhlcREdjPI",
-      authDomain: "mutqn-opt.firebaseapp.com",
-      projectId: "mutqn-opt",
-      storageBucket: "mutqn-opt.firebasestorage.app",
-      messagingSenderId: "290720043173",
-      appId: "1:290720043173:web:72167db99e1b801e31fd4c"
-    };
-
-    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    let techSession = {};
+    let isOnDuty = true;
 
     window.addEventListener('DOMContentLoaded', () => {
-      initCaptcha();
+      loadTechSession();
+      initTelemetrySync();
     });
 
-    function initCaptcha() {
-      if (window.recaptchaVerifier) window.recaptchaVerifier.clear();
-      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        'size': 'invisible',
-        'callback': (response) => {}
-      });
-      window.recaptchaVerifier.render().catch(console.error);
+    function loadTechSession() {
+      try {
+        techSession = JSON.parse(localStorage.getItem('motqan_tech_session') || '{}');
+        if (techSession.name) {
+          document.getElementById('tech-header-name').textContent = techSession.name;
+        }
+      } catch(e) { console.error(e); }
     }
 
-    function switchView(viewId) {
-      document.getElementById('view-visitor').classList.add('hidden');
-      document.getElementById('view-auth').classList.add('hidden');
-      document.getElementById(`view-${viewId}`).classList.remove('hidden');
-      if(viewId === 'auth') initCaptcha();
+    // إرسال الإحداثيات وحالة الوردية للمشرف والمالك (Telemetry)
+    function initTelemetrySync() {
+      setInterval(() => {
+        if (isOnDuty && navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((pos) => {
+            const telemetry = {
+              phone: techSession.phone,
+              name: techSession.name || 'فني',
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              dutyStatus: 'active',
+              lastUpdate: new Date().toISOString()
+            };
+            localStorage.setItem(`mucs_telemetry_${techSession.phone || 'tech'}`, JSON.stringify(telemetry));
+          }, null, { enableHighAccuracy: true });
+        }
+      }, 15000);
     }
 
-    function selectRole(role) {
-      document.getElementById('role-client').className = "flex-1 border-2 border-slate-200 bg-slate-50 text-slate-500 rounded-xl text-center cursor-pointer py-3 transition-all";
-      document.getElementById('role-tech').className = "flex-1 border-2 border-slate-200 bg-slate-50 text-slate-500 rounded-xl text-center cursor-pointer py-3 transition-all";
+    function toggleDutyStatus() {
+      isOnDuty = !isOnDuty;
+      const btn = document.getElementById('duty-btn');
+      const label = document.getElementById('tech-status-label');
+      if (isOnDuty) {
+        btn.textContent = "في الوردية ✓";
+        btn.className = "px-3 py-1.5 bg-emerald-100 text-emerald-800 rounded-xl font-black text-xs press-scale";
+        label.textContent = "متاح لاستقبال المهام الموجهة";
+        label.className = "text-xs font-black text-emerald-700";
+      } else {
+        btn.textContent = "خارج الوردية ⛔";
+        btn.className = "px-3 py-1.5 bg-red-100 text-red-800 rounded-xl font-black text-xs press-scale";
+        label.textContent = "غير متاح (استراحة / نهاية العمل)";
+        label.className = "text-xs font-black text-red-600";
+      }
+    }
+
+    // تحديث حالة المهمة يرسل تقرير فوري للإدارة المركزية
+    function updateTaskStatus(orderId, status) {
+      const statusTexts = { 'enroute': 'في الطريق إلى موقع العميل', 'arrived': 'تم الوصول لموقع العمل', 'completed': 'تم إنجاز الصيانة بنجاح' };
       
-      document.getElementById(`role-${role}`).className = "flex-1 border-2 border-[var(--mucs-primary)] bg-emerald-50 text-[var(--mucs-primary)] rounded-xl text-center cursor-pointer py-3 transition-all";
-      document.getElementById('selected-role').value = role;
+      const report = {
+        orderId: orderId,
+        techPhone: techSession.phone,
+        status: status,
+        updatedAt: new Date().toISOString()
+      };
+
+      // حفظ التقرير في السجل المركزي للمشرف والمالك
+      const auditTrail = JSON.parse(localStorage.getItem('mucs_global_audit_trail') || '[]');
+      auditTrail.unshift(report);
+      localStorage.setItem('mucs_global_audit_trail', JSON.stringify(auditTrail));
+
+      alert(`تم تحديث الحالة رسمياً: [${statusTexts[status]}] وتم إشعار الإدارة المركزية.`);
     }
 
-    function showToast(msg, isError = false) {
-      const toast = document.getElementById('mucs-toast');
-      toast.className = `fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[90%] max-w-[380px] p-3 rounded-2xl text-xs font-black text-center shadow-2xl z-50 ${isError ? 'bg-red-600 text-white' : 'bg-[var(--mucs-primary)] text-white'}`;
-      toast.innerText = msg;
-      toast.classList.remove('hidden');
-      setTimeout(() => toast.classList.add('hidden'), 4000);
-    }
-
-    async function sendOTP() {
-      let rawPhone = document.getElementById('phoneNumber').value.trim();
-      if (!rawPhone || rawPhone.length < 8) return showToast("الرجاء إدخال رقم جوال صحيح", true);
-
-      let phone = rawPhone.startsWith('+') ? rawPhone : '+966' + (rawPhone.startsWith('0') ? rawPhone.substring(1) : rawPhone);
-
-      // تمرير النظام عبر خطافات الأوامر (MUCS Hooks) قبل التنفيذ
-      if (!await MUCS_Hooks.executeBefore('otp_send', phone)) return;
-
-      const btn = document.getElementById('btn-send-otp');
-      btn.disabled = true; btn.innerText = "جاري الإرسال...";
-
-      firebase.auth().signInWithPhoneNumber(phone, window.recaptchaVerifier)
-        .then((confirmationResult) => {
-          window.confirmationResult = confirmationResult;
-          document.getElementById('step-phone').classList.add('hidden');
-          document.getElementById('step-verify').classList.remove('hidden');
-          showToast("تم إرسال الكود بنجاح ✓");
-        }).catch((error) => {
-          console.error(error);
-          showToast("فشل الإرسال، تأكد من رقم الجوال أو إعدادات النطاق", true);
-          btn.disabled = false; btn.innerText = "إرسال كود التحقق (OTP)";
-          initCaptcha();
-        });
-    }
-
-    async function verifyOTP() {
-      const code = document.getElementById('otpCode').value.trim();
-      if (code.length < 6) return showToast("أدخل 6 أرقام", true);
-
-      const btn = document.getElementById('btn-verify-otp');
-      btn.disabled = true; btn.innerText = "جاري التحقق...";
-
-      window.confirmationResult.confirm(code)
-        .then((result) => {
-          const user = result.user;
-          const role = document.getElementById('selected-role').value;
-          
-          MUCS_Hooks.executeAfter('login_success', { user, role });
-
-          const userData = { phone: user.phoneNumber, role: role, uid: user.uid };
-          const token = encodeURIComponent(btoa(JSON.stringify(userData)));
-          
-          const targetDomain = role === 'tech' ? 'https://technician.oxygen11.com' : 'https://client.oxygen11.com';
-          showToast("نجاح! جاري التوجيه...");
-          setTimeout(() => window.location.replace(`${targetDomain}/?auth_token=${token}`), 1000);
-
-        }).catch((error) => {
-          showToast("الكود المدخل غير صحيح", true);
-          btn.disabled = false; btn.innerText = "تأكيد الدخول";
-        });
-    }
-
-    function resetAuth() {
-      document.getElementById('step-verify').classList.add('hidden');
-      document.getElementById('step-phone').classList.remove('hidden');
-      initCaptcha();
+    function executeTechLogout() {
+      if (confirm('تسجيل الخروج من نظام الوردية؟')) {
+        localStorage.removeItem('motqan_tech_session');
+        window.location.replace('https://mutaqan.oxygen11.com');
+      }
     }
   </script>
 </body>
