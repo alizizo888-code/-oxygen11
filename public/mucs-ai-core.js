@@ -1,80 +1,88 @@
 /**
- * MUCS Internal AI Core & Command Executor (النظام الذكي الداخلي الموحد)
- * يربط بين المالك، المشرف، العميل، والفني، وينفذ الأوامر والطلبات أوتوماتيكياً
+ * MUCS Context-Aware AI Core (محرك الذكاء الاصطناعي الموجه)
+ * يضبط الإجابات والأسعار والنسب بدقة تامة بحسب هوية المستخدم (مالك، مشرف، فني، عميل)
  */
 const MUCS_AI = (function() {
   
-  // التحقق من حالة تفعيل الـ AI من لوحة المالك/المشرف
-  function isAIEnabled() {
-    const globalState = localStorage.getItem('mucs_ai_system_enabled');
-    return globalState !== 'false'; // مفعل افتراضياً
-  }
-
-  // معالجة الأوامر والأسئلة وتنفيذ الإجراءات (AI Command Processor)
-  async function processCommand(userQuery, userRole, userName) {
-    if (!isAIEnabled()) {
-      return "عذراً، نظام الذكاء الاصطناعي الداخلي معطل حالياً بأمر من المالك أو الإدارة.";
-    }
-
-    const query = userQuery.trim().toLowerCase();
-
-    // 1. أمر إصدار طلب صيانة أوتوماتيكي (مثال: "اطلب لي صيانة مكيف")
-    if (query.includes('اطلب') || query.includes('طلب صيانة') || query.includes('حجز')) {
-      return handleAIBasedOrderCreation(userQuery, userRole);
-    }
-
-    // 2. أمر استعلام عن حالة الطلبات أو الفنيين (يخدم المشرف والمالك والعميل)
-    if (query.includes('الطلبات') || query.includes('حالة') || query.includes('الرصيد') || query.includes('تقرير')) {
-      return handleAIQuery(query, userRole);
-    }
-
-    // 3. تحليل الذكاء الاصطناعي العام والرد التقني (تخصصات التبريد والمقاولات والتحكم)
-    return generateSmartResponse(userQuery, userRole, userName);
-  }
-
-  // تنفيذ طلب صيانة عبر الـ AI وربطه بسجل العميل والمشرف
-  function handleAIBasedOrderCreation(query, role) {
-    const orderId = 'AI-ORD-' + Math.floor(1000 + Math.random() * 9000);
-    const serviceType = query.includes('مكيف') ? 'صيانة وتكييف' : (query.includes('سباكة') ? 'سباكة وتسريبات' : 'صيانة عامة للمنشأة');
-    
-    const newOrder = {
-      orderId: orderId,
-      clientName: role === 'client' ? 'عميل عبر نظام الذكاء الاصطناعي' : 'طلب موجه إدارياً',
-      serviceRequested: serviceType,
-      timestamp: new Date().toISOString(),
-      status: 'pending_dispatch',
-      source: 'Internal AI Engine'
-    };
-
-    // حفظ الطلب في السجل المشترك للعملاء والمشرفين
-    const orders = JSON.parse(localStorage.getItem('motqan_global_orders_registry') || '[]');
-    orders.unshift(newOrder);
-    localStorage.setItem('motqan_global_orders_registry', JSON.stringify(orders));
-
-    return `✨ تم تنفيذ أمرك بنجاح! تم إنشاء طلب صيانة جديد برقم [${orderId}] لخدمة (${serviceType}) وتم توجيهه مباشرة إلى غرفة عمليات المشرفين والفنيين.`;
-  }
-
-  function handleAIQuery(query, role) {
-    const orders = JSON.parse(localStorage.getItem('motqan_global_orders_registry') || '[]');
-    if (query.includes('الطلبات')) {
-      return `📊 إجمالي الطلبات النشطة والمسجلة في النظام حالياً هو: ${orders.length} طلب. آخر طلب مسجل برقم: ${orders[0]?.orderId || 'لا توجد طلبات'}.`;
-    }
-    return `🤖 النظام يعمل بكفاءة تامة. أنت مسجل بصلاحية: [${role}]. هل ترغب في إصدار أمر جديد أو الاستعلام عن شيء محدد؟`;
-  }
-
-  function generateSmartResponse(query, role, name) {
-    return `مرحباً بك يا ${name || 'استاذي'} (${role}). بصفتي محرك الـ AI الداخلي لمؤسسة أكسجين، أنا مرتبط ببيانات الموقع والسيستم بالكامل. لقد تلقيت استفسارك وسأساعدك في تنفيذه فوراً. هل تحتاج لتوجيه فني ميداني أو تعديل إعدادات النظام؟`;
-  }
+  // قاعدة المعرفة وقواعد الأسعار والنسب التي يتحكم فيها المالك والمشرف
+  const getDefaultKnowledgeBase = () => {
+    return JSON.parse(localStorage.getItem('mucs_ai_knowledge_base') || JSON.stringify({
+      pricing: {
+        splitClean: "150 ريال شامل ضريبة القيمة المضافة 15%",
+        centralCheck: "300 ريال كشف فحص مبدئي",
+        vatRate: "15%"
+      },
+      clientPolicies: {
+        discounts: "كاش باك 30% على أول طلب صيانة عبر البوابة الرقمية",
+        paymentMethods: "الدفع إلكترونياً (مدى، تابي، أبل باي، أو تحويل بانكي معتمد)"
+      },
+      techPolicies: {
+        commissionRate: "نسبة المؤسسة 15% من إجمالي قيمة الفاتورة الميدانية",
+        taxNote: "يجب إصدار فاتورة إلكترونية معتمدة مرفقة بالرقم الضريبي"
+      },
+      customPromptForClient: "تحدث بلطف واحترافية عالية، اعرض دائماً عروض التوفير، واطلب إتمام حجز الصيانة برقم الجوال.",
+      customPromptForTech: "تحدث بمهنية هندسية فنية صارمة، وضح تفاصيل العمولات والخصومات بدقة."
+    }));
+  };
 
   return {
-    ask: async function(query, role, name) {
-      return await processCommand(query, role, name);
+    ask: async function(query, userRole, userName) {
+      const kb = getDefaultKnowledgeBase();
+      const q = query.toLowerCase();
+
+      // 1. إذا كان السائل (عميل - Client)
+      if (userRole === 'client') {
+        if (q.includes('سعر') || q.includes('تكلفة') || q.includes('بكم')) {
+          return `أهلاً بك يا ${userName || 'عميلنا العزيز'}. أسعارنا واضحة ومعتمدة: غسيل مكيف سبليت بـ ${kb.pricing.splitClean}. كما أن لديك ميزة حصرية: ${kb.clientPolicies.discounts}.`;
+        }
+        if (q.includes('دفع') || q.includes('طرق الدفع')) {
+          return `يمكنك الدفع بكل سهولة عبر: ${kb.clientPolicies.paymentMethods}. هل تحب أن أنشئ لك طلب صيانة الآن؟`;
+        }
+        if (q.includes('اطلب') || q.includes('صيانة')) {
+          return this.createOrderViaAI(query, 'client');
+        }
+        return `مرحباً بك في مؤسسة أكسجين للصيانة والمقاولات. بصفتي مساعدك الذكي، يمكنني مساعدتك في حجز المواعيد ومعرفة الأسعار. كيف أخدمك اليوم؟`;
+      }
+
+      // 2. إذا كان السائل (فني - Technician)
+      if (userRole === 'tech') {
+        if (q.includes('نسبة') || q.includes('عمولة') || q.includes('خصم')) {
+          return `إليك سياسة العمل المالية للفنيين: ${kb.techPolicies.commissionRate}. ملاحظة هامة: ${kb.techPolicies.taxNote}.`;
+        }
+        return `أهلاً بك يا فني الميدان. أنا هنا لتوجيهك في المهام، إرشادك للنسب المالية، ومراجعة حالة الطلبات الميدانية. ما استفسارك الفني؟`;
+      }
+
+      // 3. إذا كان السائل (مالك أو مشرف - Owner / Supervisor)
+      if (userRole === 'owner' || userRole === 'supervisor') {
+        if (q.includes('تحديث') || q.includes('اضبط') || q.includes('غير')) {
+          return ` بصفتي تحت إمرتك، يمكنك تعديل وتوجيه إجابات الـ AI للعملاء والفنيين مباشرة من "لوحة ضبط وتحكم الـ AI" الموجودة في لوحتك السيادية.`;
+        }
+        return `أهلاً بك يا ${userName || 'صاحب السيادة'}. النظام يعمل بكفاءة والربط بين الجهات نشط. يمكنك توجيهي بأي أمر إداري أو استعلام عن الأرباح والطلبات.`;
+      }
+
+      return "مرحباً بك في منظومة مُتقن الذكية.";
     },
-    setStatus: function(isEnabled) {
-      localStorage.setItem('mucs_ai_system_enabled', isEnabled);
+
+    createOrderViaAI: function(query, role) {
+      const orderId = 'AI-ORD-' + Math.floor(1000 + Math.random() * 9000);
+      const newOrder = {
+        orderId,
+        service: 'صيانة وتكييف (مطلوبة عبر الـ AI)',
+        timestamp: new Date().toISOString(),
+        status: 'pending'
+      };
+      const orders = JSON.parse(localStorage.getItem('motqan_global_orders_registry') || '[]');
+      orders.unshift(newOrder);
+      localStorage.setItem('motqan_global_orders_registry', JSON.stringify(orders));
+      return `✨ تم إنشاء طلب صيانة جديد بنجاح برقم مرجعي [${orderId}] وتم توجيهه إلى غرفة العمليات والمشرفين!`;
     },
-    getStatus: function() {
-      return isAIEnabled();
+
+    updateKnowledgeBase: function(newConfig) {
+      localStorage.setItem('mucs_ai_knowledge_base', JSON.stringify(newConfig));
+    },
+
+    getKnowledgeBase: function() {
+      return getDefaultKnowledgeBase();
     }
   };
 })();
