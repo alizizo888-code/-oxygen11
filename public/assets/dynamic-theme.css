@@ -1,0 +1,34 @@
+/* 
+ * MUCS Dynamic Theme Engine 
+ * المتغيرات هنا يتم تحديثها تلقائياً من لوحة المالك (Owner Dashboard)
+ */
+:root {
+  /* الألوان الأساسية */
+  --mucs-primary: #006948;
+  --mucs-primary-hover: #00553a;
+  --mucs-secondary: #fde68a;
+  
+  /* ألوان الخلفيات */
+  --mucs-bg-app: #0b1320;
+  --mucs-bg-surface: #F8FAFC;
+  
+  /* إعدادات الخطوط (يمكن للمالك تغييرها في الأعياد مثلاً) */
+  --mucs-font-family: 'Cairo', sans-serif;
+  
+  /* خصائص الحواف والظلال (UI Corners) */
+  --mucs-border-radius-card: 1.5rem; /* 24px */
+  --mucs-border-radius-btn: 0.75rem; /* 12px */
+}
+
+body {
+  font-family: var(--mucs-font-family);
+  background-color: var(--mucs-bg-app);
+}
+
+.mucs-btn-primary {
+  background-color: var(--mucs-primary);
+  border-radius: var(--mucs-border-radius-btn);
+}
+.mucs-btn-primary:hover {
+  background-color: var(--mucs-primary-hover);
+}
