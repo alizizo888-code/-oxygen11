@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة تسجيل الدخول والتحقق | OTP</title>
+    <!-- مكتبات فايربيز المطلوبة لعمل الملف بشكل منفصل -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #0f172a; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: #1e293b; padding: 25px; border-radius: 12px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); text-align: center; }
+        h2 { margin-bottom: 20px; color: #38bdf8; }
+        .input-group { margin-bottom: 15px; text-align: right; }
+        label { display: block; margin-bottom: 6px; font-size: 14px; color: #94a3b8; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 15px; text-align: center; direction: ltr; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; background: #0284c7; color: #fff; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 5px; }
+        button:hover { background: #0369a1; }
+        .hidden { display: none; }
+        .msg { margin-top: 15px; padding: 10px; border-radius: 6px; font-size: 14px; }
+        .success { background: #065f46; color: #34d399; }
+        .error { background: #7f1d1d; color: #f87171; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>بوابة المصادقة الآمنة</h2>
+
+    <!-- الخطوة الأولى: إدخال رقم الهاتف -->
+    <div id="step-phone">
+        <div class="input-group">
+            <label for="phoneNumber">رقم الهاتف (مع مفتاح الدولة، مثال: 201xxxxxxxxx+):</label>
+            <input type="tel" id="phoneNumber" placeholder="+201xxxxxxxxx">
+        </div>
+        <button onclick="handleSendOTP()">إرسال رمز التحقق (OTP)</button>
+    </div>
+
+    <!-- حاوية مخفية للكابتشا الخاصة بفايربيز -->
+    <div id="recaptcha-container"></div>
+
+    <!-- الخطوة الثانية: إدخال الكود -->
+    <div id="step-verify" class="hidden">
+        <div class="input-group">
+            <label for="otpCode">أدخل الكود المكوّن من 6 أرقام المرسل إليك:</label>
+            <input type="text" id="otpCode" maxlength="6" placeholder="123456">
+        </div>
+        <button onclick="handleVerifyOTP()">تأكيد وتسجيل الدخول</button>
+    </div>
+
+    <!-- الخطوة الثالثة: لوحة التحكم بعد نجاح التسجيل -->
+    <div id="step-dashboard" class="hidden">
+        <h3 style="color: #4ade80;">تم التحقق بنجاح!</h3>
+        <p id="userPhoneDisplay"></p>
+        <hr style="border-color: #334155; margin: 15px 0;">
+        <button onclick="executeAction('تحويل نقاط')">تحويل نقاط للمستخدم</button>
+        <button onclick="executeAction('شحن رصيد')" style="margin-top: 10px; background: #16a34a;">شحن رصيد نقدي</button>
+    </div>
+
+    <!-- رسائل النظام -->
+    <div id="statusMessage" class="msg hidden"></div>
+</div>
+
+<script>
+    // بيانات مشروعك المسحوبة من الصورة
+    const firebaseConfig = {
+        apiKey: "AIzaSyCJnFR_cALYeWvPHroEqdCHbnhlcREdjPI",
+        authDomain: "mutqn-opt.firebaseapp.com",
+        projectId: "mutqn-opt",
+        storageBucket: "mutqn-opt.firebasestorage.app",
+        messagingSenderId: "290720043173",
+        appId: "1:290720043173:web:72167db99e1b801e31fd4c",
+        measurementId: "G-V9DRMFE2QG"
+    };
+
+    // تهيئة فايربيز
+    firebase.initializeApp(firebaseConfig);
+
+    // إعداد الكابتشا المخفية (Invisible Recaptcha)
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'invisible'
+    });
+
+    function showMessage(text, isError = false) {
+        const msgDiv = document.getElementById('statusMessage');
+        msgDiv.className = 'msg ' + (isError ? 'error' : 'success');
+        msgDiv.innerText = text;
+        msgDiv.classList.remove('hidden');
+    }
+
+    function handleSendOTP() {
+        const phone = document.getElementById('phoneNumber').value.trim();
+        if (!phone.startsWith('+')) {
+            showMessage("يرجى كتابة رقم الهاتف مسبوقاً بمفتاح الدولة (مثال: +20 أو +966)", true);
+            return;
+        }
+
+        showMessage("جارٍ إرسال كود التحقق...");
+        const appVerifier = window.recaptchaVerifier;
+
+        firebase.auth().signInWithPhoneNumber(phone, appVerifier)
+            .then((confirmationResult) => {
+                window.confirmationResult = confirmationResult;
+                // إخفاء خطوة الهاتف وإظهار خطوة إدخال الكود
+                document.getElementById('step-phone').classList.add('hidden');
+                document.getElementById('step-verify').classList.remove('hidden');
+                showMessage("تم إرسال الكود بنجاح عبر رسالة نصية (SMS).");
+            }).catch((error) => {
+                showMessage("فشل الإرسال: " + error.message, true);
+                if (window.recaptchaVerifier) window.recaptchaVerifier.render().then(widgetId => grecaptcha.reset(widgetId));
+            });
+    }
+
+    function handleVerifyOTP() {
+        const code = document.getElementById('otpCode').value.trim();
+        if (code.length < 6) {
+            showMessage("الكود يجب أن يتكون من 6 أرقام", true);
+            return;
+        }
+
+        window.confirmationResult.confirm(code)
+            .then((result) => {
+                const user = result.user;
+                // إخفاء خطوة الكود وإظهار لوحة التحكم البسيطة
+                document.getElementById('step-verify').classList.add('hidden');
+                document.getElementById('step-dashboard').classList.remove('hidden');
+                document.getElementById('userPhoneDisplay').innerText = "الحساب المعتمد: " + user.phoneNumber;
+                showMessage("تم تسجيل الدخول بنجاح!");
+            }).catch((error) => {
+                showMessage("الكود غير صحيح أو انتهت صلاحيته!", true);
+            });
+    }
+
+    function executeAction(actionName) {
+        alert("تم اعتماد تنفيذ عملية (" + actionName + ") بنجاح!");
+    }
+</script>
+</body>
+</html>
