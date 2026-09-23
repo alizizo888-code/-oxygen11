@@ -2,196 +2,166 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>مُتقن | البوابة الرئيسية للصيانة والمقاولات</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>مُتقن | البوابة الرئيسية</title>
   
-  <!-- الخطوط والأيقونات -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- مكتبات فايربيز للـ OTP (النواة المركزية) -->
+  <!-- مكتبات فايربيز -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
   <style>
-    body { font-family: 'Cairo', sans-serif; background-color: #0b1320; color: #1e293b; user-select: none; }
+    body { font-family: 'Cairo', sans-serif; background-color: #0b1320; color: #1e293b; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .press-scale { transition: transform 0.1s ease; }
     .press-scale:active { transform: scale(0.96); }
     
-    /* أنيميشن الظهور السلس للواجهات */
-    .fade-in { animation: fadeIn 0.3s ease-in-out; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    /* تصميم التبويبات زي ملفك القديم */
+    .tab-btn { flex: 1; text-align: center; padding: 12px; cursor: pointer; color: #94a3b8; font-weight: 800; font-size: 13px; border-bottom: 2px solid #e2e8f0; transition: 0.3s; }
+    .tab-btn.active { color: #006948; border-bottom: 2px solid #006948; }
+    
+    /* كروت اختيار الدور (عميل / فني) */
+    .role-card { border: 2px solid #e2e8f0; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: 0.2s; background: #f8fafc; }
+    .role-card.selected { border-color: #006948; background: #ecfdf5; color: #006948; }
+    .role-card .icon { font-size: 28px; margin-bottom: 5px; display: block; }
   </style>
 </head>
 <body class="min-h-screen flex justify-center items-start p-0 sm:py-4">
 
-  <!-- إطار التطبيق الرئيسي -->
   <div class="w-full max-w-[440px] bg-[#F8FAFC] min-h-screen relative shadow-2xl flex flex-col sm:rounded-[36px] overflow-hidden">
 
-    <!-- شريط الرأس -->
-    <header class="bg-white border-b border-slate-150 px-4 py-3 flex items-center justify-between shadow-2xs relative z-40">
+    <!-- شريط الرأس للزوار -->
+    <header class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm relative z-40">
       <div class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 text-[#006948] flex items-center justify-center font-black shadow-sm">
+        <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 text-[#006948] flex items-center justify-center font-black">
           <span class="material-symbols-outlined text-lg">home_repair_service</span>
         </div>
         <div>
-          <span class="text-sm font-black text-slate-900 block leading-tight tracking-wide">مُتقن</span>
-          <span class="text-[10px] font-bold text-slate-400 block leading-tight">البوابة المركزية</span>
+          <span class="text-sm font-black text-slate-900 block leading-tight">مُتقن</span>
+          <span class="text-[10px] font-bold text-slate-500 block leading-tight">تصفح كزائر</span>
         </div>
       </div>
-      <button onclick="openAuthModal()" class="h-9 px-4 rounded-xl bg-[#006948] text-white text-xs font-black flex items-center gap-1.5 press-scale shadow-md hover:bg-[#00553a] transition">
+      <button onclick="openAuthModal()" class="h-9 px-4 rounded-xl bg-[#006948] text-white text-xs font-black flex items-center gap-1.5 press-scale shadow-md">
         <span class="material-symbols-outlined text-sm">login</span>
-        <span>دخول / تسجيل</span>
+        <span>دخول / حساب جديد</span>
       </button>
     </header>
 
-    <main class="flex-1 overflow-y-auto no-scrollbar relative z-10">
+    <main class="flex-1 overflow-y-auto no-scrollbar relative z-10 pb-10">
       
-      <!-- ================= 1. واجهة عرض الخدمات (للزوار) ================= -->
-      <section id="tab-home" class="p-4 space-y-4 fade-in">
-        
-        <!-- البانر الترويجي الذكي (سيتم التحكم به من لوحة المالك لاحقاً) -->
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-l from-[#006948] via-[#047857] to-[#065f46] text-white p-5 min-h-[160px] flex flex-col justify-between shadow-lg border border-emerald-800">
-          <!-- شكل هندسي جمالي للخلفية -->
-          <div class="absolute -left-10 -bottom-10 w-40 h-40 rounded-full bg-emerald-400/10 blur-2xl pointer-events-none"></div>
-          
-          <span class="self-start inline-flex items-center gap-1 bg-amber-500 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm z-10">
-            منصة مُتقن الرسمية
-          </span>
-          
-          <div class="z-10 mt-2">
-            <h2 class="text-lg font-black leading-tight">صيانة منزلك بأيدي فنيين معتمدين</h2>
-            <p class="text-xs text-emerald-100 mt-1 opacity-90">ضمان 30 يوماً وتخفيضات تصل لـ 30%</p>
-          </div>
-          
-          <div class="pt-4 z-10">
-            <button onclick="openAuthModal()" class="w-full py-2.5 rounded-xl bg-white text-[#006948] font-black text-xs press-scale shadow-md hover:bg-slate-50 transition">
-              ابدأ الآن وحدد موقعك
-            </button>
-          </div>
+      <!-- ================= 1. واجهة الزوار (مفتوحة بدون تسجيل) ================= -->
+      <section id="view-visitor" class="p-4 space-y-4">
+        <!-- البانر -->
+        <div class="rounded-3xl bg-gradient-to-l from-[#006948] to-[#065f46] text-white p-5 shadow-lg">
+          <span class="inline-block bg-amber-500 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full mb-2">عروض التوفير</span>
+          <h2 class="text-lg font-black leading-tight">صيانة منزلك بأيدي فنيين معتمدين</h2>
+          <p class="text-xs text-emerald-100 mt-1">تصفح خدماتنا واطلب فنيك الآن</p>
+          <button onclick="openAuthModal()" class="mt-4 w-full py-2.5 rounded-xl bg-white text-[#006948] font-black text-xs press-scale shadow-sm">
+            تسجيل لطلب الخدمة
+          </button>
         </div>
 
-        <!-- شريط الضمان -->
-        <div class="flex items-center justify-between p-3 rounded-2xl bg-[#fffbeb] border border-[#fde68a] text-[#92400e] shadow-sm">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">verified</span>
-            <span class="text-xs font-black">ضمان أكسجين الذهبي المعتمد</span>
-          </div>
-        </div>
-
-        <!-- شبكة الخدمات الترحيبية -->
-        <div class="grid grid-cols-2 gap-3 pb-6">
-          <div onclick="openAuthModal()" class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm hover:border-[#006948] cursor-pointer press-scale text-center transition-colors">
-            <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-[#006948] flex items-center justify-center mx-auto mb-3"><span class="material-symbols-outlined text-3xl">mode_fan</span></div>
+        <h3 class="text-sm font-black text-slate-900 px-1">خدمات مُتقن 🛠️</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm text-center">
+            <span class="material-symbols-outlined text-4xl text-[#006948] mb-2">mode_fan</span>
             <h3 class="font-black text-xs text-slate-900">صيانة وتكييف</h3>
           </div>
-          <div onclick="openAuthModal()" class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm hover:border-blue-500 cursor-pointer press-scale text-center transition-colors">
-            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3"><span class="material-symbols-outlined text-3xl">faucet</span></div>
+          <div class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm text-center">
+            <span class="material-symbols-outlined text-4xl text-blue-600 mb-2">faucet</span>
             <h3 class="font-black text-xs text-slate-900">سباكة وتسريبات</h3>
-          </div>
-          <div onclick="openAuthModal()" class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm hover:border-amber-500 cursor-pointer press-scale text-center transition-colors">
-            <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center mx-auto mb-3"><span class="material-symbols-outlined text-3xl">electric_bolt</span></div>
-            <h3 class="font-black text-xs text-slate-900">كهرباء وإنارة</h3>
-          </div>
-          <div onclick="openAuthModal()" class="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm hover:border-purple-500 cursor-pointer press-scale text-center transition-colors">
-            <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mx-auto mb-3"><span class="material-symbols-outlined text-3xl">format_paint</span></div>
-            <h3 class="font-black text-xs text-slate-900">مقاولات وعزل</h3>
           </div>
         </div>
       </section>
 
-      <!-- ================= 2. بوابة الفرز والدخول (OTP Gateway) ================= -->
-      <section id="tab-auth-modal" class="hidden p-4 space-y-4 fade-in">
+      <!-- ================= 2. نافذة التسجيل والدخول (Auth Modal) ================= -->
+      <section id="view-auth" class="hidden p-4 space-y-4">
         <div class="flex items-center justify-between mb-2">
-          <button onclick="closeAuthModal()" class="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 press-scale">
-            <span class="material-symbols-outlined text-base">arrow_forward</span>
+          <button onclick="closeAuthModal()" class="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 press-scale">
+            <span class="material-symbols-outlined text-base">close</span>
           </button>
-          <span class="text-xs font-black text-[#006948] bg-emerald-50 px-3 py-1 rounded-full">بوابة الدخول الموحدة</span>
+          <span class="text-xs font-black text-[#006948] bg-emerald-50 px-3 py-1 rounded-full">بوابة المصادقة</span>
           <div class="w-9"></div>
         </div>
 
-        <div class="space-y-5 bg-white p-6 rounded-[32px] border border-slate-200 shadow-lg text-center relative overflow-hidden">
+        <div class="bg-white p-5 rounded-[32px] border border-slate-200 shadow-lg">
           
-          <div class="w-14 h-14 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mx-auto font-black border-2 border-emerald-100 shadow-sm">
-            <span class="material-symbols-outlined text-2xl">lock_open</span>
-          </div>
-          
-          <div>
-            <h2 class="text-sm font-black text-slate-900">تسجيل الدخول أو إنشاء حساب</h2>
-            <p class="text-[11px] text-slate-500 mt-1">المصادقة تتم بأمان تام عبر رسالة نصية (OTP)</p>
+          <!-- التبويبات (تسجيل دخول / حساب جديد) -->
+          <div class="flex mb-5">
+            <div id="tab-login" onclick="switchAuthTab('login')" class="tab-btn active">تسجيل دخول</div>
+            <div id="tab-register" onclick="switchAuthTab('register')" class="tab-btn">حساب جديد</div>
           </div>
 
-          <!-- خطوة 1: اختيار الدور وإدخال الهاتف -->
-          <div id="step-phone" class="space-y-4 pt-2 text-right">
-            <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-700">تحديد نوع الحساب:</label>
-              <div class="relative">
-                <select id="user-role" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold outline-none focus:border-[#006948] appearance-none">
-                  <option value="client">طالب خدمة (عميل)</option>
-                  <option value="tech">مقدم خدمة (فني ميداني)</option>
-                </select>
-                <span class="material-symbols-outlined absolute left-3 top-3 text-slate-400 pointer-events-none text-lg">expand_more</span>
+          <!-- اختيار الدور (يظهر في الحالتين) -->
+          <div class="mb-5">
+            <label class="block text-[11px] font-bold text-slate-500 mb-2 text-center">أنا أستخدم التطبيق كـ :</label>
+            <div class="flex gap-3">
+              <div id="role-client" onclick="selectRole('client')" class="role-card selected flex-1">
+                <span class="material-symbols-outlined icon">person</span>
+                <span class="text-xs font-black">عميل</span>
+              </div>
+              <div id="role-tech" onclick="selectRole('tech')" class="role-card flex-1">
+                <span class="material-symbols-outlined icon">engineering</span>
+                <span class="text-xs font-black">فني / مقدم خدمة</span>
               </div>
             </div>
-            
+            <input type="hidden" id="selected-role" value="client">
+          </div>
+
+          <!-- نموذج إدخال الهاتف (خطوة 1) -->
+          <div id="step-phone" class="space-y-4">
+            <!-- حقل الاسم يظهر فقط في حالة الحساب الجديد -->
+            <div id="name-input-container" class="hidden space-y-1.5">
+              <label class="block text-[11px] font-bold text-slate-700">الاسم الكامل (إلزامي للجديد):</label>
+              <input id="userName" type="text" placeholder="مثال: عبد الله محمد" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none focus:border-[#006948]"/>
+            </div>
+
             <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-700">رقم الجوال الفعال:</label>
+              <label class="block text-[11px] font-bold text-slate-700">رقم الجوال:</label>
               <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 h-12 focus-within:border-[#006948] transition-colors" dir="ltr">
-                <span class="text-xs font-black text-slate-500 border-r border-slate-300 pr-2 mr-2 flex items-center gap-1">
-                  🇸🇦 <span class="tracking-wider">+966</span>
-                </span>
-                <input id="phoneNumber" type="tel" placeholder="5XXXXXXXX" class="w-full bg-transparent text-sm font-black outline-none text-left tracking-widest text-slate-800 placeholder:text-slate-300 placeholder:font-normal"/>
+                <span class="text-xs font-black text-slate-500 border-r border-slate-300 pr-2 mr-2">🇸🇦 +966</span>
+                <input id="phoneNumber" type="tel" placeholder="5XXXXXXXX" class="w-full bg-transparent text-sm font-black outline-none text-left tracking-widest text-slate-800"/>
               </div>
             </div>
             
-            <button onclick="handleSendOTP()" id="btn-send-otp" class="w-full py-3.5 bg-[#006948] hover:bg-[#00553a] text-white rounded-xl font-black text-xs transition shadow-md press-scale flex items-center justify-center gap-2 mt-2">
-              <span>إرسال الرمز السري</span>
-              <span class="material-symbols-outlined text-sm">send</span>
+            <button onclick="handleSendOTP()" id="btn-send-otp" class="w-full py-3.5 bg-[#006948] text-white rounded-xl font-black text-xs shadow-md press-scale">
+              إرسال كود التحقق (OTP)
             </button>
+
+            <!-- حاوية ريكابتشا ظاهرة عشان ما تضربش (ممكن نصغرها بالـ CSS بس لازم تكون موجودة في الـ DOM ومفتوحة) -->
+            <div class="flex justify-center mt-2">
+              <div id="recaptcha-container"></div>
+            </div>
           </div>
 
-          <!-- خطوة 2: إدخال الكود للتحقق -->
-          <div id="step-verify" class="hidden space-y-4 pt-2 text-center">
-            <div class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 px-3 py-1.5 rounded-lg border border-emerald-100 text-[10px] font-bold mb-2">
-              <span class="material-symbols-outlined text-sm">mark_email_read</span>
-              <span>تم إرسال الرمز لهاتفك</span>
-            </div>
+          <!-- نموذج إدخال الـ OTP (خطوة 2) -->
+          <div id="step-verify" class="hidden space-y-4 text-center">
+            <p class="text-[11px] font-bold text-emerald-600 bg-emerald-50 py-1.5 rounded-lg border border-emerald-100">تم إرسال كود لجوّالك</p>
             
             <div class="space-y-1.5">
-              <label class="block text-[11px] font-bold text-slate-700">أدخل الكود المكوّن من 6 أرقام:</label>
-              <input id="otpCode" type="tel" maxlength="6" placeholder="••••••" class="w-full bg-slate-50 border border-slate-300 rounded-2xl py-3.5 text-center text-2xl font-mono font-black tracking-[0.5em] outline-none focus:border-[#006948] focus:bg-white transition-colors text-[#006948]"/>
+              <label class="block text-[11px] font-bold text-slate-700">أدخل الكود (6 أرقام):</label>
+              <input id="otpCode" type="tel" maxlength="6" placeholder="••••••" class="w-full bg-slate-50 border border-slate-300 rounded-2xl py-3.5 text-center text-2xl font-mono font-black tracking-[0.5em] outline-none focus:border-[#006948] text-[#006948]"/>
             </div>
             
-            <button onclick="handleVerifyAndRoute()" id="btn-verify-otp" class="w-full py-3.5 bg-[#006948] hover:bg-[#00553a] text-white rounded-xl font-black text-xs transition shadow-md press-scale flex items-center justify-center gap-2">
-              <span>تأكيد الدخول</span>
-              <span class="material-symbols-outlined text-sm">verified_user</span>
+            <button onclick="handleVerifyOTP()" id="btn-verify-otp" class="w-full py-3.5 bg-[#006948] text-white rounded-xl font-black text-xs shadow-md press-scale">
+              تأكيد الدخول
             </button>
-            
-            <div class="pt-2">
-              <button onclick="location.reload()" class="text-[10px] text-slate-500 font-bold hover:text-[#006948] transition">تعديل رقم الجوال؟</button>
-            </div>
+            <button onclick="backToPhone()" class="text-[10px] text-slate-500 font-bold underline mt-2">تعديل رقم الجوال</button>
           </div>
 
-          <!-- عنصر ريكابتشا المخفي -->
-          <div id="recaptcha-container"></div>
         </div>
       </section>
       
     </main>
     
-    <!-- إشعارات النظام السريعة (Toast) -->
+    <!-- رسائل النظام -->
     <div id="statusMessage" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[90%] max-w-[380px] hidden p-3 rounded-2xl text-xs font-black text-center shadow-2xl z-50 transition-all"></div>
   </div>
 
-  <!-- سكربت التحكم المركزي (MUCS Logic) -->
   <script>
-    // 1. إعدادات قاعدة بيانات فايربيز المركزية
+    // 1. إعدادات فايربيز (مشروع mutqn-opt)
     const firebaseConfig = {
       apiKey: "AIzaSyCJnFR_cALYeWvPHroEqdCHbnhlcREdjPI",
       authDomain: "mutqn-opt.firebaseapp.com",
@@ -204,39 +174,89 @@
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
 
-    // 2. التحكم في الواجهة
-    function switchTab(tabId) {
-      document.getElementById('tab-home').classList.add('hidden');
-      document.getElementById('tab-auth-modal').classList.add('hidden');
-      document.getElementById('tab-' + tabId).classList.remove('hidden');
+    let authMode = 'login'; // 'login' or 'register'
+
+    // تهيئة الـ reCAPTCHA بشكل آمن لمنع الـ Crash
+    function initRecaptcha() {
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear(); // تنظيف القديم لو موجود
+      }
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'normal', // هنخليها normal مؤقتاً عشان لو فايربيز طلب يظهر الصورة يظهرها للمستخدم بدل ما يعلق
+        'callback': (response) => { console.log('reCAPTCHA solved'); }
+      });
+      window.recaptchaVerifier.render();
     }
 
-    function openAuthModal() { switchTab('auth-modal'); }
-    function closeAuthModal() { switchTab('home'); }
+    // التنقل بين الزائر والتسجيل
+    function openAuthModal() {
+      document.getElementById('view-visitor').classList.add('hidden');
+      document.getElementById('view-auth').classList.remove('hidden');
+      initRecaptcha(); // تجهيز الكابتشا أول ما الواجهة تفتح
+    }
+    
+    function closeAuthModal() {
+      document.getElementById('view-auth').classList.add('hidden');
+      document.getElementById('view-visitor').classList.remove('hidden');
+    }
+
+    // التبديل بين الدخول وحساب جديد
+    function switchAuthTab(mode) {
+      authMode = mode;
+      document.getElementById('tab-login').classList.remove('active');
+      document.getElementById('tab-register').classList.remove('active');
+      document.getElementById('tab-' + mode).classList.add('active');
+
+      // إظهار حقل الاسم لو حساب جديد
+      if (mode === 'register') {
+        document.getElementById('name-input-container').classList.remove('hidden');
+      } else {
+        document.getElementById('name-input-container').classList.add('hidden');
+      }
+    }
+
+    // اختيار عميل أو فني
+    function selectRole(role) {
+      document.getElementById('role-client').classList.remove('selected');
+      document.getElementById('role-tech').classList.remove('selected');
+      document.getElementById('role-' + role).classList.add('selected');
+      document.getElementById('selected-role').value = role;
+    }
 
     function showMessage(text, isError = false) {
       const msgDiv = document.getElementById('statusMessage');
-      msgDiv.className = `fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[90%] max-w-[380px] p-3 rounded-2xl text-xs font-black text-center shadow-2xl z-50 fade-in ${isError ? 'bg-red-600 text-white border border-red-700' : 'bg-emerald-600 text-white border border-emerald-700'}`;
+      msgDiv.className = `fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[90%] max-w-[380px] p-3 rounded-2xl text-xs font-black text-center shadow-2xl z-50 ${isError ? 'bg-red-600 text-white border border-red-700' : 'bg-[#006948] text-white'}`;
       msgDiv.innerText = text;
       msgDiv.classList.remove('hidden');
-      setTimeout(() => msgDiv.classList.add('hidden'), 4000);
+      setTimeout(() => msgDiv.classList.add('hidden'), 5000);
     }
 
-    // 3. إرسال كود الـ OTP
+    function backToPhone() {
+      document.getElementById('step-verify').classList.add('hidden');
+      document.getElementById('step-phone').classList.remove('hidden');
+      initRecaptcha(); // إعادة التهيئة
+    }
+
+    // ================= إرسال الـ OTP =================
     function handleSendOTP() {
       let rawPhone = document.getElementById('phoneNumber').value.trim();
+      let name = document.getElementById('userName').value.trim();
+
       if (!rawPhone || rawPhone.length < 8) {
-        return showMessage("الرجاء إدخال رقم الجوال بشكل صحيح", true);
+        return showMessage("الرجاء إدخال رقم جوال صحيح", true);
       }
-      
-      // توحيد صيغة الرقم للسعودية
+
+      if (authMode === 'register' && !name) {
+        return showMessage("الرجاء إدخال اسمك لإنشاء الحساب", true);
+      }
+
+      // إضافة مفتاح الدولة تلقائياً إذا لم يكتبه
       let phone = rawPhone.startsWith('+') ? rawPhone : '+966' + (rawPhone.startsWith('0') ? rawPhone.substring(1) : rawPhone);
 
       const btn = document.getElementById('btn-send-otp');
       btn.disabled = true;
-      btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">sync</span><span>جاري الإرسال...</span>';
+      btn.innerText = "جاري الإرسال...";
 
       firebase.auth().signInWithPhoneNumber(phone, window.recaptchaVerifier)
         .then((confirmationResult) => {
@@ -245,51 +265,47 @@
           document.getElementById('step-verify').classList.remove('hidden');
           showMessage("تم إرسال كود التحقق بنجاح ✓", false);
         }).catch((error) => {
-          showMessage("فشل الإرسال، يرجى المحاولة لاحقاً", true);
+          console.error("Firebase Error:", error);
+          let errorMsg = "حدث خطأ غير معروف.";
+          if(error.code === 'auth/invalid-phone-number') errorMsg = "رقم الجوال غير صحيح أو غير مدعوم.";
+          if(error.code === 'auth/unauthorized-domain') errorMsg = "هذا النطاق غير مصرح له في إعدادات فايربيز (يجب إضافة دومين الموقع في Firebase Console).";
+          
+          showMessage("فشل الإرسال: " + errorMsg, true);
           btn.disabled = false;
-          btn.innerHTML = '<span>إرسال الرمز السري</span><span class="material-symbols-outlined text-sm">send</span>';
-          if (window.recaptchaVerifier) window.recaptchaVerifier.render().then(id => grecaptcha.reset(id));
+          btn.innerText = "إرسال كود التحقق (OTP)";
+          initRecaptcha(); // إعادة المحاولة
         });
     }
 
-    // 4. التحقق والتوجيه المركزي (The Routing Engine)
-    function handleVerifyAndRoute() {
+    // ================= تأكيد الكود والتوجيه =================
+    function handleVerifyOTP() {
       const code = document.getElementById('otpCode').value.trim();
-      if (code.length < 6) return showMessage("الرجاء إدخال الرمز المكون من 6 أرقام", true);
+      if (code.length < 6) return showMessage("الرجاء إدخال الكود المكون من 6 أرقام", true);
 
       const btn = document.getElementById('btn-verify-otp');
       btn.disabled = true;
-      btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">sync</span><span>جاري التحقق...</span>';
+      btn.innerText = "جاري التحقق...";
 
       window.confirmationResult.confirm(code)
         .then((result) => {
           const user = result.user;
-          const role = document.getElementById('user-role').value; // 'client' أو 'tech'
+          const role = document.getElementById('selected-role').value;
+          const name = document.getElementById('userName').value.trim();
           
-          // في المعمارية الجديدة، سنسأل السجل المركزي (الـ Registry) هل المستخدم مكتمل البيانات؟
-          // مؤقتاً نحاكيها بـ LocalStorage للتوضيح:
-          const allUsers = JSON.parse(localStorage.getItem('motqan_unified_registry') || '{}');
+          // تشفير الجلسة
+          const userData = { phone: user.phoneNumber, role: role, name: name || "عميل مُتقن", uid: user.uid };
+          const token = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(userData)))));
           
-          if (allUsers[user.phoneNumber] && allUsers[user.phoneNumber].isProfileComplete) {
-            // مستخدم قديم ومكتمل -> اصدار Token وتوجيه للدومين الفرعي
-            const token = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(allUsers[user.phoneNumber])))));
-            const targetDomain = role === 'client' ? 'https://client.oxygen11.com' : 'https://technician.oxygen11.com';
-            
-            showMessage("نجاح! جاري تحويلك لحسابك...", false);
-            setTimeout(() => window.location.replace(`${targetDomain}/?auth_token=${token}`), 1000);
-            
-          } else {
-            // مستخدم جديد -> توجيه لصفحة الـ Onboarding المركزية لتسجيل الاسم/الخريطة
-            const tempSession = { phone: user.phoneNumber, role: role, uid: user.uid };
-            localStorage.setItem('motqan_temp_setup', JSON.stringify(tempSession));
-            
-            showMessage("تم التحقق! جاري توجيهك لاستكمال البيانات...", false);
-            setTimeout(() => window.location.replace(`onboarding.html?role=${role}`), 1000);
-          }
+          // التوجيه: إذا اختار "فني" يروح لفرع الفني، وإذا "عميل" يروح لفرع العميل
+          const targetDomain = role === 'tech' ? 'https://technician.oxygen11.com' : 'https://client.oxygen11.com';
+          
+          showMessage("تم التحقق بنجاح! جاري التوجيه...", false);
+          setTimeout(() => window.location.replace(`${targetDomain}/?auth_token=${token}`), 1500);
+
         }).catch((error) => {
-          showMessage("الكود غير صحيح أو منتهي الصلاحية", true);
+          showMessage("الكود المدخل غير صحيح، حاول مرة أخرى", true);
           btn.disabled = false;
-          btn.innerHTML = '<span>تأكيد الدخول</span><span class="material-symbols-outlined text-sm">verified_user</span>';
+          btn.innerText = "تأكيد الدخول";
         });
     }
   </script>
