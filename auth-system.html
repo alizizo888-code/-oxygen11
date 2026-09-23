@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مُتقن | تسجيل الدخول وإنشاء حساب</title>
+    <!-- مكتبات فايربيز -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <!-- أيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #0f172a; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .container { background: #1e293b; padding: 30px; border-radius: 12px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+        
+        .tabs { display: flex; margin-bottom: 25px; border-bottom: 2px solid #334155; }
+        .tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; color: #94a3b8; font-weight: bold; transition: 0.3s; }
+        .tab.active { color: #38bdf8; border-bottom: 2px solid #38bdf8; }
+        
+        .section { display: none; }
+        .section.active { display: block; }
+        
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-size: 14px; color: #cbd5e1; }
+        input[type="text"], input[type="tel"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; text-align: right; }
+        input[type="tel"] { direction: ltr; text-align: left; }
+        
+        .icon-selector { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .icon-option { flex: 1; min-width: 100px; background: #334155; border: 2px solid transparent; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .icon-option:hover { background: #475569; }
+        .icon-option.selected { border-color: #38bdf8; background: rgba(56, 189, 248, 0.1); color: #38bdf8; }
+        .icon-option i { display: block; font-size: 24px; margin-bottom: 5px; }
+        
+        .gps-btn { width: 100%; padding: 15px; background: #334155; border: 1px dashed #94a3b8; border-radius: 8px; color: #fff; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; margin-bottom: 15px; }
+        .gps-btn:hover { background: #475569; }
+        .gps-btn.success { border-color: #10b981; color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        
+        button.action-btn { width: 100%; padding: 14px; border: none; border-radius: 8px; background: #0284c7; color: #fff; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        button.action-btn:hover { background: #0369a1; }
+        
+        .msg { margin-top: 15px; padding: 10px; border-radius: 6px; font-size: 14px; display: none; }
+        .success-msg { background: #065f46; color: #34d399; }
+        .error-msg { background: #7f1d1d; color: #f87171; }
+        
+        #verify-section { text-align: center; }
+        #verify-section input { text-align: center; letter-spacing: 5px; font-size: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('login')">تسجيل دخول</div>
+        <div class="tab" onclick="switchTab('register')">حساب جديد</div>
+    </div>
+
+    <div id="login-section" class="section active">
+        <div class="input-group">
+            <label>رقم الهاتف (مسجل مسبقاً)</label>
+            <input type="tel" id="loginPhone" placeholder="+201xxxxxxxxx أو +966xxxxxxxxx">
+        </div>
+        <button class="action-btn" onclick="requestOTP('loginPhone')">إرسال كود الدخول (OTP)</button>
+    </div>
+
+    <div id="register-section" class="section">
+        <div class="input-group">
+            <label>الاسم بالكامل</label>
+            <input type="text" id="regName" placeholder="أدخل اسمك الكريم">
+        </div>
+        
+        <label>المنطقة</label>
+        <div class="icon-selector" id="regionSelector">
+            <div class="icon-option" onclick="selectOption(this, 'region')"><i class="fa-solid fa-city"></i>مكة المكرمة</div>
+            <div class="icon-option" onclick="selectOption(this, 'region')"><i class="fa-solid fa-building"></i>جدة</div>
+            <div class="icon-option" onclick="selectOption(this, 'region')"><i class="fa-solid fa-map"></i>أخرى</div>
+        </div>
+        
+        <label>الحي المستهدف</label>
+        <div class="icon-selector" id="districtSelector">
+            <div class="icon-option" onclick="selectOption(this, 'district')"><i class="fa-solid fa-location-dot"></i>شمال</div>
+            <div class="icon-option" onclick="selectOption(this, 'district')"><i class="fa-solid fa-location-dot"></i>جنوب</div>
+            <div class="icon-option" onclick="selectOption(this, 'district')"><i class="fa-solid fa-location-dot"></i>شرق</div>
+            <div class="icon-option" onclick="selectOption(this, 'district')"><i class="fa-solid fa-location-dot"></i>غرب</div>
+        </div>
+
+        <button class="gps-btn" id="gpsBtn" onclick="getLocation()">
+            <i class="fa-solid fa-location-crosshairs"></i> اضغط لتحديد موقعك بدقة (GPS)
+        </button>
+        <input type="hidden" id="gpsCoords">
+
+        <div class="input-group">
+            <label>رقم الهاتف</label>
+            <input type="tel" id="regPhone" placeholder="+201xxxxxxxxx أو +966xxxxxxxxx">
+        </div>
+        
+        <button class="action-btn" onclick="requestOTP('regPhone')">تأكيد وإنشاء الحساب (OTP)</button>
+    </div>
+
+    <div id="verify-section" class="section">
+        <h3 style="color: #38bdf8;">تأكيد رقم الهاتف</h3>
+        <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">تم إرسال كود مكون من 6 أرقام إلى هاتفك</p>
+        <div class="input-group">
+            <input type="text" id="otpCode" maxlength="6" placeholder="------">
+        </div>
+        <button class="action-btn" onclick="verifyOTP()">تأكيد الكود</button>
+    </div>
+
+    <div id="recaptcha-container"></div>
+    <div id="statusMessage" class="msg"></div>
+</div>
+
+<!-- استدعاء ملف الـ JS الخاص بك من مجلد public -->
+<script src="public/auth.js"></script> 
+
+</body>
+</html>
