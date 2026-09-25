@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js"
+    "check": "node --check server.js && node --check database/db.js && node -e \"require('./database/db')\""
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",
