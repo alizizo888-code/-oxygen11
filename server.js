@@ -99,8 +99,7 @@ app.post("/api/orders",requireAuth,requireRole("client","admin","owner"),async(r
   const {clientName,phone,serviceCategory,priority,location,notes}=req.body||{};
   if(!clientName||!phone||!serviceCategory||!location)return res.status(400).json({ok:false,error:"clientName, phone, serviceCategory and location are required"});
   const order={orderId:dbEnabled?await db.nextOrderId():(orders.reduce((m,o)=>Math.max(m,Number(o.orderId)||1000),1000)+1),clientUid:req.user.uid,clientName:String(clientName).trim(),phone:String(phone).trim(),serviceCategory:String(serviceCategory).trim(),priority:["normal","high","critical"].includes(priority)?priority:"normal",location:String(location).trim(),notes:notes?String(notes).trim():"",status:"pending_dispatch",dispatchType:"automatic",providerUid:null,providerName:null,pricing:{labor:0,parts:0,discount:0,total:0,commission:0,providerNet:0},payment:{method:null,status:"pending",reference:null},invoice:null,audit:[],createdAt:now(),updatedAt:now()};
-  await audit(order,"order_created",req.user.uid);dispatchAutomatically(order);if(order.providerUid)await audit(order,"automatic_dispatch:"+order.providerUid,"system");
-  orders.unshift(order);await persistOrder(order);io.emit("order_created",order);res.status(201).json({ok:true,order})
+  dispatchAutomatically(order);orders.unshift(order);await persistOrder(order);await audit(order,"order_created",req.user.uid);if(order.providerUid)await audit(order,"automatic_dispatch:"+order.providerUid,"system");io.emit("order_created",order);res.status(201).json({ok:true,order})
 });
 
 app.post("/api/orders/:id/assign",requireAuth,requireRole("admin","owner"),async(req,res)=>{
