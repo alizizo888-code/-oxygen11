@@ -176,6 +176,7 @@ app.post("/api/auth/session", async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      domain: process.env.NODE_ENV === "production" ? ".oxygen11.com" : undefined,
       maxAge: 1000 * 60 * 60 * 12
     });
 
