@@ -8,6 +8,7 @@ const {Server}=require("socket.io");
 const admin=require("firebase-admin");
 const db=require("./database/db");
 const {getPaymentProvider}=require("./backend/payment_gateway/payment_processor");
+const {securityHeaders,createRateLimiter,validateOrderInput,sameOriginGuard,cleanString,validCoordinatePair}=require("./backend/security/security");
 const ROLE_PERMISSIONS={owner:["*"],admin:["orders.read","orders.create","orders.assign","orders.update","providers.read","providers.write","registry.read","registry.write","audit.read","payments.read"],tech:["orders.read","orders.update","providers.read","payments.confirm"],client:["orders.read","orders.create","payments.create"]};
 
 const app=express();
@@ -93,10 +94,16 @@ function initFirebase(){if(admin.apps.length)return true;try{if(process.env.FIRE
 initFirebase();
 
 app.disable("x-powered-by");
+app.set("trust proxy",1);
+app.use(securityHeaders);
+app.use("/api",createRateLimiter({windowMs:60_000,max:120}));
+app.use("/api/auth/session",createRateLimiter({windowMs:60_000,max:15}));
+
 app.use((req,res,next)=>{if(process.env.NODE_ENV!=="production")return next();const origin=req.get("origin");if(origin&&!allowedOrigins.has(origin))return res.status(403).json({ok:false,error:"Origin not allowed"});next()});
-app.use(express.json({limit:"2mb"}));
+app.use(express.json({limit:"512kb",verify:(req,_res,buf)=>{req.rawBody=Buffer.from(buf)}}));
 app.use(express.urlencoded({extended:true,limit:"2mb"}));
 app.use(cookieParser());
+app.use(sameOriginGuard);
 
 app.get("/health",(_req,res)=>res.json({ok:true,service:"oxygen11",environment:process.env.NODE_ENV||"development",firebaseAdmin:admin.apps.length>0,persistence:dbEnabled?"mysql":"json-fallback",orders:orders.length,timestamp:now()}));
 app.get("/api/auth/config",(_req,res)=>res.json({ok:true,firebaseServerVerification:admin.apps.length>0,persistence:dbEnabled?"mysql":"json-fallback"}));
@@ -140,7 +147,9 @@ app.get("/api/orders",requireAuth,requirePermission("orders.read"),(req,res)=>{
 
 app.post("/api/orders",requireAuth,requirePermission("orders.create"),async(req,res)=>{
   const {clientName,phone,serviceCategory,priority,location,notes,latitude,longitude,address,mapsUrl}=req.body||{};
-  if(!clientName||!phone||!serviceCategory||!location)return res.status(400).json({ok:false,error:"clientName, phone, serviceCategory and location are required"});
+  const validationError=validateOrderInput(req.body);
+  if(validationError)return res.status(400).json({ok:false,error:validationError});
+  if(!validCoordinatePair(latitude,longitude))return res.status(400).json({ok:false,error:"Invalid coordinates"});
   const order={orderId:dbEnabled?await db.nextOrderId():(orders.reduce((m,o)=>Math.max(m,Number(o.orderId)||1000),1000)+1),clientUid:req.user.uid,clientName:String(clientName).trim(),phone:String(phone).trim(),serviceCategory:String(serviceCategory).trim(),priority:["normal","high","critical"].includes(priority)?priority:"normal",location:String(location).trim(),address:address?String(address).trim():"",mapsUrl:mapsUrl?String(mapsUrl).trim():"",latitude:latitude==null?null:Number(latitude),longitude:longitude==null?null:Number(longitude),notes:notes?String(notes).trim():"",status:"pending_dispatch",dispatchType:"automatic",providerUid:null,providerName:null,pricing:{labor:0,parts:0,discount:0,total:0,commission:0,providerNet:0},payment:{method:null,status:"pending",reference:null},invoice:null,audit:[],createdAt:now(),updatedAt:now()};
   await dispatchAutomatically(order);orders.unshift(order);await persistOrder(order);await audit(order,"order_created",req.user.uid);if(order.providerUid)await audit(order,"automatic_dispatch:"+order.providerUid,"system");io.emit("order_created",order);res.status(201).json({ok:true,order})
 });
@@ -154,3 +163,129 @@ app.patch("/api/orders/:id/status",requireAuth,requirePermission("orders.update"
 
 app.post("/api/orders/:id/accept",requireAuth,requirePermission("orders.update"),async(req,res)=>{try{const o=orders.find(x=>x.orderId===Number(req.params.id));if(!o)return res.status(404).json({ok:false,error:"Order not found"});if(req.user.role!=="tech"||o.providerUid!==req.user.uid)return res.status(403).json({ok:false,error:"Only the assigned technician can accept"});const updated=await transitionOrder(o,"in_progress",req.user);await audit(updated,"technician_accepted",req.user.uid);res.json({ok:true,order:updated})}catch(e){res.status(e.code===403?403:409).json({ok:false,error:e.message})}});
 app.post("/api/orders/:id/reject",requireAuth,requirePermission("orders.update"),async(req,res)=>{try{const o=orders.find(x=>x.orderId===Number(req.params.id));if(!o)return res.status(404).json({ok:false,error:"Order not found"});if(req.user.role!=="tech"||o.providerUid!==req.user.uid)return res.status(403).json({ok:false,error:"Only the assigned technician can reject"});o.providerUid=null;o.providerName=null;o.dispatchType="automatic";o.status="pending_dispatch";o.updatedAt=now();await audit(o,"technician_rejected",req.user.uid);await persistOrder(o);await dispatchAutomatically(o);await persistOrder(o);emitOrder(o);res.json({ok:true,order:o})}catch(e){res.status(409).json({ok:false,error:e.message})}});
+
+app.post("/api/orders/:id/invoice",requireAuth,requirePermission("orders.update"),async(req,res)=>{
+  try{
+    if(!dbEnabled)return res.status(409).json({ok:false,error:"Invoice management requires MySQL"});
+    const o=orders.find(x=>x.orderId===Number(req.params.id));
+    if(!o)return res.status(404).json({ok:false,error:"Order not found"});
+    if(o.status!=="in_progress")return res.status(409).json({ok:false,error:"Invoice can only be issued while order is in_progress"});
+    if(req.user.role==="tech"&&o.providerUid!==req.user.uid)return res.status(403).json({ok:false,error:"Forbidden"});
+    const labor=Number(req.body?.labor??o.pricing?.labor??0),parts=Number(req.body?.parts??o.pricing?.parts??0),discount=Number(req.body?.discount??o.pricing?.discount??0);
+    if(![labor,parts,discount].every(Number.isFinite)||labor<0||parts<0||discount<0||discount>labor+parts)return res.status(400).json({ok:false,error:"Invalid invoice amounts"});
+    const total=Math.max(0,labor+parts-discount);
+    const commissionRate=Math.min(100,Math.max(0,Number(process.env.PLATFORM_COMMISSION_RATE||15)));
+    const commission=Number((total*commissionRate/100).toFixed(2));
+    o.pricing={labor,parts,discount,total,commission,providerNet:Number((total-commission).toFixed(2))};
+    o.invoice={invoiceId:"INV-"+Date.now()+"-"+crypto.randomBytes(3).toString("hex"),status:"issued",issuedAt:now(),amount:total,currency:"SAR"};
+    o.updatedAt=now();
+    await audit(o,"invoice_issued",req.user.uid);
+    await persistOrder(o);
+    emitOrder(o);
+    res.status(201).json({ok:true,order:o,invoice:o.invoice});
+  }catch(e){res.status(400).json({ok:false,error:e.message})}
+});
+
+app.post("/api/orders/:id/payment",requireAuth,requirePermission("payments.create"),async(req,res)=>{
+  try{
+    if(!dbEnabled)return res.status(409).json({ok:false,error:"Payments require MySQL"});
+    const o=orders.find(x=>x.orderId===Number(req.params.id));
+    if(!o)return res.status(404).json({ok:false,error:"Order not found"});
+    if(o.clientUid!==req.user.uid&&!hasPermission(req.user.role,"payments.confirm"))return res.status(403).json({ok:false,error:"Forbidden"});
+    if(o.status!=="awaiting_payment")return res.status(409).json({ok:false,error:"Order is not awaiting payment"});
+    if(!o.invoice||o.invoice.status!=="issued")return res.status(409).json({ok:false,error:"Issued invoice required"});
+    const idempotencyKey=cleanString(req.get("Idempotency-Key")||req.body?.idempotencyKey,191);
+    if(!idempotencyKey)return res.status(400).json({ok:false,error:"Idempotency-Key is required"});
+    const existing=await db.getPaymentByIdempotency(idempotencyKey);
+    if(existing)return res.json({ok:true,payment:existing,order:o,replayed:true});
+    const method=cleanString(req.body?.method,40)||"card";
+    const allowedMethods=new Set(["card","bank_transfer","cash"]);
+    if(!allowedMethods.has(method))return res.status(400).json({ok:false,error:"Unsupported payment method"});
+    if(method==="cash"&&!hasPermission(req.user.role,"payments.confirm"))return res.status(403).json({ok:false,error:"Cash payment requires staff confirmation"});
+    const provider=getPaymentProvider();
+    const result=await provider.createPayment({paymentId:Date.now(),orderId:o.orderId,amount:Number(o.pricing.total),currency:"SAR",method});
+    const createdAt=now();
+    const payment=await db.createPayment({orderId:o.orderId,clientUid:o.clientUid,amount:Number(o.pricing.total),currency:"SAR",method,provider:provider.name,status:result.status,externalReference:result.externalReference,idempotencyKey,providerMetadata:result.providerMetadata,createdAt,updatedAt,paidAt:result.status==="paid"?createdAt:null});
+    o.payment={method,status:result.status,reference:result.externalReference};
+    if(result.status==="paid"){
+      o.status="completed";
+      o.updatedAt=now();
+      await audit(o,"payment_paid",req.user.uid);
+      await audit(o,"status_changed:awaiting_payment->completed","system");
+    }else{
+      o.updatedAt=now();
+      await audit(o,"payment_created:"+result.status,req.user.uid);
+    }
+    await persistOrder(o);
+    emitOrder(o);
+    res.status(201).json({ok:true,payment,order:o});
+  }catch(e){res.status(400).json({ok:false,error:e.message})}
+});
+
+app.post("/api/payments/:id/webhook",async(req,res)=>{
+  try{
+    if(!dbEnabled)return res.status(409).json({ok:false,error:"Payments require MySQL"});
+    const paymentId=Number(req.params.id);if(!Number.isInteger(paymentId)||paymentId<1)return res.status(400).json({ok:false,error:"Invalid payment id"});
+    const provider=getPaymentProvider(),signature=req.get("x-payment-signature")||"";
+    const payload=Buffer.isBuffer(req.rawBody)?req.rawBody.toString("utf8"):JSON.stringify(req.body||{});
+    if(!provider.verifyWebhook(payload,signature))return res.status(401).json({ok:false,error:"Invalid webhook signature"});
+    const payment=await db.getPayment(paymentId);if(!payment)return res.status(404).json({ok:false,error:"Payment not found"});
+    const webhook=await provider.handleWebhook(payload,req.headers);
+    const status=webhook.status||"pending";
+    const updated=await db.updatePayment(paymentId,{status,providerMetadata:webhook.providerMetadata||payment.providerMetadata,paidAt:status==="paid"?now():payment.paidAt});
+    const o=orders.find(x=>x.orderId===payment.orderId)||await db.getOrder(payment.orderId);
+    if(o){
+      o.payment={method:payment.method,status,reference:updated.externalReference||payment.externalReference||null};
+      if(status==="paid"&&o.status==="awaiting_payment"){o.status="completed";o.updatedAt=now();await audit(o,"payment_paid_webhook","system");await audit(o,"status_changed:awaiting_payment->completed","system");await persistOrder(o);emitOrder(o)}
+    }
+    res.json({ok:true,payment:updated});
+  }catch(e){res.status(400).json({ok:false,error:e.message})}
+});
+
+app.get("/api/audit/orders/:id",requireAuth,requirePermission("audit.read"),async(req,res)=>{
+  const orderId=Number(req.params.id);
+  if(!Number.isInteger(orderId))return res.status(400).json({ok:false,error:"Invalid order id"});
+  if(!dbEnabled)return res.json({ok:true,audit:(orders.find(x=>x.orderId===orderId)?.audit||[])});
+  res.json({ok:true,audit:await db.getAudit(orderId)});
+});
+
+app.get("/api/payments/orders/:id",requireAuth,requirePermission("payments.read"),async(req,res)=>{
+  if(!dbEnabled)return res.status(409).json({ok:false,error:"Payments require MySQL"});
+  const orderId=Number(req.params.id);if(!Number.isInteger(orderId))return res.status(400).json({ok:false,error:"Invalid order id"});
+  const o=orders.find(x=>x.orderId===orderId);if(!o)return res.status(404).json({ok:false,error:"Order not found"});
+  if(req.user.role==="client"&&o.clientUid!==req.user.uid)return res.status(403).json({ok:false,error:"Forbidden"});
+  res.json({ok:true,payments:await db.listPaymentsByOrder(orderId)});
+});
+
+app.use(express.static(PUBLIC_DIR,{index:false,dotfiles:"deny",maxAge:process.env.NODE_ENV==="production"?"1h":0}));
+
+app.get("*",(req,res)=>{
+  if(req.path.startsWith("/api/"))return res.status(404).json({ok:false,error:"Not found"});
+  const host=String(req.hostname||"").toLowerCase().replace(/:\d+/,"");
+  const page=hostPages[host]||"index.html";
+  const file=path.join(PUBLIC_DIR,page);
+  if(!fs.existsSync(file))return res.status(404).send("Not found");
+  res.sendFile(file);
+});
+
+io.on("connection",socket=>{
+  socket.emit("server_ready",{ok:true,service:"oxygen11",timestamp:now()});
+  socket.on("init_orders",()=>socket.emit("init_orders",{orders}));
+  socket.on("send_chat_message",payload=>{
+    if(!payload||!cleanString(payload.message,2000))return;
+    io.emit("chat_message",{...payload,message:String(payload.message).trim(),at:now()});
+  });
+});
+
+server.requestTimeout=30_000;
+server.headersTimeout=35_000;
+server.keepAliveTimeout=5_000;
+
+initPersistence().then(()=>{
+  server.listen(PORT,()=>console.log(`[Oxygen11] server listening on :${PORT}`));
+}).catch(error=>{
+  console.error("[Oxygen11] startup failed:",error.message);
+  process.exitCode=1;
+});
+
+module.exports={app,server,STATUS_FLOW,transitions,ROLE_PERMISSIONS};
