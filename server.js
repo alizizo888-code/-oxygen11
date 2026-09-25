@@ -55,20 +55,28 @@ async function createSession(uid,role){
   else writeJson(SESSIONS_FILE,sessions);
   return token
 }
-function sessionFromRequest(req){
+async function sessionFromRequest(req){
   const token=req.cookies?.oxygen_session||req.get("x-oxygen-session");
-  const key=dbEnabled?sessionTokenHash(token||""):token;
-  const s=key?sessions[key]:null;
+  if(!token)return null;
+  if(dbEnabled){
+    const s=await db.getSession(token);
+    if(!s)return null;
+    return {uid:s.uid,role:s.role};
+  }
+  const s=sessions[token];
   if(!s)return null;
-  if(Date.now()>Number(s.expiresAt)){delete sessions[key];if(dbEnabled)void db.deleteSession(token);else writeJson(SESSIONS_FILE,sessions);return null}
+  if(Date.now()>Number(s.expiresAt)){delete sessions[token];writeJson(SESSIONS_FILE,sessions);return null}
   return {uid:s.uid,role:s.role}
 }
-function removeSession(token){const key=dbEnabled?sessionTokenHash(token):token;if(token)delete sessions[key];if(dbEnabled)void db.deleteSession(token);else writeJson(SESSIONS_FILE,sessions)}
+async function removeSession(token){if(!token)return;if(dbEnabled){await db.deleteSession(token);delete sessions[sessionTokenHash(token)];}else{delete sessions[token];writeJson(SESSIONS_FILE,sessions)}}
 function parseCoords(location){const m=String(location||"").match(/(-?\\d+(?:\\.\\d+)?)[,\\s]+(-?\\d+(?:\\.\\d+)?)/);return m?{lat:Number(m[1]),lng:Number(m[2])}:null}
 function serviceMatches(p,category){const c=String(category||"").toLowerCase();return !p.serviceTypes.length||p.serviceTypes.some(x=>c.includes(String(x).toLowerCase())||String(x).toLowerCase().includes(c))}
 function distance(a,b){if(!a||b.latitude===null||b.longitude===null)return Number.POSITIVE_INFINITY;const R=6371,rad=Math.PI/180,dLat=(b.latitude-a.lat)*rad,dLon=(b.longitude-a.lng)*rad;const x=Math.sin(dLat/2)**2+Math.cos(a.lat*rad)*Math.cos(b.latitude*rad)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
 async function dispatchAutomatically(o){if(!dbEnabled)return false;providers=await db.listProviders();const coords=parseCoords(o.location);const candidates=providers.filter(p=>serviceMatches(p,o.serviceCategory));if(!candidates.length)return false;candidates.sort((a,b)=>{const da=distance(coords,a),dbb=distance(coords,b);if(da!==dbb)return da-dbb;return String(a.lastAssignedAt||"").localeCompare(String(b.lastAssignedAt||""))});const chosen=candidates[0];o.providerUid=chosen.uid;o.providerName=chosen.fullName;o.dispatchType="automatic";o.status="assigned_automatic";o.updatedAt=now();await db.markProviderAssigned(chosen.uid,o.updatedAt);return true}
-function requireAuth(req,res,next){const s=sessionFromRequest(req);if(!s)return res.status(401).json({ok:false,error:"Authentication required"});req.user=s;next()}
+async function requireAuth(req,res,next){
+  try{const s=await sessionFromRequest(req);if(!s)return res.status(401).json({ok:false,error:"Authentication required"});req.user=s;next()}
+  catch(e){console.error("[Oxygen11] Session lookup error:",e);res.status(500).json({ok:false,error:"Authentication service unavailable"})}
+}
 function requireRole(...roles){return(req,res,next)=>{if(!req.user||!roles.includes(req.user.role))return res.status(403).json({ok:false,error:"Forbidden"});next()}}
 function canTransition(a,b){return(transitions[a]||[]).includes(b)}
 function emitOrder(o){io.emit("order_updated",o)}
@@ -92,7 +100,7 @@ app.post("/api/auth/session",async(req,res)=>{
     res.json({ok:true,role,uid:decoded.uid})
   }catch(e){res.status(401).json({ok:false,error:e.message})}
 });
-app.post("/api/auth/logout",(req,res)=>{removeSession(req.cookies?.oxygen_session);res.clearCookie("oxygen_session");res.json({ok:true})});
+app.post("/api/auth/logout",async(req,res)=>{await removeSession(req.cookies?.oxygen_session);res.clearCookie("oxygen_session");res.json({ok:true})});
 app.get("/api/auth/me",requireAuth,(req,res)=>res.json({ok:true,user:req.user}));
 
 app.post("/api/providers",requireAuth,requireRole("admin","owner"),async(req,res)=>{
