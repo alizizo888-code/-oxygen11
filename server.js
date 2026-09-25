@@ -6,7 +6,8 @@ const crypto=require("crypto");
 const cookieParser=require("cookie-parser");
 const {Server}=require("socket.io");
 const admin=require("firebase-admin");
-const db=require("./database/db");\nconst {getPaymentProvider}=require("./backend/payment_gateway/payment_processor");
+const db=require("./database/db");
+const {getPaymentProvider}=require("./backend/payment_gateway/payment_processor");\nconst {getPaymentProvider}=require("./backend/payment_gateway/payment_processor");
 
 const app=express();
 const server=http.createServer(app);
@@ -140,60 +141,50 @@ app.post("/api/orders/:id/invoice",requireAuth,requireRole("tech","admin","owner
 });
 
 app.post("/api/orders/:id/payment",requireAuth,async(req,res)=>{
-  const o=orders.find(x=>x.orderId===Number(req.params.id));if(!o)return res.status(404).json({ok:false,error:"Order not found"});
-  if(req.user.role==="client"&&o.clientUid!==req.user.uid)return res.status(403).json({ok:false,error:"Forbidden"});
-  if(!o.invoice)return res.status(400).json({ok:false,error:"Invoice not issued"});
-  if(o.status!=="awaiting_payment")return res.status(409).json({ok:false,error:"Order is not awaiting payment"});
-  if(!dbEnabled)return res.status(409).json({ok:false,error:"Payment transactions require MySQL persistence"});
-  const method=["online_mada_visa","stc_pay","wallet","cash"].includes(req.body?.method)?req.body.method:null;
-  if(!method)return res.status(400).json({ok:false,error:"Invalid payment method"});
-  if(method==="cash"&&!["tech","admin","owner"].includes(req.user.role))return res.status(403).json({ok:false,error:"Cash payment must be confirmed by staff"});
-  const idempotencyKey=String(req.get("Idempotency-Key")||req.body?.idempotencyKey||"").trim();
-  if(!idempotencyKey||idempotencyKey.length<8)return res.status(400).json({ok:false,error:"Idempotency-Key is required"});
-  const existing=await db.getPaymentByIdempotency(idempotencyKey);if(existing)return res.status(200).json({ok:true,payment:existing,order:o,replayed:true});
-  const provider=method==="cash"?"cash":String(process.env.PAYMENT_PROVIDER||"mock").toLowerCase();
-  const createdAt=now();
-  let payment=await db.createPayment({orderId:o.orderId,clientUid:o.clientUid,amount:o.pricing.total,currency:"SAR",method,provider,status:"created",idempotencyKey,createdAt,updatedAt:createdAt});
-  if(method==="cash"){
-    payment=await db.updatePayment(payment.paymentId,{status:"paid",externalReference:String(req.body?.reference||"CASH-"+Date.now()),paidAt:now(),updatedAt:now()});
-  }else{
-    try{
-      const result=await getPaymentProvider().createPayment({paymentId:payment.paymentId,orderId:o.orderId,amount:o.pricing.total,currency:"SAR",method});
-      payment=await db.updatePayment(payment.paymentId,{status:result.status,externalReference:result.externalReference,providerMetadata:result.providerMetadata,paidAt:result.status==="paid"?now():null,updatedAt:now()});
-    }catch(e){
-      payment=await db.updatePayment(payment.paymentId,{status:"failed",providerMetadata:{error:e.message},updatedAt:now()});
-      return res.status(502).json({ok:false,error:"Payment provider unavailable",payment});
+  try{
+    const o=orders.find(x=>x.orderId===Number(req.params.id));if(!o)return res.status(404).json({ok:false,error:"Order not found"});
+    if(req.user.role==="client"&&o.clientUid!==req.user.uid)return res.status(403).json({ok:false,error:"Forbidden"});
+    if(!o.invoice)return res.status(400).json({ok:false,error:"Invoice not issued"});
+    if(o.status!=="awaiting_payment")return res.status(409).json({ok:false,error:"Order is not awaiting payment"});
+    const method=["online_mada_visa","stc_pay","wallet","cash"].includes(req.body?.method)?req.body.method:null;
+    if(!method)return res.status(400).json({ok:false,error:"Invalid payment method"});
+    if(method==="cash"&&!["tech","admin","owner"].includes(req.user.role))return res.status(403).json({ok:false,error:"Cash payment must be confirmed by staff"});
+    if(!dbEnabled)return res.status(409).json({ok:false,error:"Payment processing requires MySQL"});
+    const idempotencyKey=String(req.get("Idempotency-Key")||req.body?.idempotencyKey||"").trim();
+    if(!idempotencyKey||idempotencyKey.length>191)return res.status(400).json({ok:false,error:"A valid Idempotency-Key is required"});
+    const existing=await db.getPaymentByIdempotency(idempotencyKey);
+    if(existing){
+      if(existing.orderId!==o.orderId||existing.amount!==Number(o.pricing.total)||existing.method!==method)return res.status(409).json({ok:false,error:"Idempotency key was already used for a different payment"});
+      return res.json({ok:true,payment:existing,order:o,idempotent:true});
     }
+    const provider=getPaymentProvider(),createdAt=now();
+    const created=await provider.createPayment({paymentId:"pending-"+crypto.randomBytes(8).toString("hex"),orderId:o.orderId,amount:Number(o.pricing.total),currency:"SAR",method});
+    const payment=await db.createPayment({orderId:o.orderId,clientUid:o.clientUid,amount:Number(o.pricing.total),currency:"SAR",method,provider:provider.name,status:created.status,externalReference:created.externalReference,idempotencyKey,providerMetadata:created.providerMetadata,createdAt,updatedAt:createdAt,paidAt:created.status==="paid"?createdAt:null});
+    o.payment={method,status:created.status,reference:created.externalReference||null,paymentId:payment.paymentId};o.updatedAt=now();
+    if(created.status==="paid"){o.invoice.status="paid";o.status="completed";await audit(o,"payment_completed:"+payment.paymentId,req.user.uid)}
+    else await audit(o,"payment_created:"+payment.paymentId,req.user.uid);
+    await persistOrder(o);emitOrder(o);
+    res.status(201).json({ok:true,payment,order:o});
+  }catch(e){
+    console.error("[Oxygen11] Payment error:",e);
+    res.status(502).json({ok:false,error:"Payment provider error"});
   }
-  o.payment={method,status:payment.status,reference:payment.externalReference||null};
-  if(payment.status==="paid"){o.invoice.status="paid";o.status="completed";await audit(o,"payment_completed:"+payment.paymentId,req.user.uid)}
-  else {await audit(o,"payment_created:"+payment.paymentId,req.user.uid)}
-  o.updatedAt=now();await persistOrder(o);emitOrder(o);
-  res.status(payment.status==="paid"?200:202).json({ok:true,payment,order:o});
 });
-
-app.post("/api/payments/webhook",async(req,res)=>{
-  if(!dbEnabled)return res.status(409).json({ok:false,error:"Payment webhooks require MySQL persistence"});
-  const signature=String(req.get("X-Payment-Signature")||"");
-  const provider=getPaymentProvider();
-  const payload=JSON.stringify(req.body||{});
-  if(!provider.verifyWebhook(payload,signature))return res.status(401).json({ok:false,error:"Invalid webhook signature"});
-  const paymentId=Number(req.body?.paymentId);if(!paymentId)return res.status(400).json({ok:false,error:"paymentId is required"});
-  const payment=await db.getPayment(paymentId);if(!payment)return res.status(404).json({ok:false,error:"Payment not found"});
-  const status=["paid","failed","pending","cancelled","refunded"].includes(req.body?.status)?req.body.status:null;if(!status)return res.status(400).json({ok:false,error:"Invalid payment status"});
-  const updated=await db.updatePayment(paymentId,{status,externalReference:req.body?.externalReference||payment.externalReference,providerMetadata:req.body?.metadata||payment.providerMetadata,paidAt:status==="paid"?(payment.paidAt||now()):payment.paidAt,updatedAt:now()});
-  const o=orders.find(x=>x.orderId===payment.orderId);if(o){
-    o.payment={method:payment.method,status:updated.status,reference:updated.externalReference||null};
-    if(updated.status==="paid"&&o.status==="awaiting_payment"){o.invoice.status="paid";o.status="completed";o.updatedAt=now();await audit(o,"payment_webhook_completed:"+paymentId,"payment-provider");await persistOrder(o);emitOrder(o)}
-  }
-  res.json({ok:true,payment:updated});
-});
-app.get("/api/payments/:id",requireAuth,async(req,res)=>{
-  if(!dbEnabled)return res.status(409).json({ok:false,error:"Payment transactions require MySQL persistence"});
-  const payment=await db.getPayment(Number(req.params.id));if(!payment)return res.status(404).json({ok:false,error:"Payment not found"});
-  const o=orders.find(x=>x.orderId===payment.orderId);if(req.user.role==="client"&&(!o||o.clientUid!==req.user.uid))return res.status(403).json({ok:false,error:"Forbidden"});
-  if(!["client","tech","admin","owner"].includes(req.user.role))return res.status(403).json({ok:false,error:"Forbidden"});
-  res.json({ok:true,payment});
+app.post("/api/payments/:id/webhook",async(req,res)=>{
+  try{
+    if(!dbEnabled)return res.status(409).json({ok:false,error:"Payment webhooks require MySQL"});
+    const raw=JSON.stringify(req.body||{}),signature=String(req.get("x-payment-signature")||"");
+    const provider=getPaymentProvider();if(!provider.verifyWebhook(raw,signature))return res.status(401).json({ok:false,error:"Invalid webhook signature"});
+    const paymentId=Number(req.params.id),payment=await db.getPayment(paymentId);if(!payment)return res.status(404).json({ok:false,error:"Payment not found"});
+    if(["paid","failed","cancelled","refunded"].includes(payment.status))return res.json({ok:true,payment,idempotent:true});
+    const result=await provider.handleWebhook(req.body||{}),nextStatus=["paid","failed","cancelled","refunded"].includes(result.status)?result.status:"pending";
+    const updated=await db.updatePayment(paymentId,{status:nextStatus,externalReference:result.externalReference||payment.externalReference,providerMetadata:result.providerMetadata||payment.providerMetadata,paidAt:nextStatus==="paid"?now():null,updatedAt:now()});
+    const o=orders.find(x=>x.orderId===payment.orderId)||await db.getOrder(payment.orderId);if(!o)return res.status(404).json({ok:false,error:"Order not found"});
+    o.payment={method:payment.method,status:updated.status,reference:updated.externalReference,paymentId:updated.paymentId};o.updatedAt=now();
+    if(nextStatus==="paid"&&o.status==="awaiting_payment"){o.invoice.status="paid";o.status="completed";await audit(o,"payment_completed_webhook:"+paymentId,"payment-provider")}
+    else if(["failed","cancelled","refunded"].includes(nextStatus))await audit(o,"payment_"+nextStatus+":"+paymentId,"payment-provider");
+    await persistOrder(o);emitOrder(o);res.json({ok:true,payment:updated,order:o});
+  }catch(e){console.error("[Oxygen11] Payment webhook error:",e);res.status(500).json({ok:false,error:"Webhook processing failed"})}
 });
 app.get("/api/audit/orders/:id",requireAuth,requireRole("admin","owner"),async(req,res)=>{const o=orders.find(x=>x.orderId===Number(req.params.id));if(!o)return res.status(404).json({ok:false,error:"Order not found"});res.json({ok:true,audit:dbEnabled?await db.getAudit(o.orderId):(o.audit||[])})});
 
