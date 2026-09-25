@@ -36,3 +36,18 @@ test("dispatch ranking filters and sorts eligible providers",()=>{
   const ranked=rankProviders(providers,{serviceCategory:"AC maintenance",latitude:21.4225,longitude:39.8262});
   assert.deepEqual(ranked.map(p=>p.uid),["near"]);
 });
+
+const {MockPaymentProvider}=require("../backend/payment_gateway/payment_processor");
+test("payment provider starts pending and webhook rejects truncated signatures",async()=>{
+  delete process.env.MOCK_PAYMENT_AUTO_CONFIRM;
+  const p=new MockPaymentProvider();
+  const r=await p.createPayment({paymentId:"p1",orderId:1,amount:100,currency:"SAR",method:"stc_pay"});
+  assert.equal(r.status,"pending");
+  process.env.PAYMENT_WEBHOOK_SECRET="test-secret";
+  const crypto=require("crypto");
+  const payload='{"status":"paid"}';
+  const good=crypto.createHmac("sha256","test-secret").update(payload).digest("hex");
+  assert.equal(p.verifyWebhook(payload,good),true);
+  assert.equal(p.verifyWebhook(payload,good.slice(0,-2)),false);
+  delete process.env.PAYMENT_WEBHOOK_SECRET;
+});
