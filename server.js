@@ -186,7 +186,7 @@ app.post("/api/orders/:id/invoice",requireAuth,requirePermission("orders.update"
   }catch(e){res.status(400).json({ok:false,error:e.message})}
 });
 
-app.post("/api/orders/:id/payment",requireAuth,requirePermission("payments.create"),async(req,res)=>{
+app.post("/api/orders/:id/payment",requireAuth,(req,res,next)=>{if(!hasPermission(req.user?.role,"payments.create")&&!hasPermission(req.user?.role,"payments.confirm"))return res.status(403).json({ok:false,error:"Permission denied"});next()},async(req,res)=>{
   try{
     if(!dbEnabled)return res.status(409).json({ok:false,error:"Payments require MySQL"});
     const o=orders.find(x=>x.orderId===Number(req.params.id));
