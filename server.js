@@ -85,6 +85,8 @@ function hasPermission(role,permission){const p=ROLE_PERMISSIONS[role]||[];retur
 function requireRole(...roles){return(req,res,next)=>{if(!req.user||!roles.includes(req.user.role))return res.status(403).json({ok:false,error:"Forbidden"});next()}}
 function requirePermission(permission){return(req,res,next)=>{if(!req.user||!hasPermission(req.user.role,permission))return res.status(403).json({ok:false,error:"Permission denied"});next()}}
 function canTransition(a,b){return(transitions[a]||[]).includes(b)}
+function transitionAllowed(role,from,to){if(role==="owner"||role==="admin")return canTransition(from,to);if(role==="tech")return (from==="assigned_automatic"||from==="assigned_manual")&&["in_progress","cancelled"].includes(to);if(role==="client")return from==="awaiting_payment"&&to==="cancelled";return false}
+async function transitionOrder(o,next,actor){if(!canTransition(o.status,next))throw Object.assign(new Error("Invalid status transition"),{code:409});if(!transitionAllowed(actor.role,o.status,next))throw Object.assign(new Error("Permission denied for this transition"),{code:403});const previous=o.status;o.status=next;o.updatedAt=now();await audit(o,"status_changed:"+previous+"->"+next,actor.uid);await persistOrder(o);emitOrder(o);return o}
 function emitOrder(o){io.emit("order_updated",o)}
 async function verifyFirebaseToken(token){if(!admin.apps.length)throw new Error("Firebase Admin is not configured on the server");return admin.auth().verifyIdToken(token)}
 function initFirebase(){if(admin.apps.length)return true;try{if(process.env.FIREBASE_SERVICE_ACCOUNT_JSON){admin.initializeApp({credential:admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON))});return true}if(process.env.GOOGLE_APPLICATION_CREDENTIALS){admin.initializeApp({credential:admin.credential.applicationDefault()});return true}}catch(e){console.error("[Oxygen11] Firebase Admin init failed:",e.message)}return false}
@@ -142,77 +144,12 @@ app.post("/api/orders",requireAuth,requirePermission("orders.create"),async(req,
   await dispatchAutomatically(order);orders.unshift(order);await persistOrder(order);await audit(order,"order_created",req.user.uid);if(order.providerUid)await audit(order,"automatic_dispatch:"+order.providerUid,"system");io.emit("order_created",order);res.status(201).json({ok:true,order})
 });
 
-app.post("/api/orders/:id/assign",requireAuth,requireRole("admin","owner"),async(req,res)=>{
+app.post("/api/orders/:id/assign",requireAuth,requirePermission("orders.assign"),async(req,res)=>{
   const o=orders.find(x=>x.orderId===Number(req.params.id));if(!o)return res.status(404).json({ok:false,error:"Order not found"});if(!req.body?.providerUid)return res.status(400).json({ok:false,error:"providerUid is required"});
   o.providerUid=String(req.body.providerUid);o.providerName=req.body.providerName?String(req.body.providerName):null;o.dispatchType=req.body.dispatchType==="manual"?"manual":"automatic";o.status=o.dispatchType==="manual"?"assigned_manual":"assigned_automatic";o.updatedAt=now();await audit(o,"order_assigned",req.user.uid);await persistOrder(o);emitOrder(o);res.json({ok:true,order:o})
 });
 
-app.patch("/api/orders/:id/status",requireAuth,async(req,res)=>{
-  const o=orders.find(x=>x.orderId===Number(req.params.id));if(!o)return res.status(404).json({ok:false,error:"Order not found"});const next=String(req.body?.status||"");
-  if(!STATUS_FLOW.includes(next))return res.status(400).json({ok:false,error:"Invalid order status"});if(!canTransition(o.status,next))return res.status(409).json({ok:false,error:"Invalid status transition",from:o.status,to:next});
-  if(req.user.role==="client"&&o.clientUid!==req.user.uid)return res.status(403).json({ok:false,error:"Forbidden"});if(req.user.role==="tech"&&o.providerUid!==req.user.uid)return res.status(403).json({ok:false,error:"Forbidden"});
-  o.status=next;o.updatedAt=now();await audit(o,"status_changed:"+next,req.user.uid);await persistOrder(o);emitOrder(o);res.json({ok:true,order:o})
-});
+app.patch("/api/orders/:id/status",requireAuth,requirePermission("orders.update"),async(req,res)=>{try{const o=orders.find(x=>x.orderId===Number(req.params.id));if(!o)return res.status(404).json({ok:false,error:"Order not found"});if(req.user.role==="client"&&o.clientUid!==req.user.uid)return res.status(403).json({ok:false,error:"Forbidden"});if(req.user.role==="tech"&&o.providerUid!==req.user.uid)return res.status(403).json({ok:false,error:"Forbidden"});const next=String(req.body?.status||"");if(!STATUS_FLOW.includes(next))return res.status(400).json({ok:false,error:"Invalid order status"});const updated=await transitionOrder(o,next,req.user);res.json({ok:true,order:updated})}catch(e){res.status(e.code===403?403:409).json({ok:false,error:e.message})}});
 
-app.post("/api/orders/:id/invoice",requireAuth,requireRole("tech","admin","owner"),async(req,res)=>{
-  const o=orders.find(x=>x.orderId===Number(req.params.id));if(!o)return res.status(404).json({ok:false,error:"Order not found"});if(req.user.role==="tech"&&o.providerUid!==req.user.uid)return res.status(403).json({ok:false,error:"Forbidden"});
-  if(!["in_progress","assigned_automatic","assigned_manual"].includes(o.status))return res.status(409).json({ok:false,error:"Order is not ready for invoicing"});
-  const labor=Math.max(0,Number(req.body?.labor)||0),parts=Math.max(0,Number(req.body?.parts)||0),discount=Math.max(0,Number(req.body?.discount)||0),total=Math.max(0,labor+parts-discount),rate=Math.min(100,Math.max(0,Number(process.env.PLATFORM_COMMISSION_RATE||15))),commission=Number((total*rate/100).toFixed(2));
-  o.pricing={labor,parts,discount,total,commission,providerNet:Number((total-commission).toFixed(2))};o.invoice={invoiceId:"INV-"+o.orderId+"-"+Date.now(),issuedAt:now(),status:"issued"};o.status="awaiting_payment";o.updatedAt=now();await audit(o,"invoice_issued",req.user.uid);await persistOrder(o);emitOrder(o);res.status(201).json({ok:true,order:o})
-});
-
-app.post("/api/orders/:id/payment",requireAuth,async(req,res)=>{
-  try{
-    const o=orders.find(x=>x.orderId===Number(req.params.id));if(!o)return res.status(404).json({ok:false,error:"Order not found"});
-    if(req.user.role==="client"&&o.clientUid!==req.user.uid)return res.status(403).json({ok:false,error:"Forbidden"});
-    if(!o.invoice)return res.status(400).json({ok:false,error:"Invoice not issued"});
-    if(o.status!=="awaiting_payment")return res.status(409).json({ok:false,error:"Order is not awaiting payment"});
-    const method=["online_mada_visa","stc_pay","wallet","cash"].includes(req.body?.method)?req.body.method:null;
-    if(!method)return res.status(400).json({ok:false,error:"Invalid payment method"});
-    if(method==="cash"&&!["tech","admin","owner"].includes(req.user.role))return res.status(403).json({ok:false,error:"Cash payment must be confirmed by staff"});
-    if(!dbEnabled)return res.status(409).json({ok:false,error:"Payment processing requires MySQL"});
-    const idempotencyKey=String(req.get("Idempotency-Key")||req.body?.idempotencyKey||"").trim();
-    if(!idempotencyKey||idempotencyKey.length>191)return res.status(400).json({ok:false,error:"A valid Idempotency-Key is required"});
-    const existing=await db.getPaymentByIdempotency(idempotencyKey);
-    if(existing){
-      if(existing.orderId!==o.orderId||existing.amount!==Number(o.pricing.total)||existing.method!==method)return res.status(409).json({ok:false,error:"Idempotency key was already used for a different payment"});
-      return res.json({ok:true,payment:existing,order:o,idempotent:true});
-    }
-    const provider=getPaymentProvider(),createdAt=now();
-    const created=await provider.createPayment({paymentId:"pending-"+crypto.randomBytes(8).toString("hex"),orderId:o.orderId,amount:Number(o.pricing.total),currency:"SAR",method});
-    const payment=await db.createPayment({orderId:o.orderId,clientUid:o.clientUid,amount:Number(o.pricing.total),currency:"SAR",method,provider:provider.name,status:created.status,externalReference:created.externalReference,idempotencyKey,providerMetadata:created.providerMetadata,createdAt,updatedAt:createdAt,paidAt:created.status==="paid"?createdAt:null});
-    o.payment={method,status:created.status,reference:created.externalReference||null,paymentId:payment.paymentId};o.updatedAt=now();
-    if(created.status==="paid"){o.invoice.status="paid";o.status="completed";await audit(o,"payment_completed:"+payment.paymentId,req.user.uid)}
-    else await audit(o,"payment_created:"+payment.paymentId,req.user.uid);
-    await persistOrder(o);emitOrder(o);
-    res.status(201).json({ok:true,payment,order:o});
-  }catch(e){
-    console.error("[Oxygen11] Payment error:",e);
-    res.status(502).json({ok:false,error:"Payment provider error"});
-  }
-});
-app.post("/api/payments/:id/webhook",async(req,res)=>{
-  try{
-    if(!dbEnabled)return res.status(409).json({ok:false,error:"Payment webhooks require MySQL"});
-    const raw=JSON.stringify(req.body||{}),signature=String(req.get("x-payment-signature")||"");
-    const provider=getPaymentProvider();if(!provider.verifyWebhook(raw,signature))return res.status(401).json({ok:false,error:"Invalid webhook signature"});
-    const paymentId=Number(req.params.id),payment=await db.getPayment(paymentId);if(!payment)return res.status(404).json({ok:false,error:"Payment not found"});
-    if(["paid","failed","cancelled","refunded"].includes(payment.status))return res.json({ok:true,payment,idempotent:true});
-    const result=await provider.handleWebhook(req.body||{}),nextStatus=["paid","failed","cancelled","refunded"].includes(result.status)?result.status:"pending";
-    const updated=await db.updatePayment(paymentId,{status:nextStatus,externalReference:result.externalReference||payment.externalReference,providerMetadata:result.providerMetadata||payment.providerMetadata,paidAt:nextStatus==="paid"?now():null,updatedAt:now()});
-    const o=orders.find(x=>x.orderId===payment.orderId)||await db.getOrder(payment.orderId);if(!o)return res.status(404).json({ok:false,error:"Order not found"});
-    o.payment={method:payment.method,status:updated.status,reference:updated.externalReference,paymentId:updated.paymentId};o.updatedAt=now();
-    if(nextStatus==="paid"&&o.status==="awaiting_payment"){o.invoice.status="paid";o.status="completed";await audit(o,"payment_completed_webhook:"+paymentId,"payment-provider")}
-    else if(["failed","cancelled","refunded"].includes(nextStatus))await audit(o,"payment_"+nextStatus+":"+paymentId,"payment-provider");
-    await persistOrder(o);emitOrder(o);res.json({ok:true,payment:updated,order:o});
-  }catch(e){console.error("[Oxygen11] Payment webhook error:",e);res.status(500).json({ok:false,error:"Webhook processing failed"})}
-});
-app.get("/api/audit/orders/:id",requireAuth,requireRole("admin","owner"),async(req,res)=>{const o=orders.find(x=>x.orderId===Number(req.params.id));if(!o)return res.status(404).json({ok:false,error:"Order not found"});res.json({ok:true,audit:dbEnabled?await db.getAudit(o.orderId):(o.audit||[])})});
-
-app.get("/",(req,res)=>{const host=(req.hostname||"").toLowerCase();res.sendFile(path.join(PUBLIC_DIR,hostPages[host]||"index.html"))});
-app.use(express.static(PUBLIC_DIR,{extensions:["html"]}));
-
-io.on("connection",socket=>{socket.emit("server_ready",{service:"oxygen11",timestamp:now()});socket.emit("init_orders",orders);socket.on("send_chat_message",(p={})=>io.emit("chat_message",{orderId:Number(p.orderId),sender:String(p.sender||"system"),text:String(p.text||"").slice(0,2000),timestamp:now()}))});
-app.use((err,_req,res,_next)=>{console.error("[Oxygen11] Request error:",err);res.status(500).json({ok:false,error:"Internal server error"})});
-
-(async()=>{try{await initPersistence();server.listen(PORT,"0.0.0.0",()=>console.log(`[Oxygen11] Server listening on port ${PORT}`))}catch(e){console.error("[Oxygen11] Startup failed:",e);process.exit(1)}})();
+app.post("/api/orders/:id/accept",requireAuth,requirePermission("orders.update"),async(req,res)=>{try{const o=orders.find(x=>x.orderId===Number(req.params.id));if(!o)return res.status(404).json({ok:false,error:"Order not found"});if(req.user.role!=="tech"||o.providerUid!==req.user.uid)return res.status(403).json({ok:false,error:"Only the assigned technician can accept"});const updated=await transitionOrder(o,"in_progress",req.user);await audit(updated,"technician_accepted",req.user.uid);res.json({ok:true,order:updated})}catch(e){res.status(e.code===403?403:409).json({ok:false,error:e.message})}});
+app.post("/api/orders/:id/reject",requireAuth,requirePermission("orders.update"),async(req,res)=>{try{const o=orders.find(x=>x.orderId===Number(req.params.id));if(!o)return res.status(404).json({ok:false,error:"Order not found"});if(req.user.role!=="tech"||o.providerUid!==req.user.uid)return res.status(403).json({ok:false,error:"Only the assigned technician can reject"});o.providerUid=null;o.providerName=null;o.dispatchType="automatic";o.status="pending_dispatch";o.updatedAt=now();await audit(o,"technician_rejected",req.user.uid);await persistOrder(o);await dispatchAutomatically(o);await persistOrder(o);emitOrder(o);res.json({ok:true,order:o})}catch(e){res.status(409).json({ok:false,error:e.message})}});
