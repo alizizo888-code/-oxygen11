@@ -112,7 +112,42 @@ function createSession(uid, role) {
 
 function sessionFromRequest(req) {
   const token = req.cookies?.oxygen_session || req.get("x-oxygen-session");
-  return token ? sessions[token] : null;
+  const session = token ? sessions[token] : null;
+  if (!session) return null;
+  const maxAge = 1000 * 60 * 60 * 12;
+  if (Date.now() - session.createdAt > maxAge) {
+    delete sessions[token];
+    saveSessions();
+    return null;
+  }
+  return session;
+}
+
+let dispatchCursor = 0;
+function dispatchAutomatically(order) {
+  const techs = csvSet(process.env.TECH_UIDS);
+  if (!techs.length) return false;
+  const providerUid = techs[dispatchCursor % techs.length];
+  dispatchCursor += 1;
+  order.providerUid = providerUid;
+  order.dispatchType = "automatic";
+  order.status = "assigned_automatic";
+  order.updatedAt = now();
+  audit(order, "automatic_dispatch:" + providerUid, "system");
+  return true;
+}
+
+function canTransition(from, to) {
+  const transitions = {
+    pending_dispatch: ["assigned_automatic", "assigned_manual", "cancelled"],
+    assigned_automatic: ["in_progress", "cancelled"],
+    assigned_manual: ["in_progress", "cancelled"],
+    in_progress: ["awaiting_payment", "cancelled"],
+    awaiting_payment: ["completed", "cancelled"],
+    completed: [],
+    cancelled: []
+  };
+  return (transitions[from] || []).includes(to);
 }
 
 function requireAuth(req, res, next) {
@@ -233,6 +268,7 @@ app.post("/api/orders", requireAuth, requireRole("client", "admin", "owner"), (r
   };
 
   audit(order, "order_created", req.user.uid);
+  dispatchAutomatically(order);
   orders.unshift(order);
   saveOrders();
   io.emit("order_created", order);
@@ -261,6 +297,9 @@ app.patch("/api/orders/:id/status", requireAuth, (req, res) => {
   const next = String(req.body?.status || "");
 
   if (!STATUS_FLOW.includes(next)) return res.status(400).json({ ok: false, error: "Invalid order status" });
+  if (!canTransition(order.status, next)) {
+    return res.status(409).json({ ok: false, error: "Invalid status transition", from: order.status, to: next });
+  }
   if (req.user.role === "client" && order.clientUid !== req.user.uid) return res.status(403).json({ ok: false, error: "Forbidden" });
   if (req.user.role === "tech" && order.providerUid !== req.user.uid) return res.status(403).json({ ok: false, error: "Forbidden" });
 
@@ -311,6 +350,12 @@ app.post("/api/orders/:id/payment", requireAuth, (req, res) => {
 
   const method = ["online_mada_visa", "stc_pay", "wallet", "cash"].includes(req.body?.method) ? req.body.method : null;
   if (!method) return res.status(400).json({ ok: false, error: "Invalid payment method" });
+  if (method === "cash" && !["tech", "admin", "owner"].includes(req.user.role)) {
+    return res.status(403).json({ ok: false, error: "Cash payment must be confirmed by the technician or staff" });
+  }
+  if (order.status !== "awaiting_payment") {
+    return res.status(409).json({ ok: false, error: "Order is not awaiting payment" });
+  }
 
   order.payment = {
     method,
@@ -332,12 +377,12 @@ app.get("/api/audit/orders/:id", requireAuth, requireRole("admin", "owner"), (re
   res.json({ ok: true, audit: order.audit || [] });
 });
 
-app.use(express.static(PUBLIC_DIR, { extensions: ["html"] }));
-
 app.get("/", (req, res) => {
   const hostname = (req.hostname || "").toLowerCase();
   res.sendFile(path.join(PUBLIC_DIR, hostPages[hostname] || "index.html"));
 });
+
+app.use(express.static(PUBLIC_DIR, { extensions: ["html"] }));
 
 io.on("connection", (socket) => {
   socket.emit("server_ready", { service: "oxygen11", timestamp: now() });
