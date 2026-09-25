@@ -19,7 +19,7 @@ const SESSIONS_FILE=path.join(DATA_DIR,"sessions.json");
 const hostPages={"oxygen11.com":"index.html","www.oxygen11.com":"index.html","admin.oxygen11.com":"admin.html","owner.oxygen11.com":"owner.html","client.oxygen11.com":"client.html","technician.oxygen11.com":"technician.html"};
 const STATUS_FLOW=["pending_dispatch","assigned_automatic","assigned_manual","in_progress","awaiting_payment","completed","cancelled"];
 const transitions={pending_dispatch:["assigned_automatic","assigned_manual","cancelled"],assigned_automatic:["in_progress","cancelled"],assigned_manual:["in_progress","cancelled"],in_progress:["awaiting_payment","cancelled"],awaiting_payment:["completed","cancelled"],completed:[],cancelled:[]};
-let dbEnabled=false,orders=[],sessions={},dispatchCursor=0;
+let dbEnabled=false,orders=[],sessions={},providers=[];
 
 function now(){return new Date().toISOString()}
 function csvSet(v){return String(v||"").split(",").map(x=>x.trim()).filter(Boolean)}
@@ -33,6 +33,7 @@ async function initPersistence(){
   dbEnabled=await db.initDb();
   if(dbEnabled){
     orders=await db.listOrders();
+    providers=await db.listProviders();
     const stored=await db.listSessions();
     sessions={};
     for(const s of stored) sessions[s.tokenHash]={uid:s.uid,role:s.role,createdAt:s.createdAt,expiresAt:s.expiresAt};
@@ -62,7 +63,10 @@ function sessionFromRequest(req){
   return {uid:s.uid,role:s.role}
 }
 function removeSession(token){const key=dbEnabled?sessionTokenHash(token):token;if(token)delete sessions[key];if(dbEnabled)void db.deleteSession(token);else writeJson(SESSIONS_FILE,sessions)}
-function dispatchAutomatically(o){const techs=csvSet(process.env.TECH_UIDS);if(!techs.length)return false;const uid=techs[dispatchCursor++%techs.length];o.providerUid=uid;o.dispatchType="automatic";o.status="assigned_automatic";o.updatedAt=now();return true}
+function parseCoords(location){const m=String(location||"").match(/(-?\\d+(?:\\.\\d+)?)[,\\s]+(-?\\d+(?:\\.\\d+)?)/);return m?{lat:Number(m[1]),lng:Number(m[2])}:null}
+function serviceMatches(p,category){const c=String(category||"").toLowerCase();return !p.serviceTypes.length||p.serviceTypes.some(x=>c.includes(String(x).toLowerCase())||String(x).toLowerCase().includes(c))}
+function distance(a,b){if(!a||b.latitude===null||b.longitude===null)return Number.POSITIVE_INFINITY;const R=6371,rad=Math.PI/180,dLat=(b.latitude-a.lat)*rad,dLon=(b.longitude-a.lng)*rad;const x=Math.sin(dLat/2)**2+Math.cos(a.lat*rad)*Math.cos(b.latitude*rad)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
+async function dispatchAutomatically(o){if(!dbEnabled)return false;providers=await db.listProviders();const coords=parseCoords(o.location);const candidates=providers.filter(p=>serviceMatches(p,o.serviceCategory));if(!candidates.length)return false;candidates.sort((a,b)=>{const da=distance(coords,a),dbb=distance(coords,b);if(da!==dbb)return da-dbb;return String(a.lastAssignedAt||"").localeCompare(String(b.lastAssignedAt||""))});const chosen=candidates[0];o.providerUid=chosen.uid;o.providerName=chosen.fullName;o.dispatchType="automatic";o.status="assigned_automatic";o.updatedAt=now();await db.markProviderAssigned(chosen.uid,o.updatedAt);return true}
 function requireAuth(req,res,next){const s=sessionFromRequest(req);if(!s)return res.status(401).json({ok:false,error:"Authentication required"});req.user=s;next()}
 function requireRole(...roles){return(req,res,next)=>{if(!req.user||!roles.includes(req.user.role))return res.status(403).json({ok:false,error:"Forbidden"});next()}}
 function canTransition(a,b){return(transitions[a]||[]).includes(b)}
@@ -90,6 +94,20 @@ app.post("/api/auth/session",async(req,res)=>{
 app.post("/api/auth/logout",(req,res)=>{removeSession(req.cookies?.oxygen_session);res.clearCookie("oxygen_session");res.json({ok:true})});
 app.get("/api/auth/me",requireAuth,(req,res)=>res.json({ok:true,user:req.user}));
 
+app.post("/api/providers",requireAuth,requireRole("admin","owner"),async(req,res)=>{
+  const p=req.body||{};if(!p.uid||!p.fullName)return res.status(400).json({ok:false,error:"uid and fullName are required"});
+  if(!dbEnabled)return res.status(409).json({ok:false,error:"Provider management requires MySQL"});
+  await db.upsertProvider({uid:String(p.uid),fullName:String(p.fullName),phone:p.phone?String(p.phone):null,serviceTypes:Array.isArray(p.serviceTypes)?p.serviceTypes.map(String):[],status:p.status==="suspended"?"suspended":"active",available:p.available!==false,latitude:p.latitude==null?null:Number(p.latitude),longitude:p.longitude==null?null:Number(p.longitude)});
+  providers=await db.listProviders();res.status(201).json({ok:true,providers});
+});
+app.get("/api/providers",requireAuth,requireRole("admin","owner"),async(_req,res)=>res.json({ok:true,providers:dbEnabled?await db.listProviders():[]}));
+app.patch("/api/providers/:uid/availability",requireAuth,requireRole("tech","admin","owner"),async(req,res)=>{
+  if(!dbEnabled)return res.status(409).json({ok:false,error:"Provider management requires MySQL"});
+  const uid=String(req.params.uid);if(req.user.role==="tech"&&req.user.uid!==uid)return res.status(403).json({ok:false,error:"Forbidden"});
+  const list=await db.listProviders(),p=list.find(x=>x.uid===uid);if(!p)return res.status(404).json({ok:false,error:"Provider not found"});
+  await db.upsertProvider({...p,available:req.body?.available!==false});providers=await db.listProviders();res.json({ok:true,provider:providers.find(x=>x.uid===uid)});
+});
+
 app.get("/api/orders",requireAuth,(req,res)=>{
   let visible=orders;if(req.user.role==="client")visible=orders.filter(o=>o.clientUid===req.user.uid);if(req.user.role==="tech")visible=orders.filter(o=>!o.providerUid||o.providerUid===req.user.uid);
   res.json({ok:true,orders:visible})
@@ -99,7 +117,7 @@ app.post("/api/orders",requireAuth,requireRole("client","admin","owner"),async(r
   const {clientName,phone,serviceCategory,priority,location,notes}=req.body||{};
   if(!clientName||!phone||!serviceCategory||!location)return res.status(400).json({ok:false,error:"clientName, phone, serviceCategory and location are required"});
   const order={orderId:dbEnabled?await db.nextOrderId():(orders.reduce((m,o)=>Math.max(m,Number(o.orderId)||1000),1000)+1),clientUid:req.user.uid,clientName:String(clientName).trim(),phone:String(phone).trim(),serviceCategory:String(serviceCategory).trim(),priority:["normal","high","critical"].includes(priority)?priority:"normal",location:String(location).trim(),notes:notes?String(notes).trim():"",status:"pending_dispatch",dispatchType:"automatic",providerUid:null,providerName:null,pricing:{labor:0,parts:0,discount:0,total:0,commission:0,providerNet:0},payment:{method:null,status:"pending",reference:null},invoice:null,audit:[],createdAt:now(),updatedAt:now()};
-  dispatchAutomatically(order);orders.unshift(order);await persistOrder(order);await audit(order,"order_created",req.user.uid);if(order.providerUid)await audit(order,"automatic_dispatch:"+order.providerUid,"system");io.emit("order_created",order);res.status(201).json({ok:true,order})
+  await dispatchAutomatically(order);orders.unshift(order);await persistOrder(order);await audit(order,"order_created",req.user.uid);if(order.providerUid)await audit(order,"automatic_dispatch:"+order.providerUid,"system");io.emit("order_created",order);res.status(201).json({ok:true,order})
 });
 
 app.post("/api/orders/:id/assign",requireAuth,requireRole("admin","owner"),async(req,res)=>{
