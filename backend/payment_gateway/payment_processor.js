@@ -10,7 +10,7 @@ class MockPaymentProvider{
     const secret=process.env.PAYMENT_WEBHOOK_SECRET;
     if(!secret)return false;
     const expected=crypto.createHmac("sha256",secret).update(payload).digest("hex");
-    return typeof signature==="string"&&crypto.timingSafeEqual(Buffer.from(expected),Buffer.from(signature));
+    return typeof signature==="string"&&signature.length===expected.length&&crypto.timingSafeEqual(Buffer.from(expected),Buffer.from(signature));
   }
   async handleWebhook(){return {status:"pending"};}
 }
