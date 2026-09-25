@@ -7,7 +7,7 @@ const cookieParser=require("cookie-parser");
 const {Server}=require("socket.io");
 const admin=require("firebase-admin");
 const db=require("./database/db");
-const {getPaymentProvider}=require("./backend/payment_gateway/payment_processor");\nconst {getPaymentProvider}=require("./backend/payment_gateway/payment_processor");
+const {getPaymentProvider}=require("./backend/payment_gateway/payment_processor");
 
 const app=express();
 const server=http.createServer(app);
