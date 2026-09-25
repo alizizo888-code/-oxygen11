@@ -11,12 +11,13 @@ const {getPaymentProvider}=require("./backend/payment_gateway/payment_processor"
 
 const app=express();
 const server=http.createServer(app);
-const io=new Server(server,{cors:{origin:true,credentials:true}});
+const io=new Server(server,{cors:{origin:(origin,callback)=>{if(!origin||allowedOrigins.has(origin))return callback(null,true);callback(new Error("Origin not allowed"))},credentials:true}});
 const PORT=Number(process.env.PORT||3000);
 const PUBLIC_DIR=path.join(__dirname,"public");
 const DATA_DIR=path.join(__dirname,"data");
 const ORDERS_FILE=path.join(DATA_DIR,"orders.json");
 const SESSIONS_FILE=path.join(DATA_DIR,"sessions.json");
+const allowedOrigins=new Set(["https://oxygen11.com","https://www.oxygen11.com","https://admin.oxygen11.com","https://owner.oxygen11.com","https://client.oxygen11.com","https://technician.oxygen11.com"]);
 const hostPages={"oxygen11.com":"index.html","www.oxygen11.com":"index.html","admin.oxygen11.com":"admin.html","owner.oxygen11.com":"owner.html","client.oxygen11.com":"client.html","technician.oxygen11.com":"technician.html"};
 const STATUS_FLOW=["pending_dispatch","assigned_automatic","assigned_manual","in_progress","awaiting_payment","completed","cancelled"];
 const transitions={pending_dispatch:["assigned_automatic","assigned_manual","cancelled"],assigned_automatic:["in_progress","cancelled"],assigned_manual:["in_progress","cancelled"],in_progress:["awaiting_payment","cancelled"],awaiting_payment:["completed","cancelled"],completed:[],cancelled:[]};
