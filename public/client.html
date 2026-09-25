@@ -45,36 +45,79 @@
     </form>
 
     <div id="result"></div>
+    <h2 style="margin-top:28px;">طلباتي</h2>
+    <div id="orders"></div>
   </div>
 
   <script>
     const form = document.getElementById("orderForm");
     const result = document.getElementById("result");
+    const ordersBox = document.getElementById("orders");
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       result.style.display = "block";
       result.textContent = "جاري إرسال الطلب...";
-
       const data = Object.fromEntries(new FormData(form).entries());
 
       try {
         const response = await fetch("/api/orders", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {"Content-Type": "application/json"},
           body: JSON.stringify(data)
         });
         const payload = await response.json();
-
         if (!response.ok) throw new Error(payload.error || "تعذر إنشاء الطلب");
-
-        result.textContent = `تم إنشاء الطلب رقم ${payload.order.orderId} وحالته: قيد التوزيع.`;
+        result.textContent = "تم إنشاء الطلب رقم " + payload.order.orderId + " وحالته: قيد التوزيع.";
         form.reset();
+        loadOrders();
       } catch (error) {
         result.textContent = error.message;
         result.style.background = "#fff0f0";
       }
     });
+
+    async function loadOrders() {
+      const response = await fetch("/api/orders");
+      const payload = await response.json();
+      if (!response.ok) {
+        ordersBox.innerHTML = '<p style="color:#b91c1c">يجب تسجيل الدخول من البوابة الرئيسية أولاً.</p>';
+        return;
+      }
+
+      ordersBox.innerHTML = (payload.orders || []).map(order => {
+        const payButton = order.status === "awaiting_payment"
+          ? '<button onclick="payOrder(' + order.orderId + ')" style="background:#059669;color:#fff;border:0;border-radius:8px;padding:9px 12px;">سداد الفاتورة</button>'
+          : '';
+        const total = order.pricing?.total || 0;
+        return '<div style="border:1px solid #ddd;border-radius:10px;padding:12px;margin:10px 0;background:#fff">' +
+          '<b>طلب #' + order.orderId + '</b><br>' +
+          'الخدمة: ' + escapeHtml(order.serviceCategory) + '<br>' +
+          'الحالة: <b>' + escapeHtml(order.status) + '</b><br>' +
+          (order.invoice ? 'الإجمالي: ' + total + ' ر.س<br>' : '') +
+          payButton + '</div>';
+      }).join("") || "<p>لا توجد طلبات.</p>";
+    }
+
+    async function payOrder(orderId) {
+      const method = prompt("طريقة السداد: online_mada_visa / stc_pay / wallet / cash", "online_mada_visa");
+      if (!method) return;
+      const response = await fetch("/api/orders/" + orderId + "/payment", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({method})
+      });
+      const payload = await response.json();
+      if (!response.ok) return alert(payload.error || "تعذر السداد");
+      alert("تم تسجيل السداد بنجاح.");
+      loadOrders();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+    }
+
+    loadOrders();
   </script>
 </body>
 </html>
