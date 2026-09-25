@@ -21,5 +21,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Validate server
-        run: npm run ci
+      - name: Validate server syntax and database module
+        run: npm run check
+
+      - name: Run test suite
+        run: npm test
