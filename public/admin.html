@@ -1,23 +1,2 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم الأدمن والتحكم السيادي - Oxygen11</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; text-align: center; }
-        .container { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #8e44ad; }
-        p { color: #555; }
-        .btn-lock { background-color: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 15px; }
-        .btn-lock:hover { background-color: #c0392b; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>لوحة تحكم الأدمن والتحكم السيادي</h1>
-        <p>مرحباً بك، هذه اللوحة مخصصة لإدارة العمليات والصلاحيات والتحكم الكامل بالمنصة.</p>
-        <button class="btn-lock">تفعيل زر القفل السيادي</button>
-    </div>
-</body>
-</html>
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Oxygen11 - الإدارة</title><style>body{font-family:Tahoma;background:#f4f7f6;margin:0;padding:20px}.wrap{max-width:1100px;margin:auto}.card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:16px;margin:10px 0}button,input{padding:9px;border-radius:8px;border:1px solid #ccc}button{cursor:pointer;background:#8e44ad;color:#fff;border:0}.danger{color:#b91c1c}</style></head><body><div class="wrap"><h1>لوحة الإدارة والتوزيع</h1><p id="me"></p><div id="orders">جاري التحميل...</div></div><script>
+async function load(){const me=await fetch('/api/auth/me');if(!me.ok)return document.getElementById('orders').innerHTML='<p class="danger">يجب تسجيل الدخول من البوابة الرئيسية.</p>';document.getElementById('me').textContent='الدور: '+(await me.json()).user.role;const r=await fetch('/api/orders');const d=await r.json();document.getElementById('orders').innerHTML=(d.orders||[]).map(o=>'<div class="card"><b>#'+o.orderId+'</b> — '+esc(o.serviceCategory)+'<br>العميل: '+esc(o.clientName)+'<br>الحالة: '+esc(o.status)+'<br><input id="uid-'+o.orderId+'" placeholder="UID الفني"><button onclick="assign('+o.orderId+')">إسناد للفني</button> <button onclick="audit('+o.orderId+')">سجل التدقيق</button></div>').join('')||'لا توجد طلبات.'}async function assign(id){const uid=document.getElementById('uid-'+id).value.trim();if(!uid)return alert('أدخل UID الفني');const r=await fetch('/api/orders/'+id+'/assign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({providerUid:uid,dispatchType:'manual'})});const d=await r.json();alert(r.ok?'تم الإسناد':'خطأ: '+d.error);load()}async function audit(id){const r=await fetch('/api/audit/orders/'+id);const d=await r.json();alert((d.audit||[]).map(x=>x.at+' — '+x.action).join('\n')||'لا يوجد سجل')}function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}load();</script></body></html>
