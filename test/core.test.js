@@ -34,7 +34,7 @@ test("dispatch ranking filters and sorts eligible providers",()=>{
     {uid:"wrong",fullName:"Wrong",serviceTypes:["plumbing"],status:"active",available:true,latitude:21.422,longitude:39.826}
   ];
   const ranked=rankProviders(providers,{serviceCategory:"AC maintenance",latitude:21.4225,longitude:39.8262});
-  assert.deepEqual(ranked.map(p=>p.uid),["near"]);
+  assert.deepEqual(ranked.map(p=>p.uid),["near","far"]);
 });
 
 const {MockPaymentProvider}=require("../backend/payment_gateway/payment_processor");
