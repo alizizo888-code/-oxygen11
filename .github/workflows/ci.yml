@@ -25,15 +25,7 @@ jobs:
         run: npm run check
 
       - name: Run core tests
-        run: |
-          set +e
-          node --test test/core.test.js 2>&1 | tee /tmp/core-test.log
-          rc=$?
-          echo "CORE_TEST_RC=$rc"
-          if [ "$rc" -ne 0 ]; then
-            gh pr comment 1 --repo "$GITHUB_REPOSITORY" --body-file /tmp/core-test.log || true
-          fi
-          exit "$rc"
+        run: node --test test/core.test.js
 
       - name: Run security tests
         run: node --test test/security.test.js
