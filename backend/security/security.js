@@ -54,7 +54,7 @@ function validateOrderInput(body){
 }
 
 function sameOriginGuard(req,res,next){
-  if(process.env.NODE_ENV!=="production"||SAFE_METHODS.has(req.method)||!API_MUTATION_METHODS.has(req.method)||req.path==="/api/payments/webhook")return next();
+  if(process.env.NODE_ENV!=="production"||SAFE_METHODS.has(req.method)||!API_MUTATION_METHODS.has(req.method)||(req.path.startsWith("/api/payments/")&&req.path.endsWith("/webhook")))return next();
   const fetchSite=req.get("sec-fetch-site");
   if(fetchSite==="cross-site")return res.status(403).json({ok:false,error:"Cross-site request blocked"});
   const origin=req.get("origin");
