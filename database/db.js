@@ -25,7 +25,14 @@ async function upsertProvider(p){await db().execute("INSERT INTO oxygen_provider
 async function markProviderAssigned(uid,at){await db().execute("UPDATE oxygen_providers SET last_assigned_at=?,updated_at=? WHERE uid=?",[new Date(at),new Date(at),uid])}
 async function listOrders(){const[r]=await db().execute("SELECT * FROM oxygen_orders ORDER BY created_at DESC");return r.map(row)}
 async function getOrder(id){const[r]=await db().execute("SELECT * FROM oxygen_orders WHERE order_id=?",[id]);return r[0]?row(r[0]):null}
-async function nextOrderId(){const[r]=await db().execute("SELECT COALESCE(MAX(order_id),1000)+1 nextId FROM oxygen_orders");return Number(r[0].nextId)}
+async function nextOrderId(){
+  const [lock]=await db().execute("SELECT GET_LOCK('oxygen11_order_id',10) locked");
+  if(Number(lock[0].locked)!==1)throw new Error("Could not acquire order id lock");
+  try{
+    const [r]=await db().execute("SELECT COALESCE(MAX(order_id),1000)+1 nextId FROM oxygen_orders");
+    return Number(r[0].nextId);
+  }finally{await db().execute("SELECT RELEASE_LOCK('oxygen11_order_id')")}
+}
 async function saveOrder(o){await db().execute(`INSERT INTO oxygen_orders(order_id,client_uid,client_name,phone,service_category,priority,location,notes,status,dispatch_type,provider_uid,provider_name,labor,parts,discount,total,commission,provider_net,payment_method,payment_status,payment_reference,invoice_id,invoice_status,invoice_issued_at,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE client_uid=VALUES(client_uid),client_name=VALUES(client_name),phone=VALUES(phone),service_category=VALUES(service_category),priority=VALUES(priority),location=VALUES(location),notes=VALUES(notes),status=VALUES(status),dispatch_type=VALUES(dispatch_type),provider_uid=VALUES(provider_uid),provider_name=VALUES(provider_name),labor=VALUES(labor),parts=VALUES(parts),discount=VALUES(discount),total=VALUES(total),commission=VALUES(commission),provider_net=VALUES(provider_net),payment_method=VALUES(payment_method),payment_status=VALUES(payment_status),payment_reference=VALUES(payment_reference),invoice_id=VALUES(invoice_id),invoice_status=VALUES(invoice_status),invoice_issued_at=VALUES(invoice_issued_at),updated_at=VALUES(updated_at)`,[o.orderId,o.clientUid,o.clientName,o.phone,o.serviceCategory,o.priority,o.location,o.notes,o.status,o.dispatchType,o.providerUid,o.providerName,o.pricing.labor,o.pricing.parts,o.pricing.discount,o.pricing.total,o.pricing.commission,o.pricing.providerNet,o.payment.method,o.payment.status,o.payment.reference,o.invoice?.invoiceId||null,o.invoice?.status||null,o.invoice?.issuedAt?new Date(o.invoice.issuedAt):null,new Date(o.createdAt),new Date(o.updatedAt)])}
 async function addAudit(id,action,actor,at){await db().execute("INSERT INTO oxygen_order_audit(order_id,action,actor,created_at) VALUES(?,?,?,?)",[id,action,actor,new Date(at)])}
 async function getAudit(id){const[r]=await db().execute("SELECT action,actor,created_at at FROM oxygen_order_audit WHERE order_id=? ORDER BY id",[id]);return r.map(x=>({action:x.action,actor:x.actor,at:new Date(x.at).toISOString()}))}
