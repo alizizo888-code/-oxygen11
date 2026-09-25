@@ -1,69 +1,71 @@
-# 🚀 Oxygen11
+# Oxygen11 / مُتقن
 
-## مرحباً بك في مشروع Oxygen11
+منصة خدمات الصيانة والمقاولات مع بوابات منفصلة للعميل والفني والإدارة والمالك.
 
-هذا مشروع ويب بسيط يعمل على Hostinger مع ربط مباشر من GitHub.
+## التشغيل
 
-### ✨ الميزات
-
-- ✅ موقع ويب ديناميكي باستخدام Express.js
-- ✅ تحديثات تلقائية من GitHub
-- ✅ واجهة مستخدم جميلة وسهلة
-- ✅ يعمل على Hostinger بدون مشاكل
-
-### 📁 هيكل المشروع
-
-```
-oxygen11/
-├── public/
-│   ├── index.html      # الصفحة الرئيسية
-│   ├── style.css       # التنسيقات
-│   └── script.js       # الوظائف
-├── server.js           # الخادم الرئيسي
-├── package.json        # المكتبات المطلوبة
-└── .gitignore          # الملفات المستثناة
-```
-
-### 🔧 كيفية التثبيت والتشغيل
-
-#### محلياً:
 ```bash
-git clone https://github.com/alizizo888-code/-oxygen11.git
-cd -oxygen11
 npm install
 npm start
 ```
 
-ثم افتح: `http://localhost:3000`
+فحص JavaScript:
 
-### 📤 كيفية التحديث
-
-1. عدّل الملفات في Codespaces أو محلياً
-2. احفظ التغييرات
-3. ارفع لـ GitHub:
 ```bash
-git add .
-git commit -m "وصف التحديث"
-git push origin main
+npm run check
 ```
-4. Hostinger سينشّط التحديث تلقائياً! ✨
 
-### 🌐 الموقع المباشر
+فحص الصحة بعد التشغيل:
+
+```
+GET /health
+```
+
+## البوابات
+
+- `oxygen11.com` → البوابة الرئيسية
+- `client.oxygen11.com` → العميل
+- `technician.oxygen11.com` → الفني
+- `admin.oxygen11.com` → الإدارة
+- `owner.oxygen11.com` → المالك
+
+يتم توجيه النطاقات من خلال `server.js`، ولا توجد حاجة لملفات HTML داخل مجلدات تحمل امتداد `.html`.
+
+## البنية الحالية
+
+- `public/` واجهات الويب والـ assets
+- `backend/dispatch_engine/` توزيع الطلبات
+- `backend/payment_gateway/` حسابات الدفع والعمولات
+- `communications/chat_sockets/` طبقة الاتصال اللحظي
+- `database/` مخططات قاعدة البيانات
+- `motqan-*.js` محركات النظام الحالية
+
+## ملاحظة أمنية
+
+Firebase OTP مسؤول عن التحقق من هوية المستخدم في الواجهة الحالية. صلاحيات الإنتاج يجب أن تُفرض لاحقاً على الخادم/قاعدة البيانات، وليس بواسطة JavaScript في المتصفح وحده. لا تضع مفاتيح سرية أو كلمات مرور في ملفات `public/`.
 
 
-### 📋 المتطلبات
+## دورة التشغيل الحالية
 
-- Node.js 22.x أو أعلى
-- npm
+1. Firebase Phone OTP
+2. إنشاء جلسة خادم موثقة
+3. إنشاء طلب صيانة
+4. توزيع تلقائي على الفنيين عند ضبط `TECH_UIDS`
+5. إسناد يدوي من الإدارة عند الحاجة
+6. تنفيذ الفني وتحديث الحالة
+7. إصدار الفاتورة وحساب العمولة
+8. تسجيل السداد
+9. إغلاق الطلب
+10. Audit Log وSocket.IO للتحديثات الفورية
 
-### 📝 الرخصة
+### إعداد الإنتاج
 
-MIT License
+ضع القيم في متغيرات البيئة على الخادم فقط:
 
-### 👨‍💻 المطور
+- `FIREBASE_SERVICE_ACCOUNT_JSON` أو `GOOGLE_APPLICATION_CREDENTIALS`
+- `OWNER_UIDS`
+- `ADMIN_UIDS`
+- `TECH_UIDS`
+- `PLATFORM_COMMISSION_RATE`
 
-alizizo888-code
-
----
-
-**استمتع بمشروعك! 🎉**
+لا تضع مفاتيح Firebase Admin أو بيانات الدفع السرية داخل ملفات الواجهة أو Git.

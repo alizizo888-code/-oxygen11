@@ -243,23 +243,36 @@
       btn.disabled = true; btn.innerText = "جاري التحقق...";
 
       window.confirmationResult.confirm(code)
-        .then((result) => {
+        .then(async (result) => {
           const user = result.user;
-          const role = document.getElementById('selected-role').value;
-          
-          MUCS_Hooks.executeAfter('login_success', { user, role });
+          MUCS_Hooks.executeAfter('login_success', { user });
 
-          const userData = { phone: user.phoneNumber, role: role, uid: user.uid };
-          const token = encodeURIComponent(btoa(JSON.stringify(userData)));
-          
-          const targetDomain = role === 'tech' ? 'https://technician.oxygen11.com' : 'https://client.oxygen11.com';
-          showToast("نجاح! جاري التوجيه...");
-          setTimeout(() => window.location.replace(`${targetDomain}/?auth_token=${token}`), 1000);
+          const idToken = await user.getIdToken(true);
+          const response = await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken })
+          });
+          const session = await response.json();
+          if (!response.ok) throw new Error(session.error || 'تعذر إنشاء جلسة آمنة');
+
+          const targetDomain = session.role === 'tech'
+            ? 'https://technician.oxygen11.com'
+            : session.role === 'admin'
+              ? 'https://admin.oxygen11.com'
+              : session.role === 'owner'
+                ? 'https://owner.oxygen11.com'
+                : 'https://client.oxygen11.com';
+
+          showToast("تم الدخول الآمن ✓");
+          setTimeout(() => window.location.replace(targetDomain + '/'), 700);
 
         }).catch((error) => {
-          showToast("الكود المدخل غير صحيح", true);
+          console.error(error);
+          showToast(error.message || "فشل تسجيل الدخول", true);
           btn.disabled = false; btn.innerText = "تأكيد الدخول";
         });
+
     }
 
     function resetAuth() {
