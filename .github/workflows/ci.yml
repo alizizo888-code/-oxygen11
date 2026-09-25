@@ -24,5 +24,8 @@ jobs:
       - name: Validate server syntax and database module
         run: npm run check
 
-      - name: Run test suite
-        run: npm test
+      - name: Run core tests
+        run: node --test test/core.test.js
+
+      - name: Run security tests
+        run: node --test test/security.test.js
