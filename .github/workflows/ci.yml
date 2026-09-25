@@ -29,5 +29,13 @@ jobs:
           set -o pipefail
           node --test test/core.test.js 2>&1 | tee /tmp/core-test.log
 
+      - name: Report core test diagnostics
+        if: ${{ failure() }}
+        run: |
+          gh pr comment 1 --repo "$GITHUB_REPOSITORY" --body-file /tmp/core-test.log || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run security tests
+        if: ${{ success() }}
         run: node --test test/security.test.js
