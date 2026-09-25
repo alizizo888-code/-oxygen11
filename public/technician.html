@@ -106,128 +106,140 @@
     let activeTasks = [];
     let currentHandlingOrderId = null;
 
+    async function loadOrders() {
+      const response = await fetch('/api/orders');
+      if (response.status === 401) {
+        document.getElementById('tech-orders-container').innerHTML =
+          '<p style="text-align:center;padding:20px;color:#b91c1c;">يجب تسجيل الدخول من البوابة الرئيسية أولاً.</p>';
+        return;
+      }
+      const payload = await response.json();
+      activeTasks = payload.orders || [];
+      if (isOnDuty) renderCurrentTask();
+    }
+
     function toggleDuty() {
-        isOnDuty = !isOnDuty;
-        const btn = document.getElementById('btn-shift-toggle');
-        if(isOnDuty) {
-            btn.classList.add('active');
-            btn.innerHTML = '<i class="fas fa-satellite-dish"></i> أنت الآن متصل ونشط لاستقبال الطلبات';
-            renderCurrentTask();
-        } else {
-            btn.classList.remove('active');
-            btn.innerHTML = '<i class="fas fa-radar"></i> ابدأ استقبال الطلبات الميدانية';
-            document.getElementById('tech-orders-container').innerHTML = '<p style="text-align:center; color:#64748b; padding:20px;">تم إيقاف الوردية واستقبال الطلبات</p>';
-        }
+      isOnDuty = !isOnDuty;
+      const btn = document.getElementById('btn-shift-toggle');
+      if (isOnDuty) {
+        btn.classList.add('active');
+        btn.innerHTML = '<i class="fas fa-satellite-dish"></i> أنت الآن متصل ونشط لاستقبال الطلبات';
+        loadOrders();
+      } else {
+        btn.classList.remove('active');
+        btn.innerHTML = '<i class="fas fa-radar"></i> ابدأ استقبال الطلبات الميدانية';
+        document.getElementById('tech-orders-container').innerHTML =
+          '<p style="text-align:center;color:#64748b;padding:20px;">تم إيقاف الوردية واستقبال الطلبات</p>';
+      }
     }
 
     socket.on('init_orders', (orders) => {
-        activeTasks = orders;
-        if(isOnDuty) renderCurrentTask();
+      activeTasks = orders || [];
+      if (isOnDuty) renderCurrentTask();
     });
 
     socket.on('order_created', (order) => {
-        activeTasks.unshift(order);
-        if(isOnDuty) {
-            alert(`⚡ طلب عاجل وارد من العميل: ${order.service}`);
-            renderCurrentTask();
-        }
+      activeTasks.unshift(order);
+      if (isOnDuty) renderCurrentTask();
     });
 
     socket.on('order_updated', (order) => {
-        const idx = activeTasks.findIndex(o => o.id === order.id);
-        if(idx !== -1) activeTasks[idx] = order;
-        if(isOnDuty) renderCurrentTask();
+      const idx = activeTasks.findIndex(o => o.orderId === order.orderId);
+      if (idx === -1) activeTasks.unshift(order);
+      else activeTasks[idx] = order;
+      if (isOnDuty) renderCurrentTask();
     });
 
     function renderCurrentTask() {
-        const container = document.getElementById('tech-orders-container');
-        const active = activeTasks.find(t => !t.status.includes('مغلق'));
+      const container = document.getElementById('tech-orders-container');
+      const active = activeTasks.find(t => !['completed','cancelled'].includes(t.status));
 
-        if(!active) {
-            container.innerHTML = `<p style="text-align:center; color:#64748b; padding:20px;">لا توجد طلبات جارية بمحيطك حالياً</p>`;
-            return;
-        }
+      if (!active) {
+        container.innerHTML = '<p style="text-align:center;color:#64748b;padding:20px;">لا توجد طلبات جارية حالياً</p>';
+        return;
+      }
 
-        currentHandlingOrderId = active.id;
-        container.innerHTML = `
-            <div class="active-task-card">
-                <div class="task-header">
-                    <div>
-                        <span style="font-size:0.75rem; color:#64748b;">رقم المهمة:</span>
-                        <strong style="color:var(--tech-blue)">#${active.id}</strong>
-                    </div>
-                    <span style="background:#e0f2fe; color:#0369a1; padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:800;">الحالة: ${active.status}</span>
-                </div>
-                <div style="font-size:0.9rem; font-weight:900; margin-bottom:4px;">العميل: ${active.clientName}</div>
-                <div style="font-size:0.8rem; color:#475569;"><i class="fas fa-map-pin"></i> ${active.address}</div>
-                <div style="font-size:0.85rem; color:var(--tech-dark); font-weight:800; margin-top:6px;">الخدمة: ${active.service}</div>
-
-                <div class="action-circle-group">
-                    <div class="circle-action" onclick="openMapNavigation('${active.address}')">
-                        <div class="circle-icon" style="background:#1e293b;"><i class="fas fa-location-arrow"></i></div>
-                        <span style="font-size:0.75rem; font-weight:800;">الموقع</span>
-                    </div>
-                    <div class="circle-action" onclick="postponeTask('${active.id}')">
-                        <div class="circle-icon" style="background:#475569;"><i class="fas fa-flag"></i></div>
-                        <span style="font-size:0.75rem; font-weight:800;">تأجيل</span>
-                    </div>
-                    <div class="circle-action" onclick="quickNotifyClient('${active.id}')">
-                        <div class="circle-icon" style="background:#0d9488;"><i class="fas fa-comment-dots"></i></div>
-                        <span style="font-size:0.75rem; font-weight:800;">إشعار وصول</span>
-                    </div>
-                </div>
-
-                <button class="btn-finish-work" onclick="openFinishDialog()">
-                    <i class="fas fa-check-circle"></i> تم إنجاز العمل الميداني
-                </button>
+      currentHandlingOrderId = active.orderId;
+      const mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(active.location || '');
+      container.innerHTML = `
+        <div class="active-task-card">
+          <div class="task-header">
+            <div><span style="font-size:.75rem;color:#64748b;">رقم المهمة:</span>
+              <strong style="color:var(--tech-blue)">#${active.orderId}</strong></div>
+            <span style="background:#e0f2fe;color:#0369a1;padding:4px 8px;border-radius:8px;font-size:.75rem;font-weight:800;">
+              ${active.status}
+            </span>
+          </div>
+          <div style="font-size:.9rem;font-weight:900;margin-bottom:4px;">العميل: ${escapeHtml(active.clientName)}</div>
+          <div style="font-size:.8rem;color:#475569;"><i class="fas fa-map-pin"></i> ${escapeHtml(active.location)}</div>
+          <div style="font-size:.85rem;color:var(--tech-dark);font-weight:800;margin-top:6px;">الخدمة: ${escapeHtml(active.serviceCategory)}</div>
+          <div class="action-circle-group">
+            <a class="circle-action" href="${mapUrl}" target="_blank">
+              <div class="circle-icon" style="background:#1e293b;"><i class="fas fa-location-arrow"></i></div>
+              <span style="font-size:.75rem;font-weight:800;">الموقع</span>
+            </a>
+            <div class="circle-action" onclick="changeStatus('in_progress')">
+              <div class="circle-icon" style="background:#0284c7;"><i class="fas fa-play"></i></div>
+              <span style="font-size:.75rem;font-weight:800;">بدء العمل</span>
             </div>
-        `;
+            <div class="circle-action" onclick="quickNotifyClient()">
+              <div class="circle-icon" style="background:#0d9488;"><i class="fas fa-comment-dots"></i></div>
+              <span style="font-size:.75rem;font-weight:800;">إشعار</span>
+            </div>
+          </div>
+          <button class="btn-finish-work" onclick="openFinishDialog()">
+            <i class="fas fa-file-invoice"></i> إنهاء العمل وإصدار الفاتورة
+          </button>
+        </div>`;
     }
 
-    function openMapNavigation(address) {
-        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank');
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
     }
 
-    function postponeTask(orderId) {
-        const reason = prompt("حدد سبب تأجيل المهمة:", "انتظار قطع الغيار المعتمدة");
-        if(reason) {
-            socket.emit('tech_update_task', {
-                orderId: orderId,
-                status: `مؤجل: ${reason}`
-            });
-            alert("تم إشعار الإدارة والعميل بتأجيل الطلب.");
-        }
+    async function changeStatus(status) {
+      if (!currentHandlingOrderId) return;
+      const response = await fetch('/api/orders/' + currentHandlingOrderId + '/status', {
+        method: 'PATCH',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({status})
+      });
+      const payload = await response.json();
+      if (!response.ok) return alert(payload.error || 'تعذر تحديث الحالة');
+      alert('تم تحديث حالة الطلب.');
     }
 
-    function quickNotifyClient(orderId) {
-        socket.emit('send_chat_message', {
-            orderId: orderId,
-            sender: 'الفني',
-            text: 'أنا متواجد الآن أمام المبنى.'
-        });
-        alert("تم إرسال إشعار الوصول إلى شاشة العميل مباشرة.");
+    function quickNotifyClient() {
+      socket.emit('send_chat_message', {
+        orderId: currentHandlingOrderId,
+        sender: 'الفني',
+        text: 'الفني متواجد في الموقع الآن.'
+      });
+      alert('تم إرسال إشعار الوصول.');
     }
 
     function openFinishDialog() {
-        document.getElementById('finish-modal').style.display = 'flex';
+      document.getElementById('finish-modal').style.display = 'flex';
     }
 
-    function finalizeOrderToClient() {
-        const labor = parseFloat(document.getElementById('finish-labor-fee').value) || 0;
-        const parts = parseFloat(document.getElementById('finish-parts-cost').value) || 0;
-        const total = labor + parts;
+    async function finalizeOrderToClient() {
+      if (!currentHandlingOrderId) return;
+      const labor = parseFloat(document.getElementById('finish-labor-fee').value) || 0;
+      const parts = parseFloat(document.getElementById('finish-parts-cost').value) || 0;
 
-        socket.emit('tech_update_task', {
-            orderId: currentHandlingOrderId,
-            status: "تم الإنجاز / بإنتظار سداد العميل",
-            laborFee: labor,
-            partsFee: parts,
-            totalPrice: total
-        });
+      const response = await fetch('/api/orders/' + currentHandlingOrderId + '/invoice', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({labor, parts})
+      });
+      const payload = await response.json();
+      if (!response.ok) return alert(payload.error || 'تعذر إصدار الفاتورة');
 
-        alert(`تم رفع الفاتورة الميدانية بإجمالي ${total} ر.س.`);
-        document.getElementById('finish-modal').style.display = 'none';
+      alert('تم إصدار الفاتورة رقم ' + payload.order.invoice.invoiceId + ' بإجمالي ' + payload.order.pricing.total + ' ر.س.');
+      document.getElementById('finish-modal').style.display = 'none';
     }
+
+    loadOrders();
 </script>
 </body>
 </html>
