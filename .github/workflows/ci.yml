@@ -25,7 +25,9 @@ jobs:
         run: npm run check
 
       - name: Run core tests
-        run: node --test test/core.test.js
+        run: |
+          set -o pipefail
+          node --test test/core.test.js 2>&1 | tee /tmp/core-test.log
 
       - name: Run security tests
         run: node --test test/security.test.js
