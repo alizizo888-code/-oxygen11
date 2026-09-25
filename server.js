@@ -8,6 +8,7 @@ const {Server}=require("socket.io");
 const admin=require("firebase-admin");
 const db=require("./database/db");
 const {getPaymentProvider}=require("./backend/payment_gateway/payment_processor");
+const ROLE_PERMISSIONS={owner:["*"],admin:["orders.read","orders.create","orders.assign","orders.update","providers.read","providers.write","registry.read","registry.write","audit.read","payments.read"],tech:["orders.read","orders.update","providers.read","payments.confirm"],client:["orders.read","orders.create","payments.create"]};
 
 const app=express();
 const PORT=Number(process.env.PORT||3000);
@@ -80,7 +81,9 @@ async function requireAuth(req,res,next){
   try{const s=await sessionFromRequest(req);if(!s)return res.status(401).json({ok:false,error:"Authentication required"});req.user=s;next()}
   catch(e){console.error("[Oxygen11] Session lookup error:",e);res.status(500).json({ok:false,error:"Authentication service unavailable"})}
 }
+function hasPermission(role,permission){const p=ROLE_PERMISSIONS[role]||[];return p.includes("*")||p.includes(permission)}
 function requireRole(...roles){return(req,res,next)=>{if(!req.user||!roles.includes(req.user.role))return res.status(403).json({ok:false,error:"Forbidden"});next()}}
+function requirePermission(permission){return(req,res,next)=>{if(!req.user||!hasPermission(req.user.role,permission))return res.status(403).json({ok:false,error:"Permission denied"});next()}}
 function canTransition(a,b){return(transitions[a]||[]).includes(b)}
 function emitOrder(o){io.emit("order_updated",o)}
 async function verifyFirebaseToken(token){if(!admin.apps.length)throw new Error("Firebase Admin is not configured on the server");return admin.auth().verifyIdToken(token)}
@@ -107,13 +110,13 @@ app.post("/api/auth/session",async(req,res)=>{
 app.post("/api/auth/logout",async(req,res)=>{await removeSession(req.cookies?.oxygen_session);res.clearCookie("oxygen_session");res.json({ok:true})});
 app.get("/api/auth/me",requireAuth,(req,res)=>res.json({ok:true,user:req.user}));
 
-app.post("/api/providers",requireAuth,requireRole("admin","owner"),async(req,res)=>{
+app.post("/api/providers",requireAuth,requirePermission("providers.write"),async(req,res)=>{
   const p=req.body||{};if(!p.uid||!p.fullName)return res.status(400).json({ok:false,error:"uid and fullName are required"});
   if(!dbEnabled)return res.status(409).json({ok:false,error:"Provider management requires MySQL"});
   await db.upsertProvider({uid:String(p.uid),fullName:String(p.fullName),phone:p.phone?String(p.phone):null,serviceTypes:Array.isArray(p.serviceTypes)?p.serviceTypes.map(String):[],status:p.status==="suspended"?"suspended":"active",available:p.available!==false,latitude:p.latitude==null?null:Number(p.latitude),longitude:p.longitude==null?null:Number(p.longitude)});
   providers=await db.listProviders();res.status(201).json({ok:true,providers});
 });
-app.get("/api/providers",requireAuth,requireRole("admin","owner"),async(_req,res)=>res.json({ok:true,providers:dbEnabled?await db.listProviders():[]}));
+app.get("/api/providers",requireAuth,requirePermission("providers.read"),async(_req,res)=>res.json({ok:true,providers:dbEnabled?await db.listProviders():[]}));
 app.patch("/api/providers/:uid/availability",requireAuth,requireRole("tech","admin","owner"),async(req,res)=>{
   if(!dbEnabled)return res.status(409).json({ok:false,error:"Provider management requires MySQL"});
   const uid=String(req.params.uid);if(req.user.role==="tech"&&req.user.uid!==uid)return res.status(403).json({ok:false,error:"Forbidden"});
@@ -121,18 +124,18 @@ app.patch("/api/providers/:uid/availability",requireAuth,requireRole("tech","adm
   await db.upsertProvider({...p,available:req.body?.available!==false});providers=await db.listProviders();res.json({ok:true,provider:providers.find(x=>x.uid===uid)});
 });
 
-app.get("/api/registry/units",requireAuth,requireRole("admin","owner"),async(req,res)=>{if(!dbEnabled)return res.status(409).json({ok:false,error:"Registry requires MySQL"});res.json({ok:true,units:await db.listUnits({type:req.query.type,status:req.query.status})})});
-app.post("/api/registry/units",requireAuth,requireRole("admin","owner"),async(req,res)=>{try{if(!dbEnabled)return res.status(409).json({ok:false,error:"Registry requires MySQL"});const b=req.body||{},nowAt=now();if(!b.unitId||!b.unitType||!b.unitKey||!b.displayName)return res.status(400).json({ok:false,error:"unitId, unitType, unitKey and displayName are required"});const unit=await db.createUnit({...b,unitId:String(b.unitId),unitType:String(b.unitType),unitKey:String(b.unitKey),displayName:String(b.displayName),ownerUid:b.ownerUid||req.user.uid,createdAt:nowAt,updatedAt:nowAt});await db.addAudit(1000,"registry_unit_created:"+unit.unitId,req.user.uid,Date.now()).catch(()=>{});res.status(201).json({ok:true,unit})}catch(e){res.status(409).json({ok:false,error:e.message})}});
-app.get("/api/registry/units/:id",requireAuth,requireRole("admin","owner"),async(req,res)=>{if(!dbEnabled)return res.status(409).json({ok:false,error:"Registry requires MySQL"});const unit=await db.getUnit(String(req.params.id));if(!unit)return res.status(404).json({ok:false,error:"Unit not found"});res.json({ok:true,unit,versions:await db.listUnitVersions(unit.unitId)})});
-app.patch("/api/registry/units/:id",requireAuth,requireRole("admin","owner"),async(req,res)=>{try{if(!dbEnabled)return res.status(409).json({ok:false,error:"Registry requires MySQL"});const allowed=["unitType","unitKey","displayName","status","ownerUid","permissions","conditions","design","linking","timing","scriptRef","texts","data","notifications"];const patch={};for(const k of allowed)if(req.body&&Object.prototype.hasOwnProperty.call(req.body,k))patch[k]=req.body[k];const unit=await db.updateUnit(String(req.params.id),patch,req.user.uid,String(req.body?.changeSummary||"registry_update"));res.json({ok:true,unit})}catch(e){res.status(400).json({ok:false,error:e.message})}});
-app.get("/api/registry/units/:id/versions",requireAuth,requireRole("admin","owner"),async(req,res)=>{if(!dbEnabled)return res.status(409).json({ok:false,error:"Registry requires MySQL"});res.json({ok:true,versions:await db.listUnitVersions(String(req.params.id))})});
+app.get("/api/registry/units",requireAuth,requirePermission("registry.read"),async(req,res)=>{if(!dbEnabled)return res.status(409).json({ok:false,error:"Registry requires MySQL"});res.json({ok:true,units:await db.listUnits({type:req.query.type,status:req.query.status})})});
+app.post("/api/registry/units",requireAuth,requirePermission("registry.write"),async(req,res)=>{try{if(!dbEnabled)return res.status(409).json({ok:false,error:"Registry requires MySQL"});const b=req.body||{},nowAt=now();if(!b.unitId||!b.unitType||!b.unitKey||!b.displayName)return res.status(400).json({ok:false,error:"unitId, unitType, unitKey and displayName are required"});const unit=await db.createUnit({...b,unitId:String(b.unitId),unitType:String(b.unitType),unitKey:String(b.unitKey),displayName:String(b.displayName),ownerUid:b.ownerUid||req.user.uid,createdAt:nowAt,updatedAt:nowAt});await db.addAudit(1000,"registry_unit_created:"+unit.unitId,req.user.uid,Date.now()).catch(()=>{});res.status(201).json({ok:true,unit})}catch(e){res.status(409).json({ok:false,error:e.message})}});
+app.get("/api/registry/units/:id",requireAuth,requirePermission("registry.read"),async(req,res)=>{if(!dbEnabled)return res.status(409).json({ok:false,error:"Registry requires MySQL"});const unit=await db.getUnit(String(req.params.id));if(!unit)return res.status(404).json({ok:false,error:"Unit not found"});res.json({ok:true,unit,versions:await db.listUnitVersions(unit.unitId)})});
+app.patch("/api/registry/units/:id",requireAuth,requirePermission("registry.write"),async(req,res)=>{try{if(!dbEnabled)return res.status(409).json({ok:false,error:"Registry requires MySQL"});const allowed=["unitType","unitKey","displayName","status","ownerUid","permissions","conditions","design","linking","timing","scriptRef","texts","data","notifications"];const patch={};for(const k of allowed)if(req.body&&Object.prototype.hasOwnProperty.call(req.body,k))patch[k]=req.body[k];const unit=await db.updateUnit(String(req.params.id),patch,req.user.uid,String(req.body?.changeSummary||"registry_update"));res.json({ok:true,unit})}catch(e){res.status(400).json({ok:false,error:e.message})}});
+app.get("/api/registry/units/:id/versions",requireAuth,requirePermission("registry.read"),async(req,res)=>{if(!dbEnabled)return res.status(409).json({ok:false,error:"Registry requires MySQL"});res.json({ok:true,versions:await db.listUnitVersions(String(req.params.id))})});
 
-app.get("/api/orders",requireAuth,(req,res)=>{
+app.get("/api/orders",requireAuth,requirePermission("orders.read"),(req,res)=>{
   let visible=orders;if(req.user.role==="client")visible=orders.filter(o=>o.clientUid===req.user.uid);if(req.user.role==="tech")visible=orders.filter(o=>!o.providerUid||o.providerUid===req.user.uid);
   res.json({ok:true,orders:visible})
 });
 
-app.post("/api/orders",requireAuth,requireRole("client","admin","owner"),async(req,res)=>{
+app.post("/api/orders",requireAuth,requirePermission("orders.create"),async(req,res)=>{
   const {clientName,phone,serviceCategory,priority,location,notes}=req.body||{};
   if(!clientName||!phone||!serviceCategory||!location)return res.status(400).json({ok:false,error:"clientName, phone, serviceCategory and location are required"});
   const order={orderId:dbEnabled?await db.nextOrderId():(orders.reduce((m,o)=>Math.max(m,Number(o.orderId)||1000),1000)+1),clientUid:req.user.uid,clientName:String(clientName).trim(),phone:String(phone).trim(),serviceCategory:String(serviceCategory).trim(),priority:["normal","high","critical"].includes(priority)?priority:"normal",location:String(location).trim(),notes:notes?String(notes).trim():"",status:"pending_dispatch",dispatchType:"automatic",providerUid:null,providerName:null,pricing:{labor:0,parts:0,discount:0,total:0,commission:0,providerNet:0},payment:{method:null,status:"pending",reference:null},invoice:null,audit:[],createdAt:now(),updatedAt:now()};
