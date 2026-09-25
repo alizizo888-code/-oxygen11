@@ -31,6 +31,7 @@ function writeJson(file,value){fs.mkdirSync(DATA_DIR,{recursive:true});const tmp
 async function persistOrder(o){if(dbEnabled)await db.saveOrder(o);else writeJson(ORDERS_FILE,orders)}
 async function persistAudit(o,action,actor){if(dbEnabled)await db.addAudit(o.orderId,action,actor,Date.now());}
 async function audit(o,action,actor){o.audit=o.audit||[];o.audit.push({action,actor,at:now()});await persistAudit(o,action,actor)}
+async function seedRegistry(){if(!dbEnabled)return;const existing=await db.listUnits();if(existing.length)return;const base=[["page","home","الرئيسية"],["page","admin","لوحة الإدارة"],["page","owner","لوحة المالك"],["page","client","بوابة العميل"],["page","technician","بوابة الفني"],["workflow","maintenance-order","طلب صيانة"],["feature","automatic-dispatch","التوزيع التلقائي"],["feature","payments","الدفع الإلكتروني"],["feature","audit","سجل التدقيق"]];for(const [unitType,unitKey,displayName] of base){const at=now();try{await db.createUnit({unitId:"unit-"+unitKey,unitType,unitKey,displayName,status:"active",version:1,ownerUid:null,permissions:{roles:["owner","admin"]},conditions:{},design:{},linking:{},timing:{},scriptRef:null,texts:{ar:displayName},data:{},notifications:{},createdAt:at,updatedAt:at})}catch(e){console.warn("[Oxygen11] Registry seed skipped:",unitKey,e.message)}}}
 async function initPersistence(){
   dbEnabled=await db.initDb();
   if(dbEnabled){
@@ -39,6 +40,7 @@ async function initPersistence(){
     const stored=await db.listSessions();
     sessions={};
     for(const s of stored) sessions[s.tokenHash]={uid:s.uid,role:s.role,createdAt:s.createdAt,expiresAt:s.expiresAt};
+    await seedRegistry();
     console.log("[Oxygen11] MySQL persistence enabled");
   }else{
     if(process.env.NODE_ENV==="production"&&!String(process.env.ALLOW_JSON_FALLBACK||"").toLowerCase().includes("true"))throw new Error("Production database is not configured");
