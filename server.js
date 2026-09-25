@@ -86,6 +86,7 @@ function initFirebase(){if(admin.apps.length)return true;try{if(process.env.FIRE
 initFirebase();
 
 app.disable("x-powered-by");
+app.use((req,res,next)=>{if(process.env.NODE_ENV!=="production")return next();const origin=req.get("origin");if(origin&&!allowedOrigins.has(origin))return res.status(403).json({ok:false,error:"Origin not allowed"});next()});
 app.use(express.json({limit:"2mb"}));
 app.use(express.urlencoded({extended:true,limit:"2mb"}));
 app.use(cookieParser());
