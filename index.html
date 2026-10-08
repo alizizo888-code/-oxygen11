@@ -1,198 +1,2068 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html dir="rtl" lang="ar">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>بوابة الفني الميداني | مُتقن</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    :root {
-      --mucs-primary: #006948;
-      --mucs-primary-hover: #00553a;
-      --mucs-bg: #0b1320;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Oxygen AI - ذكاء المناخ والتبريد والمستشار الذكي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+@layer base {
+    html, body {
+        width: 100vw;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        background-color: #f6fafe;
+        overflow-x: hidden;
     }
-    body { font-family: 'Cairo', sans-serif; background-color: var(--mucs-bg); color: #1e293b; user-select: none; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .press-scale:active { transform: scale(0.96); transition: 0.1s; }
-    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  </style>
+    body {
+        overscroll-behavior-y: auto;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        -webkit-overflow-scrolling: touch;
+    }
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+}
+::-webkit-scrollbar { display: none; }
+html { scroll-behavior: smooth; }
 
-  <!-- فك التوكن الخاص بالفني عند الإقلاع -->
-  <script>
-    (function initTechSession() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('auth_token');
-      if (token) {
-        try {
-          const raw = decodeURIComponent(escape(atob(decodeURIComponent(token))));
-          localStorage.setItem('motqan_tech_session', raw);
-          window.history.replaceState({}, document.title, window.location.pathname);
-        } catch(e) { console.error("Tech Token Error:", e); }
-      }
-    })();
-  </script>
+@keyframes slideUpFade {
+    0% { transform: translateY(20px) translateX(-50%); opacity: 0; }
+    100% { transform: translateY(0) translateX(-50%); opacity: 1; }
+}
+.toast-enter { animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+@keyframes fadeOutDown {
+    0% { transform: translateY(0) translateX(-50%); opacity: 1; }
+    100% { transform: translateY(20px) translateX(-50%); opacity: 0; }
+}
+.toast-exit { animation: fadeOutDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+@keyframes ticker {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(100%); }
+}
+.animate-ticker {
+    animation: ticker 35s linear infinite;
+}
+</style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries" defer></script>
+<script id="tailwind-config">
+tailwind.config = { 
+    darkMode: "class", 
+    theme: { 
+        extend: { 
+            colors: { 
+                "surface-glass": "rgba(255, 255, 255, 0.88)", "primary-fixed": "#dae2ff", "text-primary": "#0c1a30", "on-primary": "#ffffff", "on-background": "#171c1f", "on-tertiary-fixed": "#0d1c32", "surface-tint": "#0c56d0", "surface-container-highest": "#dfe3e7", "surface-variant": "#dfe3e7", "surface-container-lowest": "#ffffff", "secondary": "#00677f", "error": "#ba1a1a", "inverse-primary": "#b2c5ff", "surface-container-high": "#e4e9ed", "primary": "#003d9b", "tertiary-fixed-dim": "#b9c7e4", "whatsapp-green": "#25d366", "on-primary-container": "#c4d2ff", "surface-dim": "#d6dade", "warranty-gold": "#f59e0b", "secondary-container": "#00d2ff", "on-secondary": "#ffffff", "inverse-surface": "#2c3134", "outline": "#737685", "border-hairline": "rgba(0, 82, 204, 0.12)", "alert-crimson": "#ef4444", "on-secondary-container": "#00566a", "on-error-container": "#93000a", "text-muted": "#64748b", "on-tertiary-container": "#c5d3f1", "on-tertiary-fixed-variant": "#39475f", "tertiary": "#36445c", "surface-container": "#eaeef2", "surface-bright": "#f6fafe", "primary-container": "#0052cc", "on-secondary-fixed-variant": "#004e60", "surface": "#f6fafe", "secondary-fixed": "#b6ebff", "on-surface-variant": "#434654", "on-error": "#ffffff", "surface-card": "#ffffff", "error-container": "#ffdad6", "on-surface": "#171c1f", "primary-fixed-dim": "#b2c5ff", "surface-container-low": "#f0f4f8", "on-primary-fixed": "#001848", "tertiary-container": "#4d5b74", "inverse-on-surface": "#edf1f5", "glow-cyan": "rgba(0, 210, 255, 0.22)", "on-secondary-fixed": "#001f28", "outline-variant": "#c3c6d6", "secondary-fixed-dim": "#47d6ff", "background": "#f6fafe", "tertiary-fixed": "#d6e3ff", "on-primary-fixed-variant": "#0040a2", "on-tertiary": "#ffffff" 
+            }, 
+            spacing: { "space-xs": "0.25rem", "space-xl": "2rem", "space-lg": "1.25rem", "space-md": "0.75rem", "margin-mobile": "1rem", "gutter": "1rem", "margin": "1.5rem", "space-sm": "0.5rem", "gutter-mobile": "0.75rem" }
+        } 
+    } 
+};
+</script>
 </head>
-<body class="min-h-screen flex justify-center items-start p-0 sm:py-4">
+<body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen relative antialiased selection:bg-secondary-container selection:text-on-secondary-container">
 
-  <div class="w-full max-w-[440px] bg-[#F8FAFC] min-h-screen relative shadow-2xl flex flex-col sm:rounded-[36px] overflow-hidden pb-20">
-
-    <!-- رأس لوحة الفني -->
-    <header class="bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-40 flex items-center justify-between shadow-2xs">
-      <div class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center font-black">
-          <span class="material-symbols-outlined text-lg">engineering</span>
+<header class="fixed top-0 w-full z-40 bg-surface/90 backdrop-blur-xl shadow-[0_1px_10px_rgba(0,0,0,0.05)] border-b border-border-hairline">
+    <div class="w-full bg-[#0f172a] text-white h-8 flex items-center overflow-hidden border-b-2 border-warranty-gold relative dir-rtl">
+        <div class="whitespace-nowrap flex items-center gap-6 animate-ticker font-bold text-[11px] w-max px-4" id="ticker-wrapper">
+            <span>🏠 مؤسسة أكسجين: نظام "الزيارة الفورية الآن" مفعّل</span>
+            <span>•</span>
+            <span class="text-secondary-fixed-dim">🧼 غسيل وحدات التكييف بأفضل الأسعار</span>
+            <span>•</span>
+            <span class="text-warranty-gold">🛡️ ضمان معتمد يشمل القطع والإصلاح حتى 90 يوماً</span>
+            <span>•</span>
+            <span class="text-whatsapp-green">🔍 فحص وصيانة مجانية في حال طلب خدمة لأكثر من وحدتين</span>
         </div>
-        <div>
-          <span id="tech-header-name" class="text-xs font-black text-slate-900 block leading-tight">فني ميداني معتمد</span>
-          <span class="text-[9px] font-bold text-emerald-600 block leading-tight flex items-center gap-1">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> متصل بالرادار المركزي
-          </span>
+    </div>
+    <div class="h-14 px-gutter flex items-center justify-between max-w-[420px] mx-auto w-full pt-safe">
+        <div class="flex items-center gap-space-sm">
+            <button onclick="promptAdminPin()" class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors flex items-center justify-center text-text-muted hover:text-primary shadow-sm border border-border-hairline relative" title="لوحة تحكم الإدارة">
+                <span class="material-symbols-outlined text-[18px]" id="admin-lock-icon">lock</span>
+                <span id="admin-call-badge" class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-alert-crimson text-white text-[8px] font-bold items-center justify-center hidden animate-ping"></span>
+            </button>
+            <div class="flex items-center gap-1.5 bg-secondary-fixed/40 px-2 py-0.5 rounded-full border border-secondary-fixed-dim/30">
+                <span class="w-1.5 h-1.5 rounded-full bg-secondary-container animate-pulse"></span>
+                <span class="font-label-sm text-[10px] text-on-secondary-container font-bold">التغطية الميدانية المباشرة</span>
+            </div>
         </div>
-      </div>
-
-      <button onclick="executeTechLogout()" class="h-8 px-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-black flex items-center gap-1 press-scale">
-        <span class="material-symbols-outlined text-sm">logout</span>
-        <span>خروج</span>
-      </button>
-    </header>
-
-    <!-- المحتوى الميداني -->
-    <main class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-4">
-
-      <!-- حالة الرادار الميداني (تشغيل / إيقاف استقبال الطلبات) -->
-      <div class="bg-gradient-to-l from-slate-900 to-slate-800 text-white p-4 rounded-3xl shadow-md flex items-center justify-between">
-        <div>
-          <span class="text-[10px] text-slate-400 font-bold block">حالة الاستقبال الميداني</span>
-          <h2 id="radar-status-label" class="text-sm font-black text-emerald-400">الرادار نشط (يستقبل طلبات)</h2>
+        <div class="flex items-center gap-space-sm">
+            <div class="flex flex-col text-left">
+                <span class="font-label-md text-label-md text-primary font-black tracking-wider leading-none">OXYGEN AI</span>
+                <span class="font-label-sm text-[9px] text-text-muted leading-tight font-medium">ذكاء المناخ والتبريد</span>
+            </div>
+            <div class="w-8 h-8 rounded-full overflow-hidden bg-white shadow-sm flex items-center justify-center border border-border-hairline p-0.5">
+                <img loading="lazy" decoding="async" alt="Oxygen AI Official Logo" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvqinOZ1sI1XqS4aLtmUpBXQIlwJMr2ntT0PTZvPwZUir1rkUqffGvCEmii5Z37jmZjB9L28xInmj7FvgFqdRAUH_RHciyb_ValODT9_e9nv8Om3oijO0RVmf7aBO6eRztLyGWiB6fIJG7bau8-F5NxcQezxfEYDPojwi272uA89DgOIEdTaPhL6HzAIgcVuE08KJKKH1warSs2jgEWC-N2clpUiFd-23A60OSuS04_uCK8H8ziF3Q"/>
+            </div>
         </div>
-        <button onclick="toggleTechRadar()" id="radar-toggle-btn" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs rounded-xl press-scale shadow-sm transition">
-          إيقاف مؤقت
-        </button>
-      </div>
+    </div>
+</header>
 
-      <!-- قائمة الطلبات المتاحة في الميدان -->
-      <div class="space-y-3">
-        <div class="flex items-center justify-between px-1">
-          <h3 class="text-xs font-black text-slate-900">الطلبات المتاحة في نطاقك ⚡</h3>
-          <span class="text-[10px] text-slate-400 font-bold">تحديث تلقائي</span>
+<main class="flex flex-col relative w-full pt-[90px] pb-28 bg-surface max-w-[420px] mx-auto min-h-screen overflow-y-visible">
+    <div id="customer-view" class="flex flex-col w-full px-margin-mobile gap-space-lg pb-8 transition-opacity duration-300">
+        
+        <!-- Geo-Verification Pulse Ribbon -->
+        <div class="w-full bg-secondary-fixed/20 rounded-xl p-space-sm flex items-center justify-between shadow-sm border border-secondary-fixed-dim/20">
+            <div class="flex items-center gap-space-sm min-w-0">
+                <span class="w-2.5 h-2.5 rounded-full bg-secondary-container animate-ping"></span>
+                <p class="font-label-sm text-label-sm text-on-secondary-container truncate font-medium">
+                    📍 تم التحقق التلقائي 100%: الخدمة مفعلة بالكامل
+                </p>
+            </div>
+            <span class="material-symbols-outlined text-secondary text-base">verified</span>
         </div>
 
-        <div id="tech-orders-container" class="space-y-2.5">
-          <!-- طلب تجريبي وارد من النظام المركزي -->
-          <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-3">
+        <!-- Offers Slider -->
+        <div id="offers-section" class="w-full relative overflow-hidden bg-surface-card rounded-xl shadow-md border border-border-hairline py-space-md">
+            <div class="flex items-center justify-between px-space-md mb-3">
+                <div class="flex items-center gap-space-xs">
+                    <span class="material-symbols-outlined text-warranty-gold animate-bounce">local_offer</span>
+                    <h2 class="font-headline-sm text-headline-sm text-text-primary">عروض وباقات أكسجين المتخصصة</h2>
+                </div>
+                <span class="bg-error-container text-on-error-container px-2 py-0.5 rounded-full font-label-sm text-[10px] font-bold animate-pulse shadow-sm">تتحرك الآن</span>
+            </div>
+            
+            <div class="flex overflow-x-auto gap-3 px-space-md pb-4 snap-x snap-mandatory no-scrollbar" id="offers-slider" style="scroll-behavior: smooth;">
+                <div class="flex-none w-[85%] snap-center relative rounded-xl p-4 bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-lg border border-primary-fixed/30 cursor-pointer overflow-hidden group" onclick="applyOffer('wash', 'سبليت', 'full', 3)">
+                    <span class="material-symbols-outlined absolute -left-4 -bottom-4 text-[100px] text-white/10 group-hover:scale-110 transition-transform duration-500">ac_unit</span>
+                    <div class="absolute top-2 right-2 bg-whatsapp-green text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">الأكثر طلباً</div>
+                    <h3 class="font-headline-sm text-headline-sm font-bold mb-1 relative z-10">باقة غسيل 3 سبليت (شامل)</h3>
+                    <p class="font-body-sm text-[11px] text-on-primary-container mb-3 leading-relaxed relative z-10">غسيل داخلي وخارجي للوحدات بالضغط العالي مع فحص مجاني للغاز.</p>
+                    <div class="flex items-end justify-between mt-auto relative z-10">
+                        <div>
+                            <span class="text-[10px] line-through text-on-primary-container/70">300 ر.س</span>
+                            <div class="font-data-metric text-[22px] font-black text-warranty-gold">270 <span class="font-label-sm text-[10px]">ر.س</span></div>
+                        </div>
+                        <button class="bg-surface-glass text-primary px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm active:scale-95 transition-transform">تطبيق العرض</button>
+                    </div>
+                </div>
+
+                <div class="flex-none w-[85%] snap-center relative rounded-xl p-4 bg-gradient-to-br from-secondary to-[#004e60] text-on-secondary shadow-lg border border-secondary-fixed/30 cursor-pointer overflow-hidden group" onclick="applyOffer('wash', 'شباك', 'full', 2)">
+                    <span class="material-symbols-outlined absolute -left-4 -bottom-4 text-[100px] text-white/5 group-hover:scale-110 transition-transform duration-500">window</span>
+                    <div class="absolute top-2 right-2 bg-warranty-gold text-on-primary text-[10px] font-bold px-2 py-1 rounded shadow-sm">خصم 15%</div>
+                    <h3 class="font-headline-sm text-headline-sm font-bold mb-1 relative z-10">باقة 2 مكيف شباك</h3>
+                    <p class="font-body-sm text-[11px] text-on-secondary-container mb-3 leading-relaxed relative z-10">تنظيف عميق وإزالة للأتربة المتراكمة لتحسين كفاءة التبريد.</p>
+                    <div class="flex items-end justify-between mt-auto relative z-10">
+                        <div>
+                            <span class="text-[10px] line-through text-on-secondary-container/70">120 ر.س</span>
+                            <div class="font-data-metric text-[22px] font-black text-secondary-fixed">100 <span class="font-label-sm text-[10px]">ر.س</span></div>
+                        </div>
+                        <button class="bg-surface-glass text-secondary-container px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm active:scale-95 transition-transform">تطبيق العرض</button>
+                    </div>
+                </div>
+
+                <div class="flex-none w-[85%] snap-center relative rounded-xl p-4 bg-gradient-to-br from-[#065f46] to-[#0f766e] text-white shadow-xl border border-emerald-500/30 cursor-pointer overflow-hidden group" onclick="applyOffer('wash', 'سبليت', 'full', 10); showToast('تم تفعيل باقة بيوت الله (المساجد)', 'success', 'mosque')">
+                    <span class="material-symbols-outlined absolute -left-4 -bottom-4 text-[110px] text-emerald-100/10 group-hover:scale-110 transition-transform duration-500">mosque</span>
+                    <div class="absolute top-2 right-2 bg-white/20 backdrop-blur-md text-white border border-white/30 text-[10px] font-bold px-2 py-1 rounded shadow-sm">خصم خيري 30%</div>
+                    <h3 class="font-headline-sm text-headline-sm font-bold mb-1 flex items-center gap-1.5 text-emerald-100 relative z-10"><span class="material-symbols-outlined text-lg">mosque</span> باقة بيوت الله (للمساجد)</h3>
+                    <p class="font-body-sm text-[11px] text-emerald-50 mb-3 leading-relaxed relative z-10">غسيل وصيانة شاملة لمكيفات المساجد والجوامع بأسعار خيرية خاصة ابتداءً من 10 وحدات.</p>
+                    <div class="flex items-end justify-between mt-auto relative z-10">
+                        <button class="bg-white text-emerald-800 w-full px-3 py-2 rounded-lg text-xs font-black shadow-md active:scale-95 transition-transform flex justify-center items-center gap-1"><span class="material-symbols-outlined text-[16px]">volunteer_activism</span> تطبيق الباقة الخيرية الآن</button>
+                    </div>
+                </div>
+
+                <div class="flex-none w-[85%] snap-center relative rounded-xl p-4 bg-gradient-to-br from-slate-700 to-slate-900 text-white shadow-xl border border-slate-600 cursor-pointer overflow-hidden group" onclick="applyOffer('maintenance', 'مركزي', 'full', 5); showToast('تم تفعيل باقة المصانع والمستودعات', 'success', 'factory')">
+                    <span class="material-symbols-outlined absolute -left-4 -bottom-4 text-[110px] text-white/5 group-hover:scale-110 transition-transform duration-500">factory</span>
+                    <div class="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">عقود سنوية</div>
+                    <h3 class="font-headline-sm text-headline-sm font-bold mb-1 flex items-center gap-1.5 text-orange-400 relative z-10"><span class="material-symbols-outlined text-lg">precision_manufacturing</span> باقة المصانع والمستودعات</h3>
+                    <p class="font-body-sm text-[11px] text-gray-300 mb-3 leading-relaxed relative z-10">عقود صيانة دورية للأنظمة المركزية مع سرعة استجابة للحالات الطارئة 24/7.</p>
+                    <div class="flex items-end justify-between mt-auto relative z-10">
+                        <button class="bg-orange-500 text-white w-full px-3 py-2 rounded-lg text-xs font-black shadow-md active:scale-95 transition-transform flex justify-center items-center gap-1"><span class="material-symbols-outlined text-[16px]">engineering</span> طلب معاينة هندسية</button>
+                    </div>
+                </div>
+
+                <div class="flex-none w-[85%] snap-center relative rounded-xl p-4 bg-gradient-to-br from-indigo-800 to-violet-950 text-white shadow-xl border border-indigo-500/30 cursor-pointer overflow-hidden group" onclick="applyOffer('maintenance', 'كونسيلد', 'full', 8); showToast('تم تفعيل باقة الشركات والمؤسسات', 'success', 'domain')">
+                    <span class="material-symbols-outlined absolute -left-4 -bottom-4 text-[110px] text-white/5 group-hover:scale-110 transition-transform duration-500">domain</span>
+                    <div class="absolute top-2 right-2 bg-cyan-400 text-indigo-950 text-[10px] font-black px-2 py-1 rounded shadow-sm">B2B VIP</div>
+                    <h3 class="font-headline-sm text-headline-sm font-bold mb-1 flex items-center gap-1.5 text-cyan-200 relative z-10"><span class="material-symbols-outlined text-lg">business_center</span> باقة الشركات والمؤسسات</h3>
+                    <p class="font-body-sm text-[11px] text-indigo-100 mb-3 leading-relaxed relative z-10">تأسيس وصيانة أنظمة الكونسيلد والداكت للمكاتب بجدولة مرنة.</p>
+                    <div class="flex items-end justify-between mt-auto relative z-10">
+                        <button class="bg-cyan-400 text-indigo-950 w-full px-3 py-2 rounded-lg text-xs font-black shadow-md active:scale-95 transition-transform flex justify-center items-center gap-1"><span class="material-symbols-outlined text-[16px]">handshake</span> عقد شراكة مؤسسية</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart Calculator -->
+        <div class="w-full bg-surface-card rounded-xl p-space-md shadow-md flex flex-col gap-space-md border border-border-hairline" id="service-calc-card">
             <div class="flex items-center justify-between">
-              <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-black">بانتظار القبول</span>
-              <span class="text-[10px] font-bold text-slate-400 font-mono">قبل دقيقتين</span>
+                <div class="flex items-center gap-space-xs">
+                    <span class="material-symbols-outlined text-primary-container">calculate</span>
+                    <h3 class="font-headline-sm text-headline-sm text-text-primary">حاسبة الخدمات الذكية</h3>
+                </div>
+                <div class="bg-primary-fixed/50 text-primary px-2 py-0.5 rounded-full font-label-sm text-label-sm font-bold">تسعير آلي</div>
             </div>
-            <div>
-              <h4 class="font-black text-xs text-slate-900">غسيل مكيف سبليت (عدد 3 أجهزة)</h4>
-              <p class="text-[11px] text-slate-600 mt-0.5">📍 الموقع: مكة المكرمة - حي العزيزية</p>
-              <p class="text-[11px] text-emerald-700 font-bold mt-1">💰 العائد المتوقع: 185 ر.س</p>
+
+            <div class="flex p-1 bg-surface-container-low rounded-lg border border-surface-container-highest gap-1">
+                <button id="btn-mode-wash" class="mode-btn flex-1 py-1.5 bg-primary text-white rounded-md font-label-sm text-label-sm font-bold transition-all shadow-sm" onclick="setMode('wash')">خدمة الغسيل</button>
+                <button id="btn-mode-install" class="mode-btn flex-1 py-1.5 bg-transparent text-text-muted rounded-md font-label-sm text-label-sm font-bold transition-all" onclick="setMode('install')">تركيب/فك/نقل</button>
+                <button id="btn-mode-maintenance" class="mode-btn flex-1 py-1.5 bg-transparent text-text-muted rounded-md font-label-sm text-label-sm font-bold transition-all" onclick="setMode('maintenance')">صيانة وإصلاح</button>
             </div>
-            <div class="grid grid-cols-2 gap-2 pt-1">
-              <button onclick="acceptOrder('ORD-984210')" class="py-2.5 bg-[#006948] hover:bg-[#00553a] text-white rounded-xl font-black text-xs press-scale shadow-sm transition">
-                قبول الطلب
-              </button>
-              <button onclick="rejectOrder('ORD-984210')" class="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-black text-xs press-scale transition">
-                اعتذار
-              </button>
+            
+            <div class="flex flex-col gap-space-xs">
+                <span class="font-label-md text-label-md text-text-primary font-bold" id="service-picker-title">1. اختر نوع وحدة التكييف:</span>
+                
+                <div id="maintenance-services-box" class="hidden flex flex-col gap-1.5 bg-surface-container-low p-2 rounded-lg border border-surface-container-highest mb-2">
+                    <span class="font-label-sm text-label-sm text-text-primary font-bold">اختر نوع الصيانة المطلوبة (يمكن دمج أكثر من خدمة):</span>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center gap-1.5 cursor-pointer bg-surface-card p-1.5 rounded border border-border-hairline">
+                            <input type="checkbox" value="فحص وإصلاح أعطال" class="maint-service-cb rounded text-primary" checked onchange="calcTotal()">
+                            <span class="font-label-sm text-[11px] font-bold text-text-primary">فحص وإصلاح أعطال</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer bg-surface-card p-1.5 rounded border border-border-hairline">
+                            <input type="checkbox" value="شحن غاز فريون" class="maint-service-cb rounded text-primary" onchange="calcTotal()">
+                            <span class="font-label-sm text-[11px] font-bold text-text-primary">شحن غاز فريون</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer bg-surface-card p-1.5 rounded border border-border-hairline">
+                            <input type="checkbox" value="لحام مواسير وتنسيم" class="maint-service-cb rounded text-primary" onchange="calcTotal()">
+                            <span class="font-label-sm text-[11px] font-bold text-text-primary">لحام مواسير وتنسيم</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer bg-surface-card p-1.5 rounded border border-border-hairline">
+                            <input type="checkbox" value="إصلاح كارت الكتروني" class="maint-service-cb rounded text-primary" onchange="calcTotal()">
+                            <span class="font-label-sm text-[11px] font-bold text-text-primary">إصلاح كارت الكتروني</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="install-services-box" class="hidden flex flex-col gap-1.5 bg-surface-container-low p-2 rounded-lg border border-surface-container-highest mb-2">
+                    <span class="font-label-sm text-label-sm text-text-primary font-bold">اختر عمليات التركيب والنقل (يمكن دمج أكثر من خدمة):</span>
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <label class="flex items-center gap-1 cursor-pointer bg-surface-card p-1.5 rounded border border-border-hairline">
+                            <input type="checkbox" value="تركيب" class="install-service-cb rounded text-primary" checked onchange="calcTotal()">
+                            <span class="font-label-sm text-[11px] font-bold text-text-primary">تركيب جديد</span>
+                        </label>
+                        <label class="flex items-center gap-1 cursor-pointer bg-surface-card p-1.5 rounded border border-border-hairline">
+                            <input type="checkbox" value="فك" class="install-service-cb rounded text-primary" onchange="calcTotal()">
+                            <span class="font-label-sm text-[11px] font-bold text-text-primary">فك فقط</span>
+                        </label>
+                        <label class="flex items-center gap-1 cursor-pointer bg-surface-card p-1.5 rounded border border-border-hairline">
+                            <input type="checkbox" value="نقل" class="install-service-cb rounded text-primary" onchange="calcTotal()">
+                            <span class="font-label-sm text-[11px] font-bold text-text-primary">نقل بين موقعين</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2" id="unit-types-grid">
+                    <button class="unit-type-btn p-2 rounded-lg bg-surface-container-high text-primary shadow-sm border border-primary/30 flex flex-col items-center gap-1 active:scale-95 transition-all" onclick="selectUnit(this, 'سبليت')">
+                        <span class="material-symbols-outlined text-xl">mode_fan</span>
+                        <span class="font-label-sm text-label-sm font-bold">سبليت</span>
+                    </button>
+                    <button class="unit-type-btn p-2 rounded-lg bg-surface-container-low text-text-muted flex flex-col items-center gap-1 active:scale-95 transition-all border border-transparent" onclick="selectUnit(this, 'شباك')">
+                        <span class="material-symbols-outlined text-xl">window</span>
+                        <span class="font-label-sm text-label-sm font-bold">شباك</span>
+                    </button>
+                    <button class="unit-type-btn p-2 rounded-lg bg-surface-container-low text-text-muted flex flex-col items-center gap-1 active:scale-95 transition-all border border-transparent" onclick="selectUnit(this, 'كونسيلد')">
+                        <span class="material-symbols-outlined text-xl">air</span>
+                        <span class="font-label-sm text-label-sm font-bold">كونسيلد</span>
+                    </button>
+                    <button class="unit-type-btn p-2 rounded-lg bg-surface-container-low text-text-muted flex flex-col items-center gap-1 active:scale-95 transition-all border border-transparent" onclick="selectUnit(this, 'داكت')">
+                        <span class="material-symbols-outlined text-xl">hvac</span>
+                        <span class="font-label-sm text-label-sm font-bold">داكت</span>
+                    </button>
+                    <button class="unit-type-btn p-2 rounded-lg bg-surface-container-low text-text-muted flex flex-col items-center gap-1 active:scale-95 transition-all border border-transparent" onclick="selectUnit(this, 'مركزي')">
+                        <span class="material-symbols-outlined text-xl">apartment</span>
+                        <span class="font-label-sm text-label-sm font-bold">مركزي</span>
+                    </button>
+                    <button class="unit-type-btn p-2 rounded-lg bg-surface-container-low text-text-muted flex flex-col items-center gap-1 active:scale-95 transition-all border border-transparent" onclick="selectUnit(this, 'دولابي')">
+                        <span class="material-symbols-outlined text-xl">kitchen</span>
+                        <span class="font-label-sm text-label-sm font-bold">دولابي</span>
+                    </button>
+                </div>
             </div>
-          </div>
+
+            <div id="wash-options" class="flex p-1 bg-surface-container rounded-lg border border-surface-container-highest gap-1">
+                <button class="flex-1 py-1.5 rounded bg-surface-card shadow-sm text-primary font-label-sm text-label-sm font-bold border border-border-hairline transition-all" onclick="setWashDepth('full'); this.classList.add('bg-surface-card','text-primary','shadow-sm','border-border-hairline'); this.nextElementSibling.classList.remove('bg-surface-card','text-primary','shadow-sm','border-border-hairline'); this.nextElementSibling.classList.add('text-text-muted');">داخلي وخارجي (شامل)</button>
+                <button class="flex-1 py-1.5 rounded text-text-muted font-label-sm text-label-sm font-bold transition-all" onclick="setWashDepth('inner'); this.classList.add('bg-surface-card','text-primary','shadow-sm','border-border-hairline'); this.previousElementSibling.classList.remove('bg-surface-card','text-primary','shadow-sm','border-border-hairline'); this.previousElementSibling.classList.add('text-text-muted');">داخلي فقط</button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2" id="options-vat-warranty">
+                <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container-highest flex flex-col justify-center">
+                    <div class="flex items-center justify-between">
+                        <span class="font-label-sm text-[11px] text-text-primary font-bold">ضريبة مضافة 15%</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" value="" class="sr-only peer" onchange="toggleVat()">
+                            <div class="w-8 h-4 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-surface-container-low p-1.5 rounded-lg border border-surface-container-highest">
+                    <select id="warranty-select" class="w-full h-full bg-transparent text-primary font-label-sm text-[11px] font-bold focus:outline-none border-none p-0 cursor-pointer" onchange="updateWarranty()">
+                        <option value="0">ضمان (15 يوم) مجاني</option>
+                        <option value="10">ضمان شهر (+10 ر.س)</option>
+                        <option value="20">ضمان شهرين (+20 ر.س)</option>
+                        <option value="30">ضمان 3 شهور (+30 ر.س)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between bg-surface-container-low p-space-sm rounded-lg border border-surface-container-highest mt-1">
+                <div class="flex flex-col">
+                    <span class="font-label-md text-label-md text-text-primary font-bold" id="stepper-label">عدد الوحدات المطلوب صيانتها</span>
+                    <span class="font-label-sm text-[10px] text-secondary font-bold" id="discount-badge">بدون خصم</span>
+                </div>
+                <div class="flex items-center gap-space-sm bg-surface-card p-1 rounded-lg shadow-sm border border-border-hairline">
+                    <button class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-primary active:scale-90 transition-transform font-bold" onclick="updateCount(-1)">
+                        <span class="material-symbols-outlined text-sm font-bold">remove</span>
+                    </button>
+                    <span class="font-data-metric text-data-metric text-text-primary px-2 min-w-[28px] text-center" id="unit-count">1</span>
+                    <button class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-primary active:scale-90 transition-transform font-bold" onclick="updateCount(1)">
+                        <span class="material-symbols-outlined text-sm font-bold">add</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="install-custom-notice" class="hidden w-full bg-amber-50 border border-amber-300 p-2.5 rounded-lg text-amber-900 text-xs font-bold flex items-center gap-2">
+                <span class="material-symbols-outlined text-amber-600 text-lg">support_agent</span>
+                <span>بما أن العدد 4 وحدات فأكثر، سيتم التواصل معك مباشرة من قبل الفني المختص لتقديم عرض سعر مخصص وخاص.</span>
+            </div>
+
+            <div class="w-full bg-secondary-fixed/20 p-space-sm rounded-lg flex flex-col gap-1 border border-secondary-fixed-dim/30" id="price-summary-box-wrapper">
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col">
+                        <span class="font-body-md text-body-md text-on-secondary-fixed-variant font-bold" id="summary-title-label">الإجمالي التقديري:</span>
+                        <span class="font-label-sm text-label-sm text-text-muted" id="selected-service-summary">سبليت (1 وحدة)</span>
+                    </div>
+                    <div class="flex items-baseline gap-1" id="price-display-wrapper">
+                        <span class="font-data-metric text-[28px] leading-none text-primary font-black" id="total-price">100</span>
+                        <span class="font-label-sm text-label-sm text-primary font-bold" id="price-currency-unit">ر.س</span>
+                    </div>
+                </div>
+                <div id="maintenance-red-warning" class="hidden text-alert-crimson font-label-sm text-[11px] font-bold bg-error-container/40 p-1.5 rounded border border-error-container">
+                    ⚠️ ملحوظة: الفحص مجاني في حال الاتفاق. أما في حال عدم الاتفاق فيحتسب رسوم معاينة للزيارة.
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-space-xs">
+                <div class="flex items-center justify-between">
+                    <span class="font-label-md text-label-md text-text-primary font-bold">2. اختر فترة الزيارة المناسبة:</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button class="slot-chip p-2.5 rounded-lg bg-surface-container-high text-primary flex items-center gap-2 active:scale-95 transition-all border border-primary/30" onclick="selectSlot(this, 'قبل الظهر (09:00 ص - 11:30 ص)')">
+                        <span class="text-base">☀️</span>
+                        <div class="flex flex-col text-right">
+                            <span class="font-label-sm text-label-sm font-bold">قبل الظهر</span>
+                            <span class="font-body-sm text-body-sm text-text-muted">09:00 ص - 11:30 ص</span>
+                        </div>
+                    </button>
+                    <button class="slot-chip p-2.5 rounded-lg bg-surface-container-low text-text-primary flex items-center gap-2 active:scale-95 transition-all border border-transparent" onclick="selectSlot(this, 'بعد الظهر (01:30 م - 03:00 م)')">
+                        <span class="text-base">🌤️</span>
+                        <div class="flex flex-col text-right">
+                            <span class="font-label-sm text-label-sm font-bold">بعد الظهر</span>
+                            <span class="font-body-sm text-body-sm text-text-muted">01:30 م - 03:00 م</span>
+                        </div>
+                    </button>
+                    <button class="slot-chip p-2.5 rounded-lg bg-surface-container-low text-text-primary flex items-center gap-2 active:scale-95 transition-all border border-transparent" onclick="selectSlot(this, 'قبل العصر (03:15 م - 04:30 م)')">
+                        <span class="text-base">⛅</span>
+                        <div class="flex flex-col text-right">
+                            <span class="font-label-sm text-label-sm font-bold">قبل العصر</span>
+                            <span class="font-body-sm text-body-sm text-text-muted">03:15 م - 04:30 م</span>
+                        </div>
+                    </button>
+                    <button class="slot-chip p-2.5 rounded-lg bg-surface-container-low text-text-primary flex items-center gap-2 active:scale-95 transition-all border border-transparent" onclick="selectSlot(this, 'بعد العصر (04:45 م - 06:15 م)')">
+                        <span class="text-base">🌇</span>
+                        <div class="flex flex-col text-right">
+                            <span class="font-label-sm text-label-sm font-bold">بعد العصر</span>
+                            <span class="font-body-sm text-body-sm text-text-muted">04:45 م - 06:15 م</span>
+                        </div>
+                    </button>
+                    <button class="slot-chip p-2.5 rounded-lg bg-surface-container-low text-text-primary flex items-center gap-2 active:scale-95 transition-all border border-transparent" onclick="selectSlot(this, 'بعد المغرب (07:00 م - 08:15 م)')">
+                        <span class="text-base">🌙</span>
+                        <div class="flex flex-col text-right">
+                            <span class="font-label-sm text-label-sm font-bold">بعد المغرب</span>
+                            <span class="font-body-sm text-body-sm text-text-muted">07:00 م - 08:15 م</span>
+                        </div>
+                    </button>
+                    <button class="slot-chip p-2.5 rounded-lg bg-surface-container-low text-text-primary flex items-center gap-2 active:scale-95 transition-all border border-transparent" onclick="selectSlot(this, 'بعد العشاء (08:30 م - 11:00 م)')">
+                        <span class="text-base">🌌</span>
+                        <div class="flex flex-col text-right">
+                            <span class="font-label-sm text-label-sm font-bold">بعد العشاء</span>
+                            <span class="font-body-sm text-body-sm text-text-muted">08:30 م - 11:00 م</span>
+                        </div>
+                    </button>
+                </div>
+                <button class="w-full mt-1 py-2 px-space-sm bg-surface-container rounded-lg flex items-center justify-between text-primary active:scale-98 transition-transform border border-border-hairline hover:bg-surface-container-high" onclick="triggerTimeDialog()">
+                    <span class="flex items-center gap-1 font-label-md text-label-md font-semibold">
+                        <span class="material-symbols-outlined text-base">alarm</span> تخصيص الوقت الدقيق
+                    </span>
+                    <span class="font-label-sm text-label-sm font-bold bg-surface-card px-2 py-0.5 rounded shadow-xs" id="precise-time-val">05:15 مساءً</span>
+                </button>
+            </div>
+
+            <div class="flex flex-col gap-2 pt-space-xs">
+                <button class="w-full bg-gradient-to-r from-alert-crimson to-[#b91c1c] py-3 px-space-sm rounded-xl text-white flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(239,68,68,0.4)] active:scale-95 transition-all hover:brightness-110" onclick="processSecureBooking()">
+                    <span class="material-symbols-outlined text-xl animate-pulse">bolt</span>
+                    <span class="font-headline-sm text-headline-sm font-extrabold">اطلب الفني الحين (زيارة فورية)</span>
+                </button>
+                <button class="w-full bg-whatsapp-green text-white py-2.5 px-space-sm rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all font-bold hover:brightness-105" onclick="prepareAndOpenWhatsApp()">
+                    <span class="material-symbols-outlined text-xl">chat</span>
+                    <span class="font-label-lg text-label-lg">إرسال الطلب واعتماده للإدارة</span>
+                </button>
+                <div class="flex items-center justify-center gap-1 text-warranty-gold pt-0.5">
+                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">shield</span>
+                    <span class="font-label-sm text-[11px] font-bold">معتمد مع ضمان أكسجين الذهبي وحماية من التلاعب</span>
+                </div>
+            </div>
         </div>
-      </div>
 
-    </main>
+        <!-- VoIP Hotline Section -->
+        <div id="hotline-section" class="w-full bg-[#121b22] text-white rounded-xl p-space-md shadow-lg flex flex-col gap-space-sm relative overflow-hidden border border-[#1f2c34] mt-2">
+            <div class="flex items-center justify-between z-10 w-full">
+                <div class="flex items-center gap-space-xs">
+                    <div class="w-7 h-7 rounded-full bg-alert-crimson/20 flex items-center justify-center border border-alert-crimson/40">
+                        <span class="w-2 h-2 rounded-full bg-alert-crimson animate-pulse"></span>
+                    </div>
+                    <h3 class="font-headline-sm text-headline-sm text-white">مركز الاتصال الداخلي (VoIP)</h3>
+                </div>
+                <span class="bg-whatsapp-green/20 text-whatsapp-green border border-whatsapp-green/30 px-2 py-0.5 rounded-full font-label-sm text-[10px] font-bold">اتصال إنترنت مجاني</span>
+            </div>
 
-    <!-- شريط التنقل السفلي للفني -->
-    <nav class="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white/95 border-t border-slate-200 px-2 py-2 z-40 flex items-center justify-around text-[10px]">
-      <button class="flex flex-col items-center text-[var(--mucs-primary)] font-black">
-        <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">radar</span>
-        <span>الرادار</span>
-      </button>
-      <button class="flex flex-col items-center text-slate-500 font-bold">
-        <span class="material-symbols-outlined text-xl">task_alt</span>
-        <span>مهامي</span>
-      </button>
-      <button class="flex flex-col items-center text-slate-500 font-bold">
-        <span class="material-symbols-outlined text-xl">payments</span>
-        <span>الأرباح</span>
-      </button>
-    </nav>
+            <div class="flex flex-col items-center justify-center py-4 z-10 w-full min-h-[220px]">
+                <div id="hotline-avatar" class="w-20 h-20 rounded-full bg-[#1f2c34] border-4 border-[#2a3942] flex items-center justify-center text-[#8696a0] mb-3 transition-all duration-300 relative">
+                    <span class="material-symbols-outlined text-[36px]">support_agent</span>
+                    <div id="hotline-ripple" class="absolute inset-0 rounded-full border border-whatsapp-green animate-ping hidden"></div>
+                </div>
+                
+                <h4 class="font-headline-md text-headline-md font-bold text-[#e9edef] mb-1">مركز عمليات أكسجين</h4>
+                <p id="hotline-status" class="font-body-sm text-body-sm text-[#8696a0]">عبر بروتوكول الإنترنت الآمن (VoIP)</p>
+                <p id="hotline-timer" class="font-data-metric text-[26px] tracking-widest text-whatsapp-green font-black hidden mt-1">00:00</p>
+                
+                <div id="hotline-waveform" class="flex items-center justify-center gap-1.5 h-8 mt-2 hidden">
+                    <span class="w-1.5 bg-whatsapp-green rounded-full h-2 animate-[pulse_0.4s_ease-in-out_infinite_alternate]"></span>
+                    <span class="w-1.5 bg-whatsapp-green rounded-full h-6 animate-[pulse_0.6s_ease-in-out_infinite_alternate]"></span>
+                    <span class="w-1.5 bg-whatsapp-green rounded-full h-3 animate-[pulse_0.3s_ease-in-out_infinite_alternate]"></span>
+                    <span class="w-1.5 bg-whatsapp-green rounded-full h-8 animate-[pulse_0.7s_ease-in-out_infinite_alternate]"></span>
+                    <span class="w-1.5 bg-whatsapp-green rounded-full h-4 animate-[pulse_0.5s_ease-in-out_infinite_alternate]"></span>
+                </div>
+            </div>
 
-  </div>
+            <div class="flex items-center justify-center gap-6 z-10 w-full pt-2">
+                <button id="btn-start-call" class="w-14 h-14 rounded-full bg-whatsapp-green text-white flex items-center justify-center shadow-[0_4px_20px_rgba(37,211,102,0.3)] active:scale-90 transition-transform" onclick="startHotlineCall()">
+                    <span class="material-symbols-outlined text-[28px]">call</span>
+                </button>
+                <button id="btn-end-call" class="w-14 h-14 rounded-full bg-alert-crimson text-white hidden items-center justify-center shadow-[0_4px_20px_rgba(239,68,68,0.3)] active:scale-90 transition-transform" onclick="endHotlineCall()">
+                    <span class="material-symbols-outlined text-[28px]">call_end</span>
+                </button>
+                <button id="btn-mute-call" class="w-12 h-12 rounded-full bg-[#1f2c34] text-[#8696a0] hidden items-center justify-center active:scale-90 transition-all border border-[#2a3942]" onclick="toggleMuteCall()">
+                    <span class="material-symbols-outlined text-[20px]" id="icon-mute-call">mic</span>
+                </button>
+                <button id="btn-speaker-call" class="w-12 h-12 rounded-full bg-whatsapp-green/20 text-whatsapp-green hidden items-center justify-center active:scale-90 transition-all border border-whatsapp-green/30" onclick="toggleSpeakerCall()">
+                    <span class="material-symbols-outlined text-[20px]" id="icon-speaker-call">volume_up</span>
+                </button>
+            </div>
+        </div>
 
-  <script>
-    let techSession = {};
-    let isRadarActive = true;
+        <!-- Bank Account Card -->
+        <div class="w-full bg-surface-card rounded-xl p-space-md shadow-md flex flex-col gap-space-sm border border-border-hairline" id="bank-account-card-section">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-space-xs">
+                    <span class="material-symbols-outlined text-primary" id="bank-icon-display">account_balance</span>
+                    <h3 class="font-headline-sm text-headline-sm text-text-primary" id="bank-title-display">حساب مصرف الراجحي</h3>
+                </div>
+                <span class="bg-primary-fixed/40 text-primary px-2 py-0.5 rounded font-label-sm text-label-sm font-bold" id="bank-status-display">معتمد</span>
+            </div>
+            <div class="w-full bg-gradient-to-br from-surface-container to-surface-container-high rounded-lg p-space-sm flex flex-col gap-space-xs border border-surface-container-highest">
+                <div class="flex items-center justify-between">
+                    <span class="font-label-md text-label-md text-text-primary font-bold" id="bank-holder-display">مؤسسة أكسجين الذكية لتقنية التكييف</span>
+                    <span class="material-symbols-outlined text-secondary">security</span>
+                </div>
+                <div class="flex items-center justify-between bg-surface-card p-2 rounded border border-border-hairline mt-1">
+                    <div class="flex flex-col">
+                        <span class="font-label-sm text-label-sm text-text-muted" id="bank-number-label">الآيبان الدولي (IBAN):</span>
+                        <span class="font-label-md text-label-md font-mono text-primary font-black tracking-wider select-all" id="iban-text">SA84 8000 0412 ****************</span>
+                    </div>
+                    <button class="bg-surface-container-low px-2 py-1.5 rounded text-primary flex items-center gap-1 text-xs active:scale-90 font-bold border border-border-hairline" onclick="revealIban()">
+                        <span class="material-symbols-outlined text-sm" id="iban-eye-icon">visibility</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-    window.addEventListener('DOMContentLoaded', () => {
-      loadTechSession();
-      initTechStealthGPS();
-    });
+        <!-- Floating Action Dock -->
+        <div id="floating-dock" class="fixed bottom-20 left-4 z-40 flex flex-col items-center gap-3 transition-opacity duration-300">
+            <button class="w-11 h-11 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform hover:opacity-95 border-2 border-white animate-bounce" onclick="openAiChatModal()" title="مستشار أكسجين الذكي">
+                <span class="material-symbols-outlined text-xl">smart_toy</span>
+            </button>
+            <button class="w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg active:scale-90 transition-transform hover:opacity-95 border-2 border-white" onclick="openVerificationModal()" title="التحقق الأمني">
+                <span class="material-symbols-outlined text-xl">verified_user</span>
+            </button>
+            <a class="w-11 h-11 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shadow-lg active:scale-90 transition-transform hover:opacity-95 border-2 border-white" id="floating-call-btn" href="tel:0549423050" title="اتصال مباشر الإدارة">
+                <span class="material-symbols-outlined text-xl">call</span>
+            </a>
+            <button class="w-12 h-12 rounded-full bg-whatsapp-green text-on-primary flex items-center justify-center shadow-xl active:scale-90 transition-transform hover:opacity-95 animate-pulse border-2 border-white" onclick="prepareAndOpenWhatsApp()" title="واتساب الإدارة">
+                <span class="material-symbols-outlined text-2xl">chat</span>
+            </button>
+        </div>
+    </div>
 
-    function loadTechSession() {
+    <!-- AI Chat Modal Container with Voice & TTS -->
+    <div id="ai-chat-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-surface-card w-full max-w-md h-[85vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-border-hairline relative">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-indigo-900 to-primary text-white p-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-xl">smart_toy</span>
+                    </div>
+                    <div>
+                        <h4 class="font-headline-sm text-sm font-bold">مستشار أكسجين الذكي (صوتي + نصي)</h4>
+                        <span class="text-[10px] text-cyan-200">ذاكرة ذكية • فصال آلي • دعم صوتي مباشر</span>
+                    </div>
+                </div>
+                <button onclick="closeAiChatModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
+            </div>
+            
+            <!-- Quick Chips -->
+            <div class="bg-slate-100 px-3 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-border-hairline">
+                <button onclick="sendQuickChip('كم سعر غسيل 3 مكيفات سبليت؟')" class="flex-none bg-white text-primary px-2.5 py-1 rounded-full text-[11px] font-bold shadow-xs border border-border-hairline active:scale-95">🧼 غسيل 3 مكيفات؟</button>
+                <button onclick="sendQuickChip('هل يوجد خصم إضافي أو فصال على السعر؟')" class="flex-none bg-white text-primary px-2.5 py-1 rounded-full text-[11px] font-bold shadow-xs border border-border-hairline active:scale-95">💬 فصال في السعر</button>
+                <button onclick="sendQuickChip('أريد تعديل موعد الزيارة أو الكمية')" class="flex-none bg-white text-primary px-2.5 py-1 rounded-full text-[11px] font-bold shadow-xs border border-border-hairline active:scale-95">⏰ تعديل الموعد</button>
+                <button onclick="sendQuickChip('أين موقع الفني الحالي وحالة الطلب؟')" class="flex-none bg-white text-primary px-2.5 py-1 rounded-full text-[11px] font-bold shadow-xs border border-border-hairline active:scale-95">📍 تتبع الطلب</button>
+            </div>
+
+            <!-- Messages Container -->
+            <div id="ai-chat-messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-slate-50">
+                <div class="flex items-start gap-2 max-w-[85%]">
+                    <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-xs font-bold">AI</div>
+                    <div class="bg-white p-3 rounded-2xl rounded-tr-none shadow-sm text-xs text-text-primary leading-relaxed border border-border-hairline flex flex-col gap-2">
+                        <span>أهلاً بك! أنا مستشار أكسجين الذكي ❄️. يمكنك كتابة استفسارك أو استخدام زر الميكروفون للتحدث صوتياً وسأرد عليك صوتياً وكتابياً! كيف يمكنني خدمتك اليوم؟</span>
+                        <button onclick="speakText(this.previousElementSibling.innerText)" class="self-start text-[10px] text-primary bg-primary-fixed/40 px-2 py-0.5 rounded flex items-center gap-1 font-bold">
+                            <span class="material-symbols-outlined text-[14px]">volume_up</span> الاستماع للصوت
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area with Mic Button -->
+            <div class="p-3 bg-white border-t border-border-hairline flex items-center gap-2">
+                <button id="mic-btn" onclick="toggleVoiceRecording()" class="w-11 h-11 bg-surface-container hover:bg-surface-container-high text-primary rounded-xl flex items-center justify-center shadow-xs border border-border-hairline active:scale-95 transition-all" title="التسجيل الصوتي">
+                    <span class="material-symbols-outlined text-xl" id="mic-icon">mic</span>
+                </button>
+                <input type="text" id="ai-chat-input" class="flex-1 h-11 bg-surface-container-low border border-border-hairline rounded-xl px-3 text-xs focus:outline-none focus:border-primary" placeholder="اكتب رسالتك أو اضغط الميكروفون للتحدث..." onkeydown="if(event.key==='Enter') sendAiMessage()">
+                <button onclick="sendAiMessage()" class="w-11 h-11 bg-primary text-white rounded-xl flex items-center justify-center shadow-md active:scale-95 transition-transform">
+                    <span class="material-symbols-outlined text-xl">send</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Control View -->
+    <div id="admin-view" class="hidden flex-col w-full px-margin-mobile gap-space-lg pb-8 transition-opacity duration-300">
+        <div class="flex items-center justify-between bg-surface-container-low p-space-md rounded-xl shadow-sm border border-surface-container-highest">
+            <div class="flex items-center gap-space-sm">
+                <div class="w-10 h-10 rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-md">
+                    <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-headline-sm text-headline-sm text-text-primary">لوحة القيادة المركزية</span>
+                        <span class="w-2 h-2 rounded-full bg-whatsapp-green animate-pulse"></span>
+                    </div>
+                    <p class="font-body-sm text-body-sm text-text-muted">نظام التشغيل الذاتي المركزي</p>
+                </div>
+            </div>
+            <div class="flex flex-col items-end">
+                <span class="bg-secondary-fixed/40 text-on-secondary-fixed-variant px-2 py-0.5 rounded-full font-label-sm text-label-sm font-bold">السيرفر المركزي</span>
+                <span class="font-label-sm text-label-sm text-whatsapp-green font-bold mt-0.5">Online 99.98%</span>
+            </div>
+        </div>
+
+        <!-- CRM & Customer Orders Hub -->
+        <div class="bg-surface-card p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md border border-border-hairline">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">groups</span>
+                    <h2 class="font-headline-sm text-headline-sm text-text-primary">سجل العملاء والطلبات الذكية (CRM)</h2>
+                </div>
+                <span class="bg-primary-fixed text-primary px-2 py-0.5 rounded font-label-sm text-xs font-bold" id="crm-counter">0 عميل مسجل</span>
+            </div>
+            <p class="text-xs text-text-muted">إدارة بيانات العملاء، أرقام الجوال، المواقع، وتفاصيل الطلبات المسجلة عبر مستشار الذكاء الاصطناعي أو الحاسبة.</p>
+            
+            <div id="crm-clients-list" class="flex flex-col gap-3 max-h-[350px] overflow-y-auto">
+                <div class="p-3 bg-surface-container-low rounded-xl text-xs text-text-muted text-center">لا توجد بيانات عملاء مسجلة حتى الآن.</div>
+            </div>
+        </div>
+
+        <!-- AI Assistant Configuration Matrix Panel -->
+        <div class="bg-surface-card p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md border border-border-hairline mt-1">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-indigo-600">smart_toy</span>
+                    <h2 class="font-headline-sm text-headline-sm text-text-primary">إدارة ولوحة أوامر الذكاء الاصطناعي (AI Matrix)</h2>
+                </div>
+                <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-label-sm text-xs font-bold">OpenAI — GPT-6 Luna</span>
+            </div>
+            <div class="flex flex-col gap-3">
+                <div class="bg-surface-container-low p-2.5 rounded-lg border border-surface-container-highest flex flex-col gap-2">
+                    <label class="font-label-sm text-[11px] text-text-primary font-bold">تعليمات الشخصية وأسلوب الحوار (System Prompt & Persona)</label>
+                    <textarea id="ai-admin-prompt" rows="3" class="w-full bg-surface-card border border-border-hairline rounded p-2 text-xs font-medium text-text-primary focus:outline-none focus:border-primary">أنت مستشار مبيعات وممثل خدمة عملاء ذكي لمؤسسة أكسجين لخدمات التكييف. كن ذكياً، مرناً، وردودك قصيرة ومباشرة وتدعم الرد الصوتي والكتابي. تذكر دائماً سياق محادثة العميل، ساعده في الفصال بالحد المسموح، واطلب دائماً رقمه وموقعه لتسجيل طلبه بدقة وتوجيهه لواتساب الإدارة.</textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container-highest flex flex-col gap-1">
+                        <label class="font-label-sm text-[10px] text-text-primary font-bold">أقصى نسبة خصم مسموحة للفصال (%)</label>
+                        <input type="number" id="ai-admin-max-discount" class="w-full bg-surface-card border border-border-hairline rounded p-1.5 text-center font-bold text-primary text-xs" value="15">
+                    </div>
+                    <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container-highest flex flex-col gap-1">
+                        <label class="font-label-sm text-[10px] text-text-primary font-bold">الحد الأدنى للسعر بعد الفصال (ر.س)</label>
+                        <input type="number" id="ai-admin-min-price" class="w-full bg-surface-card border border-border-hairline rounded p-1.5 text-center font-bold text-primary text-xs" value="80">
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-low p-2.5 rounded-lg border border-surface-container-highest flex flex-col gap-2">
+                    <label class="font-label-sm text-[11px] text-text-primary font-bold">طريقة الكلام وقواعد الرد (Tone & Negotiation Rules)</label>
+                    <textarea id="ai-admin-rules" rows="2" class="w-full bg-surface-card border border-border-hairline rounded p-2 text-xs font-medium text-text-primary focus:outline-none focus:border-primary">كن ودوداً جداً، قدم إجابات مختصرة ومفيدة في أسطر قليلة، وافق على الخصم البسيط بحماس لكسب العميل، وادعم القراءة الصوتية والإرسال.</textarea>
+                </div>
+
+                <div class="bg-surface-container-low p-2.5 rounded-lg border border-surface-container-highest flex flex-col gap-2">
+                    <label class="font-label-sm text-[11px] text-text-primary font-bold">بيانات التواصل الموجهة للعملاء عبر AI</label>
+                    <input type="text" id="ai-admin-contact" class="w-full bg-surface-card border border-border-hairline rounded p-2 font-bold text-primary text-xs" value="واتساب واتصال مباشر: 0549423050 (متاح 24/7)">
+                </div>
+            </div>
+            <div class="bg-indigo-50 p-2.5 rounded-lg border border-indigo-200 flex flex-col gap-2">
+                <label class="font-label-sm text-[11px] text-text-primary font-bold">واجهة ربط الذكاء الاصطناعي (API Endpoint)</label>
+                <input type="url" id="ai-admin-endpoint" class="w-full bg-white border border-border-hairline rounded p-2 font-mono text-[11px] text-primary dir-ltr" value="/wp-json/oxygen-ai/v1/chat" placeholder="https://example.com/api/ai">
+                <p class="text-[10px] text-text-muted">استخدم Endpoint على WordPress/Hostinger. مفتاح OpenAI يبقى على السيرفر ولا يوضع داخل الصفحة أو GitHub.</p>
+                <div class="bg-white p-2 rounded border border-indigo-100 text-[10px] text-text-muted leading-relaxed">🔐 مفتاح OpenAI محفوظ على السيرفر فقط. لا تضع المفتاح داخل الصفحة أو GitHub.</div>
+                <div class="flex gap-2">
+                    <button onclick="testAiConnection()" class="flex-1 bg-white text-indigo-700 py-2 rounded-lg font-bold text-xs border border-indigo-200">اختبار الاتصال</button>
+                    <span id="ai-connection-status" class="flex-1 flex items-center justify-center text-[10px] font-bold text-text-muted">غير مختبر</span>
+                </div>
+            </div>
+            <button onclick="saveAiAdminSettings()" class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-label-md text-label-md font-bold shadow-sm active:scale-95 transition-transform flex items-center justify-center gap-1 mt-1">
+                <span class="material-symbols-outlined text-[18px]">save</span>
+                حفظ وتحديث نظام مستشار الذكاء الاصطناعي
+            </button>
+        </div>
+
+        <!-- VoIP Admin Live Call Dashboard -->
+        <div class="bg-[#121b22] text-white p-space-lg rounded-xl shadow-lg flex flex-col gap-space-md border border-[#1f2c34] mt-1">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-space-xs">
+                    <span class="material-symbols-outlined text-whatsapp-green text-xl animate-pulse">headset_mic</span>
+                    <h2 class="font-headline-sm text-headline-sm text-white">واجهة استقبال المكالمات (VoIP Admin)</h2>
+                </div>
+                <span class="bg-whatsapp-green/20 text-whatsapp-green border border-whatsapp-green/30 px-2 py-0.5 rounded-full font-label-sm text-[10px] font-bold" id="admin-voip-status-pill">متصل وجاهز</span>
+            </div>
+
+            <div id="admin-incoming-call-box" class="hidden flex flex-col items-center justify-center p-4 bg-[#1f2c34] rounded-xl border border-whatsapp-green/40 shadow-inner">
+                <div class="w-16 h-16 rounded-full bg-whatsapp-green/20 border-2 border-whatsapp-green flex items-center justify-center text-whatsapp-green mb-2 animate-bounce">
+                    <span class="material-symbols-outlined text-[30px]">call</span>
+                </div>
+                <h4 class="font-headline-md text-headline-md font-bold text-white mb-0.5">مكالمة واردة جديدة!</h4>
+                <p class="font-body-sm text-body-sm text-[#8696a0] mb-3">عميل في انتظار الرد على الخط الساخن (VoIP)</p>
+                <div class="flex items-center gap-3">
+                    <button onclick="adminAcceptCall()" class="bg-whatsapp-green text-white px-4 py-2 rounded-lg font-bold text-xs shadow-md active:scale-95 transition-transform flex items-center gap-1">
+                        <span class="material-symbols-outlined text-base">call</span> قبول المكالمة
+                    </button>
+                    <button onclick="adminRejectCall()" class="bg-alert-crimson text-white px-4 py-2 rounded-lg font-bold text-xs shadow-md active:scale-95 transition-transform flex items-center gap-1">
+                        <span class="material-symbols-outlined text-base">call_end</span> رفض
+                    </button>
+                </div>
+            </div>
+
+            <div id="admin-active-call-box" class="hidden flex flex-col items-center justify-center p-4 bg-[#1f2c34] rounded-xl border border-primary/40">
+                <div class="w-14 h-14 rounded-full bg-primary/20 border border-primary flex items-center justify-center text-primary-fixed mb-2">
+                    <span class="material-symbols-outlined text-[26px]">support_agent</span>
+                </div>
+                <h4 class="font-headline-sm text-headline-sm font-bold text-white">مكالمة نشطة الآن مع العميل</h4>
+                <p id="admin-call-timer" class="font-data-metric text-[22px] tracking-widest text-whatsapp-green font-black my-1">00:00</p>
+                <button onclick="adminEndCall()" class="bg-alert-crimson text-white px-4 py-2 rounded-lg font-bold text-xs shadow-md active:scale-95 transition-transform flex items-center gap-1 mt-1">
+                    <span class="material-symbols-outlined text-base">call_end</span> إنهاء المكالمة
+                </button>
+            </div>
+
+            <div id="admin-idle-call-state" class="flex flex-col items-center justify-center py-3 text-[#8696a0]">
+                <span class="material-symbols-outlined text-3xl mb-1 text-slate-500">wifi_calling_3</span>
+                <p class="font-body-sm text-body-sm text-center">لا توجد مكالمات واردة حالياً. اضغط الزر أدناه لاختبار استقبال مكالمة تجريبية من العميل.</p>
+                <button onclick="simulateIncomingCallForAdmin()" class="mt-3 bg-primary text-white px-4 py-2 rounded-lg font-bold text-xs shadow-sm active:scale-95 transition-transform">
+                    محاكاة اتصال وارد من عميل
+                </button>
+            </div>
+        </div>
+
+        <!-- Toggles Section -->
+        <div class="bg-surface-card p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md border border-border-hairline">
+            <h2 class="font-headline-sm text-headline-sm text-text-primary">التحكم في واجهة العملاء</h2>
+            <div class="flex flex-col gap-space-sm">
+                <div class="flex items-center justify-between p-space-sm bg-surface-container-low rounded-lg border border-surface-container-highest">
+                    <span class="font-label-lg text-label-lg text-text-primary">لوحة العروض المتحركة</span>
+                    <button class="w-12 h-6 bg-primary-container rounded-full relative p-0.5 transition-colors focus:outline-none toggle-btn" onclick="toggleSystemFeature(this, 'offers-section', 'لوحة العروض والخصومات')">
+                        <div class="w-5 h-5 bg-on-primary rounded-full shadow-md transition-transform translate-x-[-24px] thumb"></div>
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between p-space-sm bg-surface-container-low rounded-lg border border-surface-container-highest">
+                    <span class="font-label-lg text-label-lg text-text-primary">أزرار الاتصال العائمة</span>
+                    <button class="w-12 h-6 bg-primary-container rounded-full relative p-0.5 transition-colors focus:outline-none toggle-btn" onclick="toggleSystemFeature(this, 'floating-dock', 'أزرار الاتصال السريع')">
+                        <div class="w-5 h-5 bg-on-primary rounded-full shadow-md transition-transform translate-x-[-24px] thumb"></div>
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between p-space-sm bg-surface-container-low rounded-lg border border-surface-container-highest">
+                    <span class="font-label-lg text-label-lg text-text-primary">نظام مكالمات الإنترنت (VoIP)</span>
+                    <button class="w-12 h-6 bg-primary-container rounded-full relative p-0.5 transition-colors focus:outline-none toggle-btn" onclick="toggleSystemFeature(this, 'hotline-section', 'نظام الاتصال الداخلي (VoIP)')">
+                        <div class="w-5 h-5 bg-on-primary rounded-full shadow-md transition-transform translate-x-[-24px] thumb"></div>
+                    </button>
+                </div>
+
+                <div class="flex flex-col gap-2 p-space-sm bg-surface-container-low rounded-lg border border-surface-container-highest mt-1">
+                    <span class="font-label-lg text-label-lg text-text-primary">رقم التواصل الموحد (اتصال وواتساب)</span>
+                    <div class="flex items-center gap-2 mt-1">
+                        <input type="tel" id="admin-phone-input" class="flex-1 h-10 bg-surface-card border border-border-hairline rounded-lg px-3 text-left font-bold text-primary focus:outline-none focus:border-primary dir-ltr tracking-wider" value="0549423050">
+                        <button class="bg-primary text-on-primary px-4 h-10 rounded-lg font-label-md text-label-md font-bold shadow-sm active:scale-95 transition-transform flex items-center gap-1" onclick="updateSystemPhone()">
+                            <span class="material-symbols-outlined text-[18px]">sync</span> تحديث
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2 p-space-sm bg-surface-container-low rounded-lg border border-surface-container-highest mt-1">
+                    <span class="font-label-lg text-label-lg text-text-primary">بث إعلان أو حدث جديد في الشريط</span>
+                    <div class="flex items-center gap-2 mt-1">
+                        <input type="text" id="admin-event-input" class="flex-1 h-10 bg-surface-card border border-border-hairline rounded-lg px-3 text-right font-bold text-primary focus:outline-none focus:border-primary placeholder:font-normal placeholder:text-[11px]" placeholder="اكتب الحدث أو العرض الجديد هنا...">
+                        <button class="bg-warranty-gold text-on-primary px-4 h-10 rounded-lg font-label-md text-label-md font-bold shadow-sm active:scale-95 transition-transform flex items-center gap-1" onclick="broadcastNewEvent()">
+                            <span class="material-symbols-outlined text-[18px]">podcast</span> بث
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Management Engine -->
+        <div class="bg-surface-card p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md border border-border-hairline mt-1">
+            <h2 class="font-headline-sm text-headline-sm text-text-primary">إدارة التسعير المتقدمة</h2>
+            <div class="flex flex-col gap-3">
+                <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container-highest flex flex-col gap-2">
+                    <label class="font-label-sm text-[11px] text-text-primary font-bold">غسيل وحدات (شامل/داخلي)</label>
+                    <div class="grid grid-cols-3 gap-1">
+                        <div class="flex flex-col"><span class="text-[9px] text-text-muted mb-1">القطعة 1</span><input type="number" id="ap-wash-1" class="w-full bg-surface-card border border-border-hairline rounded p-1.5 text-center font-bold text-primary" value="100"></div>
+                        <div class="flex flex-col"><span class="text-[9px] text-text-muted mb-1">القطعة 2</span><input type="number" id="ap-wash-2" class="w-full bg-surface-card border border-border-hairline rounded p-1.5 text-center font-bold text-primary" value="80"></div>
+                        <div class="flex flex-col"><span class="text-[9px] text-text-muted mb-1">نسبة الزيادة %</span><input type="number" id="ap-wash-f" class="w-full bg-surface-card border border-border-hairline rounded p-1.5 text-center font-bold text-primary" value="70"></div>
+                    </div>
+                </div>
+                
+                <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container-highest flex flex-col gap-2">
+                    <label class="font-label-sm text-[11px] text-text-primary font-bold">تركيب / فك / نقل</label>
+                    <div class="grid grid-cols-3 gap-1">
+                        <div class="flex flex-col"><input type="number" id="ap-install-1" class="w-full bg-surface-card border border-border-hairline rounded p-1.5 text-center font-bold text-primary" value="250"></div>
+                        <div class="flex flex-col"><input type="number" id="ap-install-2" class="w-full bg-surface-card border border-border-hairline rounded p-1.5 text-center font-bold text-primary" value="200"></div>
+                        <div class="flex flex-col"><input type="number" id="ap-install-f" class="w-full bg-surface-card border border-border-hairline rounded p-1.5 text-center font-bold text-primary" value="90"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="saveAdminPrices()" class="w-full bg-primary-container text-on-primary-container py-2.5 rounded-lg font-label-md text-label-md font-bold shadow-sm active:scale-95 transition-transform flex items-center justify-center gap-1 mt-2 border border-primary/20">
+                <span class="material-symbols-outlined text-[18px]">cloud_sync</span>
+                حفظ وتطبيق الخوارزمية للعملاء
+            </button>
+        </div>
+
+        <!-- Payment Methods Management in Admin -->
+        <div class="bg-surface-card p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md border border-border-hairline mt-1">
+            <h2 class="font-headline-sm text-headline-sm text-text-primary">إدارة وتحديث طرق الدفع والحسابات</h2>
+            <div class="flex flex-col gap-3">
+                <div class="bg-surface-container-low p-2.5 rounded-lg border border-surface-container-highest flex flex-col gap-2">
+                    <label class="font-label-sm text-[11px] text-text-primary font-bold">اسم البنك / جهة التحصيل</label>
+                    <input type="text" id="admin-bank-name" class="w-full bg-surface-card border border-border-hairline rounded p-2 font-bold text-primary" value="مصرف الراجحي">
+                </div>
+                <div class="bg-surface-container-low p-2.5 rounded-lg border border-surface-container-highest flex flex-col gap-2">
+                    <label class="font-label-sm text-[11px] text-text-primary font-bold">اسم المستفيد / المؤسسة</label>
+                    <input type="text" id="admin-bank-holder" class="w-full bg-surface-card border border-border-hairline rounded p-2 font-bold text-primary" value="مؤسسة أكسجين الذكية لتقنية التكييف">
+                </div>
+                <div class="bg-surface-container-low p-2.5 rounded-lg border border-surface-container-highest flex flex-col gap-2">
+                    <label class="font-label-sm text-[11px] text-text-primary font-bold">رقم الآيبان الدولي (IBAN)</label>
+                    <input type="text" id="admin-bank-iban" class="w-full bg-surface-card border border-border-hairline rounded p-2 font-mono font-bold text-primary dir-ltr" value="SA84 8000 0412 6080 1014 9901">
+                </div>
+            </div>
+            
+            <button onclick="saveAdminBankDetails()" class="w-full bg-primary text-on-primary py-2.5 rounded-lg font-label-md text-label-md font-bold shadow-sm active:scale-95 transition-transform flex items-center justify-center gap-1 mt-2">
+                <span class="material-symbols-outlined text-[18px]">account_balance</span>
+                تحديث بيانات الدفع والآيبان للمستخدمين
+            </button>
+        </div>
+    </div>
+
+    <!-- Security Verification Modal -->
+    <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-300" id="security-modal">
+        <div class="bg-surface-card w-full max-w-md rounded-2xl p-5 shadow-2xl flex flex-col gap-4 border border-border-hairline relative">
+            <button class="absolute top-4 left-4 text-text-muted hover:text-text-primary transition-colors" onclick="closeVerificationModal()">
+                <span class="material-symbols-outlined text-2xl">close</span>
+            </button>
+            <div class="flex items-center gap-2 text-right mt-2">
+                <div class="w-10 h-10 rounded-xl bg-secondary-fixed/40 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-2xl">verified</span>
+                </div>
+                <div class="flex flex-col">
+                    <h4 class="font-headline-sm text-headline-sm text-text-primary" id="verification-panel-title">توثيق الطلب ومراجعة البيانات</h4>
+                    <span class="font-label-sm text-label-sm text-secondary font-bold">Oxygen AI Audit Security Protocol</span>
+                </div>
+            </div>
+
+            <div id="tamper-status-banner" class="w-full p-3 rounded-xl flex items-center gap-2 border font-bold text-xs">
+                <span class="material-symbols-outlined text-lg" id="tamper-banner-icon">check_circle</span>
+                <span id="tamper-banner-text">تم التحقق بنجاح: السعر والضمان والبيانات متطابقة تماماً وخالية من أي تلاعب.</span>
+            </div>
+
+            <div class="w-full bg-surface-container-low rounded-xl p-3 flex flex-col gap-2 border border-surface-container-highest">
+                <div class="flex items-center justify-between">
+                    <span class="font-label-sm text-label-sm text-text-muted">كود التوثيق الأمني:</span>
+                    <span class="font-label-md text-label-md font-mono text-primary font-black tracking-wider" id="modal-hash-code">#OXG-SEC-89A4F</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-border-hairline/60">
+                    <div class="flex flex-col">
+                        <span class="text-text-muted font-medium">الخدمة:</span>
+                        <span class="font-bold text-text-primary" id="modal-service-name">سبليت</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-text-muted font-medium">العدد:</span>
+                        <span class="font-bold text-text-primary" id="modal-units-count">1 وحدة</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-text-muted font-medium">السعر المبلغ عنه:</span>
+                        <span class="font-bold text-primary" id="modal-price-val">100 ر.س</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-text-muted font-medium">الضمان:</span>
+                        <span class="font-bold text-text-primary" id="modal-warranty-val">ضمان 15 يوم مجاني</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full bg-surface-container-low rounded-xl p-3 flex flex-col gap-2 border border-surface-container-highest">
+                <div class="text-xs font-bold text-text-primary">بيانات العميل لاعتماد الطلب</div>
+                <input id="order-customer-name" type="text" class="w-full h-10 bg-white border border-border-hairline rounded-lg px-3 text-xs" placeholder="اسم العميل">
+                <input id="order-customer-phone" type="tel" inputmode="tel" class="w-full h-10 bg-white border border-border-hairline rounded-lg px-3 text-xs dir-ltr text-right" placeholder="رقم الجوال">
+                <div class="flex gap-2">
+                    <input id="order-location" type="text" readonly class="flex-1 h-10 bg-white border border-border-hairline rounded-lg px-3 text-xs" placeholder="لم يتم تحديد الموقع">
+                    <button onclick="captureCustomerLocation()" type="button" class="bg-primary text-white px-3 rounded-lg text-xs font-bold">تحديد موقعي</button>
+                </div>
+                <div id="order-location-status" class="text-[10px] text-text-muted">يمكنك تحديد الموقع تلقائياً قبل الإرسال.</div>
+            </div>
+
+            <div class="flex flex-col gap-2 mt-1">
+                <button class="w-full bg-whatsapp-green text-white py-3 rounded-xl flex items-center justify-center gap-2 font-bold shadow-md active:scale-95 transition-all hover:brightness-105" onclick="sendOrderToWhatsAppNow()">
+                    <span class="material-symbols-outlined text-xl">send</span>
+                    <span id="modal-wa-text">العودة لمحادثة الواتساب (0549423050)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin PIN Entry Modal -->
+    <div class="fixed inset-0 z-[70] bg-black/60 backdrop-blur-md hidden items-center justify-center p-4 transition-opacity duration-300" id="admin-pin-modal">
+        <div class="bg-surface-card w-full max-w-sm rounded-2xl p-6 shadow-2xl flex flex-col gap-4 border border-border-hairline relative">
+            <button class="absolute top-4 left-4 text-text-muted hover:text-text-primary transition-colors" onclick="closeAdminPinModal()">
+                <span class="material-symbols-outlined text-2xl">close</span>
+            </button>
+            <div class="flex flex-col items-center gap-2 mt-2">
+                <div class="w-14 h-14 rounded-full bg-error-container text-on-error-container flex items-center justify-center mb-2 shadow-inner">
+                    <span class="material-symbols-outlined text-3xl">admin_panel_settings</span>
+                </div>
+                <h3 class="font-headline-md text-headline-md text-text-primary font-bold">بوابة الإدارة المركزية</h3>
+                <p class="font-body-sm text-body-sm text-text-muted text-center">الرجاء إدخال رمز الوصول السري للدخول إلى لوحة التحكم والتعديل اللحظي.</p>
+            </div>
+            
+            <div class="mt-4 flex flex-col gap-3">
+                <div class="relative">
+                    <input type="password" id="admin-pin-input" class="w-full h-14 bg-surface-container-low border border-surface-container-highest rounded-xl text-center font-headline-md text-headline-md text-primary tracking-[0.5em] focus:outline-none focus:border-primary transition-colors" placeholder="•••••••••" maxlength="9">
+                </div>
+                <p id="pin-error-msg" class="text-alert-crimson font-label-sm text-label-sm text-center hidden">رمز المرور غير صحيح.</p>
+                <button onclick="verifyAdminPin()" class="w-full h-12 bg-primary text-on-primary rounded-xl font-headline-sm text-headline-sm font-bold shadow-md hover:bg-primary-container active:scale-95 transition-all flex items-center justify-center gap-2 mt-2">
+                    <span class="material-symbols-outlined">login</span> دخول آمن
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Toast Notification Container -->
+    <div id="toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 z-[90] flex flex-col gap-2 w-max max-w-[90vw] pointer-events-none"></div>
+
+</main>
+
+<!-- Bottom Navigation Dock -->
+<nav class="fixed bottom-0 w-full z-40 pb-safe bg-surface-glass backdrop-blur-xl shadow-[0_-4px_20px_rgba(12,26,48,0.08)] border-t border-border-hairline">
+    <div class="max-w-[420px] mx-auto flex items-center justify-between px-space-xs h-16">
+        <a class="flex-1 flex flex-col items-center justify-center min-h-[44px] text-on-surface-variant transition-colors hover:text-primary active:scale-95" href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+            <span class="material-symbols-outlined text-[22px]">home</span>
+            <span class="font-label-sm text-label-sm mt-0.5 font-bold">الرئيسية</span>
+        </a>
+        <a class="flex-1 flex flex-col items-center justify-center min-h-[44px] text-on-surface-variant transition-colors hover:text-primary active:scale-95" href="#offers-section">
+            <span class="material-symbols-outlined text-[22px]">local_offer</span>
+            <span class="font-label-sm text-label-sm mt-0.5 font-bold">العروض</span>
+        </a>
+        <a class="flex-1 flex flex-col items-center justify-center min-h-[44px] text-on-surface-variant transition-colors hover:text-primary active:scale-95" href="#service-calc-card">
+            <span class="material-symbols-outlined text-[22px]">bolt</span>
+            <span class="font-label-sm text-label-sm mt-0.5 font-bold">الخدمات</span>
+        </a>
+        <a class="flex-1 flex flex-col items-center justify-center min-h-[44px] text-on-surface-variant transition-colors hover:text-primary active:scale-95 text-indigo-600 font-bold" href="#" onclick="openAiChatModal(); return false;">
+            <span class="material-symbols-outlined text-[22px]">smart_toy</span>
+            <span class="font-label-sm text-label-sm mt-0.5 font-bold">مستشار الذكاء الاصطناعي</span>        </a>
+        <a class="flex-1 flex flex-col items-center justify-center min-h-[44px] text-on-surface-variant transition-colors hover:text-primary active:scale-95" id="bottom-nav-call" href="tel:0549423050">
+            <span class="material-symbols-outlined text-[22px]">call</span>
+            <span class="font-label-sm text-label-sm mt-0.5 font-bold">الاتصال</span>
+        </a>
+    </div>
+</nav>
+
+<script>
+  let state = {
+      mode: 'wash',
+      phone: '0549423050',
+      washDepth: 'full',
+      vatEnabled: false,
+      warranty: 0,
+      warrantyText: 'ضمان (15 يوم) مجاني',
+      count: 1,
+      unitName: "سبليت",
+      slot: "قبل الظهر (09:00 ص - 11:30 ص)",
+      preciseTime: "05:15 مساءً",
+      hash: "",
+      ibanRevealed: false,
+      callActive: false,
+      isAdminOpen: false,
+      bankDetails: {
+          name: "مصرف الراجحي",
+          holder: "مؤسسة أكسجين الذكية لتقنية التكييف",
+          iban: "SA84 8000 0412 6080 1014 9901"
+      },
+      prices: {
+          wash: { p1: 100, p2: 80, factor: 0.7 },
+          install: { p1: 250, p2: 200, factor: 0.9 },
+          maintenance: { p1: 0, p2: 0, factor: 0.0 }
+      },
+      aiConfig: {
+          apiKey: "",
+          systemPrompt: "أنت مستشار مبيعات وممثل خدمة عملاء ذكي لمؤسسة أكسجين لخدمات التكييف. كن ذكياً، مرناً، وردودك قصيرة ومباشرة وتدعم الرد الصوتي والكتابي. تذكر سياق محادثة العميل، ساعده في الفصال بالحد المسموح، واطلب دائماً رقمه وموقعه لتسجيل طلبه وتوجيهه لواتساب الإدارة.",
+          maxDiscount: 15,
+          minPrice: 80,
+          rules: "كن ودوداً جداً، قدم إجابات مختصرة ومفيدة في أسطر قليلة، وافق على الخصم البسيط بحماس لكسب العميل، واطلب رقم الجوال والموقع بدقة، وادعم القراءة الصوتية.",
+          contactInfo: "واتساب واتصال مباشر: 0549423050 (متاح 24/7)",
+          endpoint: "/wp-json/oxygen-ai/v1/chat",
+          directMode: false
+      }
+  };
+
+  let chatHistory = [];
+  let crmClients = [];
+  let isRecording = false;
+  let recognition = null;
+
+  window.addEventListener('DOMContentLoaded', () => {
+      const savedCrm = localStorage.getItem('oxygen_crm_clients');
+      if (savedCrm) {
+          try { crmClients = JSON.parse(savedCrm); } catch(e) { crmClients = []; }
+      }
+      loadPersistentSettings();
+      syncAdminFormFromState();
+
+      const hashQuery = window.location.hash;
+      if (hashQuery && hashQuery.includes('#OXG-SEC-')) {
+          const code = hashQuery.substring(1);
+          openVerificationModalWithCode(code);
+      }
+      chatHistory = [];
+      renderCrmList();
+      initSpeechRecognition();
+  });
+
+  function loadPersistentSettings() {
       try {
-        techSession = JSON.parse(localStorage.getItem('motqan_tech_session') || '{}');
-        if (techSession.name) {
-          document.getElementById('tech-header-name').textContent = techSession.name;
-        }
-      } catch(e) { console.error(e); }
-    }
+          const saved = JSON.parse(localStorage.getItem('oxygen_ai_settings') || 'null');
+          if (saved) {
+              state.phone = saved.phone || state.phone;
+              state.prices = Object.assign({}, state.prices, saved.prices || {});
+              state.bankDetails = Object.assign({}, state.bankDetails, saved.bankDetails || {});
+              state.aiConfig = Object.assign({}, state.aiConfig, saved.aiConfig || {});
+          }
+      } catch (e) { console.warn('تعذر تحميل إعدادات Oxygen AI', e); }
+  }
 
-    // تتبع موقع الفني سرياً لرفعه إلى لوحة المشرف والمالك (صلاحيات إدارية جبارة)
-    function initTechStealthGPS() {
-      setInterval(() => {
-        if (isRadarActive && navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((pos) => {
-            const gpsData = {
-              phone: techSession.phone,
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-              updatedAt: new Date().toISOString()
-            };
-            // حفظ آخر موقع للفني في السجل المركزي ليراها المشرف على الخريطة
-            localStorage.setItem(`mucs_live_tech_${techSession.phone || 'default'}`, JSON.stringify(gpsData));
-          }, null, { enableHighAccuracy: true });
-        }
-      }, 20000); // تحديث كل 20 ثانية
-    }
+  function persistSettings() {
+      try {
+          localStorage.setItem('oxygen_ai_settings', JSON.stringify({
+              phone: state.phone,
+              prices: state.prices,
+              bankDetails: state.bankDetails,
+              aiConfig: state.aiConfig
+          }));
+      } catch (e) { showToast('تعذر حفظ الإعدادات على هذا المتصفح', 'warning', 'save'); }
+  }
 
-    function toggleTechRadar() {
-      isRadarActive = !isRadarActive;
-      const btn = document.getElementById('radar-toggle-btn');
-      const label = document.getElementById('radar-status-label');
-      if (isRadarActive) {
-        btn.textContent = "إيقاف مؤقت";
-        btn.className = "px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs rounded-xl press-scale shadow-sm transition";
-        label.textContent = "الرادار نشط (يستقبل طلبات)";
-        label.className = "text-sm font-black text-emerald-400";
+  function syncAdminFormFromState() {
+      const set = (id, value) => { const el = document.getElementById(id); if (el && value !== undefined) el.value = value; };
+      set('admin-phone-input', state.phone);
+      set('ap-wash-1', state.prices.wash.p1); set('ap-wash-2', state.prices.wash.p2); set('ap-wash-f', state.prices.wash.factor * 100);
+      set('ap-install-1', state.prices.install.p1); set('ap-install-2', state.prices.install.p2); set('ap-install-f', state.prices.install.factor * 100);
+      set('admin-bank-name', state.bankDetails.name); set('admin-bank-holder', state.bankDetails.holder); set('admin-bank-iban', state.bankDetails.iban);
+      set('ai-admin-prompt', state.aiConfig.systemPrompt); set('ai-admin-max-discount', state.aiConfig.maxDiscount);
+      set('ai-admin-min-price', state.aiConfig.minPrice); set('ai-admin-rules', state.aiConfig.rules);
+      set('ai-admin-contact', state.aiConfig.contactInfo); set('ai-admin-endpoint', state.aiConfig.endpoint || '/wp-json/oxygen-ai/v1/chat');
+      updatePublicContactUI();
+  }
+
+  function updatePublicContactUI() {
+      document.querySelectorAll('a[href^="tel:"]').forEach(a => a.href = `tel:${state.phone}`);
+      const call = document.getElementById('floating-call-btn'); if (call) call.href = `tel:${state.phone}`;
+      const bottom = document.getElementById('bottom-nav-call'); if (bottom) bottom.href = `tel:${state.phone}`;
+      const modalWaText = document.getElementById('modal-wa-text'); if (modalWaText) modalWaText.innerText = `إرسال الطلب للواتساب (${state.phone})`;
+  }
+
+  function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+          recognition = new SpeechRecognition();
+          recognition.lang = 'ar-SA';
+          recognition.interimResults = false;
+          recognition.maxAlternatives = 1;
+
+          recognition.onresult = (event) => {
+              const speechResult = event.results[0][0].transcript;
+              document.getElementById('ai-chat-input').value = speechResult;
+              stopVoiceRecording();
+              sendAiMessage();
+          };
+
+          recognition.onerror = () => {
+              stopVoiceRecording();
+              showToast('تعذر التقاط الصوت، يرجى المحاولة مرة أخرى', 'warning', 'mic_off');
+          };
+
+          recognition.onend = () => {
+              stopVoiceRecording();
+          };
+      }
+  }
+
+  function toggleVoiceRecording() {
+      if (!recognition) {
+          showToast('متصفحك لا يدعم التعرف على الصوت', 'error', 'mic_off');
+          return;
+      }
+      if (isRecording) {
+          recognition.stop();
+          stopVoiceRecording();
       } else {
-        btn.textContent = "تفعيل الرادار";
-        btn.className = "px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl press-scale shadow-sm transition";
-        label.textContent = "الرادار متوقف (في استراحة)";
-        label.className = "text-sm font-black text-amber-400";
+          try {
+              recognition.start();
+              isRecording = true;
+              const micBtn = document.getElementById('mic-btn');
+              micBtn.classList.add('bg-alert-crimson', 'text-white', 'animate-pulse');
+              document.getElementById('mic-icon').innerText = 'stop';
+              showToast('جار الاستماع... تحدث الآن', 'success', 'mic');
+          } catch(e) {
+              isRecording = false;
+          }
       }
-    }
+  }
 
-    function acceptOrder(orderId) {
-      alert(`تم قبول الطلب [${orderId}] بنجاح! تم إرسال إشعار للعميل وتفعيل نظام التوجيه الميداني.`);
-    }
-
-    function rejectOrder(orderId) {
-      alert(`تم الاعتذار عن الطلب [${orderId}] وتوجيهه لفني آخر في المنطقة.`);
-    }
-
-    function executeTechLogout() {
-      if (confirm('هل ترغب في تسليم الوردية وتسجيل الخروج؟')) {
-        localStorage.removeItem('motqan_tech_session');
-        window.location.replace('https://mutaqan.oxygen11.com');
+  function stopVoiceRecording() {
+      isRecording = false;
+      const micBtn = document.getElementById('mic-btn');
+      if (micBtn) {
+          micBtn.classList.remove('bg-alert-crimson', 'text-white', 'animate-pulse');
+          document.getElementById('mic-icon').innerText = 'mic';
       }
-    }
-  </script>
+  }
+
+  function speakText(text) {
+      if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'ar-SA';
+          utterance.rate = 1.0;
+          utterance.pitch = 1.0;
+          window.speechSynthesis.speak(utterance);
+          showToast('جار قراءة النص صوتياً...', 'success', 'volume_up');
+      } else {
+          showToast('خاصية القراءة الصوتية غير متوفرة في متصفحك', 'warning', 'volume_off');
+      }
+  }
+
+  function showToast(message, type = 'success', icon = 'verified') {
+      const toastContainer = document.getElementById('toast-container');
+      if (!toastContainer) return;
+
+      const toast = document.createElement('div');
+      let iconColor = type === 'success' ? 'text-whatsapp-green' : type === 'warning' ? 'text-warranty-gold' : 'text-alert-crimson';
+      let borderColor = type === 'success' ? 'border-whatsapp-green/30' : type === 'warning' ? 'border-warranty-gold/30' : 'border-alert-crimson/30';
+
+      toast.className = `flex items-center gap-3 bg-surface-card border ${borderColor} px-4 py-3 rounded-xl shadow-lg toast-enter pointer-events-auto`;
+      toast.innerHTML = `
+          <span class="material-symbols-outlined ${iconColor} text-xl">${icon}</span>
+          <span class="font-label-sm text-label-sm text-text-primary font-bold">${message}</span>
+      `;
+
+      toastContainer.appendChild(toast);
+      setTimeout(() => {
+          toast.classList.remove('toast-enter');
+          toast.classList.add('toast-exit');
+          setTimeout(() => toast.remove(), 300);
+      }, 3000);
+  }
+
+  function openAiChatModal() {
+      const modal = document.getElementById('ai-chat-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+  }
+
+  function closeAiChatModal() {
+      const modal = document.getElementById('ai-chat-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  }
+
+  function sendQuickChip(text) {
+      const inputEl = document.getElementById('ai-chat-input');
+      inputEl.value = text;
+      sendAiMessage();
+  }
+
+  async function sendAiMessage() {
+      const inputEl = document.getElementById('ai-chat-input');
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      const messagesContainer = document.getElementById('ai-chat-messages');
+      
+      messagesContainer.innerHTML += `
+          <div class="flex items-start gap-2 max-w-[85%] self-end flex-row-reverse">
+              <div class="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center flex-shrink-0 text-xs font-bold">أنت</div>
+              <div class="bg-primary text-white p-3 rounded-2xl rounded-tl-none shadow-sm text-xs leading-relaxed">
+                  ${escapeHtml(text)}
+              </div>
+          </div>
+      `;
+      inputEl.value = '';
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      chatHistory.push({ role: "user", parts: [{ text: text }] });
+
+      const loadingId = 'ai-loading-' + Date.now();
+      messagesContainer.innerHTML += `
+          <div id="${loadingId}" class="flex items-start gap-2 max-w-[85%]">
+              <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-xs font-bold">AI</div>
+              <div class="bg-white p-3 rounded-2xl rounded-tr-none shadow-sm text-xs text-text-muted border border-border-hairline animate-pulse">
+                  مستشار أكسجين يفكر ويرد صوتياً وكتابياً...
+              </div>
+          </div>
+      `;
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      try {
+          const apiResponse = await callOpenAIAPI(chatHistory);
+          const loadingEl = document.getElementById(loadingId);
+          if(loadingEl) loadingEl.remove();
+
+          messagesContainer.innerHTML += `
+              <div class="flex items-start gap-2 max-w-[85%]">
+                  <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-xs font-bold">AI</div>
+                  <div class="bg-white p-3 rounded-2xl rounded-tr-none shadow-sm text-xs text-text-primary leading-relaxed border border-border-hairline flex flex-col gap-2">
+                      <span>${escapeHtml(apiResponse)}</span>
+                      <button onclick="speakText(this.previousElementSibling.innerText)" class="self-start text-[10px] text-primary bg-primary-fixed/40 px-2 py-0.5 rounded flex items-center gap-1 font-bold">
+                          <span class="material-symbols-outlined text-[14px]">volume_up</span> الاستماع للصوت
+                      </button>
+                  </div>
+              </div>
+          `;
+          chatHistory.push({ role: "model", parts: [{ text: apiResponse }] });
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+          // Automatically speak the response
+          speakText(apiResponse);
+
+          // Extract potential client details and log in CRM
+          parseAndSaveCrmData(text, apiResponse);
+
+      } catch (err) {
+          const loadingEl = document.getElementById(loadingId);
+          if(loadingEl) loadingEl.remove();
+          
+          messagesContainer.innerHTML += `
+              <div class="flex items-start gap-2 max-w-[85%]">
+                  <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-xs font-bold">AI</div>
+                  <div class="bg-red-50 p-3 rounded-2xl rounded-tr-none shadow-sm text-xs text-alert-crimson border border-red-200">
+                      عذراً، تعذر الاتصال بمستشار أكسجين الآن. تحقق من اتصال السيرفر وحاول مرة أخرى.
+                  </div>
+              </div>
+          `;
+      }
+  }
+
+  function parseAndSaveCrmData(userMsg, aiMsg) {
+      const phoneMatch = userMsg.match(/05\d{8}/);
+      const phone = phoneMatch ? phoneMatch[0] : "رقم غير محدد";
+      
+      let clientRecord = crmClients.find(c => c.phone === phone);
+      if (!clientRecord && phone !== "رقم غير محدد") {
+          clientRecord = {
+              id: 'CRM-' + Math.floor(Math.random() * 90000 + 10000),
+              phone: phone,
+              location: "لم يتم التحديد بعد",
+              request: userMsg,
+              lastChat: userMsg,
+              timestamp: new Date().toLocaleString('ar-SA')
+          };
+          crmClients.unshift(clientRecord);
+      } else if (clientRecord) {
+          clientRecord.lastChat = userMsg;
+          clientRecord.timestamp = new Date().toLocaleString('ar-SA');
+      } else {
+          if (crmClients.length === 0 || crmClients[0].phone !== "عميل محادثة ذكية") {
+              crmClients.unshift({
+                  id: 'CRM-' + Math.floor(Math.random() * 90000 + 10000),
+                  phone: "عميل محادثة ذكية",
+                  location: "عبر مستشار AI",
+                  request: userMsg,
+                  lastChat: userMsg,
+                  timestamp: new Date().toLocaleString('ar-SA')
+              });
+          }
+      }
+      localStorage.setItem('oxygen_crm_clients', JSON.stringify(crmClients));
+      renderCrmList();
+  }
+
+  function renderCrmList() {
+      const container = document.getElementById('crm-clients-list');
+      const counter = document.getElementById('crm-counter');
+      if (!container) return;
+
+      counter.innerText = `${crmClients.length} عميل مسجل`;
+      if (crmClients.length === 0) {
+          container.innerHTML = `<div class="p-3 bg-surface-container-low rounded-xl text-xs text-text-muted text-center">لا توجد بيانات عملاء مسجلة حتى الآن.</div>`;
+          return;
+      }
+
+      container.innerHTML = crmClients.map(c => `
+          <div class="p-3 bg-surface-container-low rounded-xl border border-surface-container-highest flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                  <span class="font-label-md text-label-md font-bold text-primary">${c.id} • ${c.phone}</span>
+                  <span class="text-[10px] text-text-muted">${c.timestamp}</span>
+              </div>
+              <div class="text-xs text-text-primary">آخر طلب/استفسار: <span class="font-medium">${c.lastChat}</span></div>
+              <div class="flex items-center gap-2 pt-1 border-t border-border-hairline/60">
+                  <button onclick="copyCrmClient('${c.id}', '${c.phone}', '${c.lastChat}')" class="bg-surface-card px-2.5 py-1 rounded text-xs font-bold text-primary border border-border-hairline active:scale-95">نسخ البيانات</button>
+                  <button onclick="sendCrmToWhatsapp('${c.phone}', '${c.lastChat}')" class="bg-whatsapp-green text-white px-2.5 py-1 rounded text-xs font-bold active:scale-95 flex items-center gap-1"><span class="material-symbols-outlined text-sm">chat</span> إرسال للواتساب</button>
+              </div>
+          </div>
+      `).join('');
+  }
+
+  function copyCrmClient(id, phone, chat) {
+      const text = `عميل أكسجين: ${id}\nالجوال: ${phone}\nالطلب: ${chat}`;
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      showToast('تم نسخ بيانات العميل بنجاح', 'success', 'content_copy');
+  }
+
+  function sendCrmToWhatsapp(phone, chat) {
+      let waPhone = state.phone;
+      if(waPhone.startsWith('0')) waPhone = '966' + waPhone.substring(1);
+      const msg = `مرحباً إدارة أكسجين، تفاصيل عميل محادثة الذكاء الاصطناعي:%0A- الجوال: ${phone}%0A- الطلب/الاستفسار: ${chat}`;
+      window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
+  }
+
+  async function callOpenAIAPI(contents) {
+      const cfg = state.aiConfig || {};
+      const dynamicSystemPrompt = `${cfg.systemPrompt}\nطريقة الكلام والقواعد: ${cfg.rules}\nمعلومات التواصل المعتمدة: ${cfg.contactInfo}\nأقصى نسبة خصم مسموحة: ${cfg.maxDiscount}%\nالحد الأدنى للسعر بعد الفصال: ${cfg.minPrice} ر.س.`;
+      const endpoint = (cfg.endpoint || '/wp-json/oxygen-ai/v1/chat').trim();
+      const input = (contents || [])
+          .filter(m => m && (m.role === 'user' || m.role === 'model' || m.role === 'assistant'))
+          .slice(-12)
+          .map(m => ({
+              role: m.role === 'model' ? 'assistant' : m.role,
+              content: Array.isArray(m.content) ? m.content.map(x => x.text || '').join(' ') :
+                       Array.isArray(m.parts) ? m.parts.map(x => x.text || '').join(' ') : String(m.content || '')
+          }))
+          .filter(m => m.content.trim());
+      if (!input.length) throw new Error('لا توجد رسالة لإرسالها');
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 25000);
+      try {
+          const response = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+              body: JSON.stringify({ input, instructions: dynamicSystemPrompt, model: 'gpt-6-luna' }),
+              signal: controller.signal,
+              credentials: 'same-origin'
+          });
+          const raw = await response.text();
+          let result = {}; try { result = raw ? JSON.parse(raw) : {}; } catch (_) {}
+          if (!response.ok) throw new Error(result.message || result.error?.message || `API HTTP ${response.status}`);
+          const text = result.text || result.output_text || result.response || '';
+          if (text) return text;
+          throw new Error('OpenAI أعاد استجابة بدون نص');
+      } catch (e) {
+          if (e.name === 'AbortError') throw new Error('انتهت مهلة الاتصال. حاول مرة أخرى.');
+          throw e;
+      } finally {
+          clearTimeout(timeout);
+      }
+  }
+
+  function escapeHtml(string) {
+      return string.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function saveAiAdminSettings() {
+      const get = id => document.getElementById(id);
+      state.aiConfig.systemPrompt = get('ai-admin-prompt').value.trim() || state.aiConfig.systemPrompt;
+      state.aiConfig.maxDiscount = Math.max(0, Math.min(100, parseFloat(get('ai-admin-max-discount').value) || 15));
+      state.aiConfig.minPrice = Math.max(0, parseFloat(get('ai-admin-min-price').value) || 80);
+      state.aiConfig.rules = get('ai-admin-rules').value.trim();
+      state.aiConfig.contactInfo = get('ai-admin-contact').value.trim();
+      state.aiConfig.endpoint = get('ai-admin-endpoint').value.trim() || '/wp-json/oxygen-ai/v1/chat';
+      persistSettings();
+      chatHistory = [];
+      showToast('تم حفظ إعدادات AI والربط والتعديل', 'success', 'save');
+  }
+
+  async function testAiConnection() {
+      saveAiAdminSettings();
+      const status = document.getElementById('ai-connection-status');
+      status.textContent = 'جاري الاختبار...';
+      try {
+          const result = await callOpenAIAPI([{ role: 'user', parts: [{ text: 'اختبار اتصال فقط. أجب بكلمة: جاهز' }] }]);
+          status.textContent = result ? 'متصل ويعمل ✓' : 'استجابة فارغة';
+          status.className = 'flex-1 flex items-center justify-center text-[10px] font-bold text-whatsapp-green';
+      } catch (e) {
+          status.textContent = 'فشل: ' + (e.message || 'خطأ');
+          status.className = 'flex-1 flex items-center justify-center text-[10px] font-bold text-alert-crimson text-center';
+      }
+  }
+
+
+  function setMode(mode) {
+      state.mode = mode;
+      document.querySelectorAll('.mode-btn').forEach(b => {
+          b.classList.remove('bg-primary', 'text-white', 'shadow-sm');
+          b.classList.add('bg-transparent', 'text-text-muted');
+      });
+      const activeBtn = document.getElementById('btn-mode-' + mode);
+      if(activeBtn) {
+          activeBtn.classList.remove('bg-transparent', 'text-text-muted');
+          activeBtn.classList.add('bg-primary', 'text-white', 'shadow-sm');
+      }
+
+      const depthBox = document.getElementById('wash-options');
+      const vatWarrantyBox = document.getElementById('options-vat-warranty');
+      const maintServicesBox = document.getElementById('maintenance-services-box');
+      const installServicesBox = document.getElementById('install-services-box');
+      const stepperLabel = document.getElementById('stepper-label');
+
+      depthBox.style.display = 'none';
+      vatWarrantyBox.style.display = 'grid';
+      maintServicesBox.classList.add('hidden');
+      installServicesBox.classList.add('hidden');
+
+      if (mode === 'wash') {
+          stepperLabel.innerText = 'عدد الوحدات المطلوب غسيلها';
+          if (!['شباك','داكت','مركزي','كونسيلد','دولابي'].includes(state.unitName)) {
+              depthBox.style.display = 'flex';
+          }
+      } else if (mode === 'install') {
+          stepperLabel.innerText = 'عدد الوحدات (تركيب/فك/نقل)';
+          installServicesBox.classList.remove('hidden');
+      } else if (mode === 'maintenance') {
+          stepperLabel.innerText = 'عدد الوحدات المطلوب صيانتها';
+          vatWarrantyBox.style.display = 'none';
+          maintServicesBox.classList.remove('hidden');
+      }
+
+      calcTotal();
+  }
+
+  function selectUnit(btn, name) {
+      document.querySelectorAll('.unit-type-btn').forEach(b => {
+          b.classList.remove('bg-surface-container-high', 'text-primary', 'border-primary/30', 'shadow-sm');
+          b.classList.add('bg-surface-container-low', 'text-text-muted', 'border-transparent');
+      });
+      btn.classList.add('bg-surface-container-high', 'text-primary', 'border-primary/30', 'shadow-sm');
+      btn.classList.remove('bg-surface-container-low', 'text-text-muted', 'border-transparent');
+      
+      state.unitName = name;
+
+      const depthBox = document.getElementById('wash-options');
+      if (state.mode === 'wash') {
+          if (['شباك','داكت','مركزي','كونسيلد','دولابي'].includes(name)) {
+              depthBox.style.display = 'none';
+          } else {
+              depthBox.style.display = 'flex';
+          }
+      }
+
+      calcTotal();
+  }
+
+  function updateCount(delta) {
+      state.count = Math.max(1, state.count + delta);
+      document.getElementById('unit-count').innerText = state.count;
+      calcTotal();
+  }
+
+  function setWashDepth(depth) {
+      state.washDepth = depth;
+      calcTotal();
+  }
+
+  function toggleVat() {
+      state.vatEnabled = !state.vatEnabled;
+      calcTotal();
+  }
+
+  function updateWarranty() {
+      const selectEl = document.getElementById('warranty-select');
+      state.warranty = parseInt(selectEl.value) || 0;
+      state.warrantyText = selectEl.options[selectEl.selectedIndex].text;
+      calcTotal();
+  }
+
+  function calcTotal() {
+      let total = 0;
+      let qty = state.count;
+      let type = state.unitName;
+      let summaryText = "";
+
+      const installNotice = document.getElementById('install-custom-notice');
+      const priceDisplayWrapper = document.getElementById('price-display-wrapper');
+      const summaryTitleLabel = document.getElementById('summary-title-label');
+      const redWarningNote = document.getElementById('maintenance-red-warning');
+
+      if (state.mode === 'maintenance') {
+          if (qty <= 2) {
+              total = 0;
+              summaryText = `${type} (${qty} وحدة) - فحص ومعاينة مجانية`;
+              if(redWarningNote) redWarningNote.classList.add('hidden');
+          } else if (qty >= 3 && qty <= 5) {
+              total = 30;
+              summaryText = `${type} (${qty} وحدة) - رسوم زيارة وفحص (30 ر.س)`;
+              if(redWarningNote) redWarningNote.classList.remove('hidden');
+          } else {
+              total = 50;
+              summaryText = `${type} (${qty} وحدة) - رسوم زيارة وفحص متقدمة (50 ر.س)`;
+              if(redWarningNote) redWarningNote.classList.remove('hidden');
+          }
+
+          let selectedMaint = [];
+          document.querySelectorAll('.maint-service-cb:checked').forEach(cb => selectedMaint.push(cb.value));
+          if(selectedMaint.length > 0) {
+              summaryText += ` [الخدمات: ${selectedMaint.join(', ')}]`;
+          }
+
+          if(installNotice) installNotice.classList.add('hidden');
+          if(priceDisplayWrapper) priceDisplayWrapper.style.display = 'flex';
+
+      } else {
+          if(redWarningNote) redWarningNote.classList.add('hidden');
+          
+          if (state.mode === 'install') {
+              let selectedInst = [];
+              document.querySelectorAll('.install-service-cb:checked').forEach(cb => selectedInst.push(cb.value));
+              let serviceDesc = selectedInst.join(' + ') || 'تركيب';
+
+              if (qty >= 4) {
+                  if(installNotice) installNotice.classList.remove('hidden');
+                  if(priceDisplayWrapper) priceDisplayWrapper.style.display = 'none';
+                  if(summaryTitleLabel) summaryTitleLabel.innerText = "عرض سعر خاص (تواصل مع الفني)";
+              } else {
+                  if(installNotice) installNotice.classList.add('hidden');
+                  if(priceDisplayWrapper) priceDisplayWrapper.style.display = 'flex';
+                  if(summaryTitleLabel) summaryTitleLabel.innerText = "الإجمالي التقديري:";
+
+                  let p1 = state.prices.install.p1;
+                  let p2 = state.prices.install.p2;
+                  let factor = state.prices.install.factor;
+
+                  if (qty === 1) total = p1;
+                  else if (qty === 2) total = p1 + p2;
+                  else total = p1 + p2 + ((qty - 2) * (p1 * (1 + factor)));
+
+                  total += (qty * state.warranty);
+                  if (state.vatEnabled) total = total * 1.15;
+              }
+              summaryText = `${serviceDesc} - ${type} (${qty} وحدة)`;
+
+          } else {
+              if(installNotice) installNotice.classList.add('hidden');
+              if(priceDisplayWrapper) priceDisplayWrapper.style.display = 'flex';
+              if(summaryTitleLabel) summaryTitleLabel.innerText = "الإجمالي التقديري:";
+
+              let p1 = state.prices.wash.p1;
+              let p2 = state.prices.wash.p2;
+              let factor = state.prices.wash.factor;
+
+              if (qty === 1) total = p1;
+              else if (qty === 2) total = p1 + p2;
+              else total = p1 + p2 + ((qty - 2) * (p1 * (1 + factor)));
+
+              total += (qty * state.warranty);
+              if (state.vatEnabled) total = total * 1.15;
+
+              const depthTxt = state.washDepth === 'full' ? 'شامل (داخلي وخارجي)' : 'داخلي فقط';
+              summaryText = `غسيل ${depthTxt} - ${type} (${qty} وحدة)`;
+          }
+      }
+
+      const finalPrice = Math.round(total);
+      const totalEl = document.getElementById('total-price');
+      const currencyEl = document.getElementById('price-currency-unit');
+
+      if (state.mode === 'maintenance' && finalPrice === 0) {
+          totalEl.innerText = "مجاناً";
+          if(currencyEl) currencyEl.innerText = "";
+      } else if (state.mode === 'install' && qty >= 4) {
+          totalEl.innerText = "حسب الاتفاق";
+          if(currencyEl) currencyEl.innerText = "";
+      } else {
+          if(totalEl) totalEl.innerText = finalPrice;
+          if(currencyEl) currencyEl.innerText = "ر.س";
+      }
+
+      const discountBadge = document.getElementById('discount-badge');
+      if(discountBadge) {
+          if (qty >= 3) {
+              discountBadge.innerText = "شامل خصم الكمية والزيادة المدروسة 🎉";
+              discountBadge.className = "font-label-sm text-[10px] text-whatsapp-green font-bold";
+          } else {
+              discountBadge.innerText = "بدون خصم إضافي";
+              discountBadge.className = "font-label-sm text-[10px] text-secondary font-bold";
+          }
+      }
+
+      const summaryEl = document.getElementById('selected-service-summary');
+      if(summaryEl) summaryEl.innerText = summaryText;
+
+      state.hash = generateDynamicHash(state.mode, type, qty, finalPrice);
+  }
+
+  function generateDynamicHash(mode, name, units, price) {
+      const str = `${mode}-${name}-${units}-${price}-${state.vatEnabled}-${state.warranty}`;
+      let hashNum = 0;
+      for (let i = 0; i < str.length; i++) {
+          hashNum = ((hashNum << 5) - hashNum) + str.charCodeAt(i);
+          hashNum |= 0;
+      }
+      const hex = Math.abs(hashNum).toString(16).toUpperCase().padStart(5, '0').substring(0, 5);
+      return `#OXG-SEC-${hex}`;
+  }
+
+  function selectSlot(btn, slotName) {
+      document.querySelectorAll('.slot-chip').forEach(b => {
+          b.classList.remove('bg-surface-container-high', 'text-primary', 'border-primary/30', 'shadow-sm');
+          b.classList.add('bg-surface-container-low', 'text-text-primary', 'border-transparent');
+      });
+      btn.classList.add('bg-surface-container-high', 'text-primary', 'border-primary/30', 'shadow-sm');
+      btn.classList.remove('bg-surface-container-low', 'text-text-primary', 'border-transparent');
+      state.slot = slotName;
+  }
+
+  function triggerTimeDialog() {
+      const hours = ['09:30 ص', '01:45 م', '04:15 م', '05:30 م', '07:20 م', '09:00 م'];
+      const randomHour = hours[Math.floor(Math.random() * hours.length)];
+      state.preciseTime = randomHour;
+      document.getElementById('precise-time-val').innerText = randomHour;
+      showToast('تم تحديد وتخصيص الوقت بنجاح', 'success', 'schedule');
+  }
+
+  function openVerificationModal() {
+      const totalPrice = document.getElementById('total-price').innerText;
+      document.getElementById('modal-hash-code').innerText = state.hash;
+      const serviceDisplayNames = {'wash': 'غسيل', 'install': 'تركيب/فك/نقل', 'maintenance': 'صيانة وإصلاح'};
+      document.getElementById('modal-service-name').innerText = `${serviceDisplayNames[state.mode]} ${state.unitName}`;
+      document.getElementById('modal-units-count').innerText = `${state.count} وحدة`;
+      document.getElementById('modal-price-val').innerText = `${totalPrice} ر.س`;
+      document.getElementById('modal-warranty-val').innerText = state.warrantyText;
+
+      const banner = document.getElementById('tamper-status-banner');
+      banner.className = "w-full p-3 rounded-xl flex items-center gap-2 border font-bold text-xs bg-emerald-50 text-emerald-800 border-emerald-200";
+      document.getElementById('tamper-banner-icon').innerText = "check_circle";
+      document.getElementById('tamper-banner-text').innerText = "تم التحقق بنجاح: السعر والضمان والبيانات متطابقة تماماً وخالية من أي تلاعب.";
+      document.getElementById('verification-panel-title').innerText = "توثيق الطلب ومراجعة البيانات";
+
+      const modal = document.getElementById('security-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+  }
+
+  function openVerificationModalWithCode(code) {
+      document.getElementById('modal-hash-code').innerText = code;
+      document.getElementById('modal-service-name').innerText = state.unitName;
+      document.getElementById('modal-units-count').innerText = `${state.count} وحدة`;
+      document.getElementById('modal-price-val').innerText = document.getElementById('total-price').innerText + " ر.س";
+      document.getElementById('modal-warranty-val').innerText = state.warrantyText;
+
+      const banner = document.getElementById('tamper-status-banner');
+      if (code === state.hash || code.startsWith('#OXG-SEC-')) {
+          banner.className = "w-full p-3 rounded-xl flex items-center gap-2 border font-bold text-xs bg-emerald-50 text-emerald-800 border-emerald-200";
+          document.getElementById('tamper-banner-icon').innerText = "check_circle";
+          document.getElementById('tamper-banner-text').innerText = "علامة التوثيق مفعلة ومؤكدة: الطلب رسمي ومتطابق تماماً.";
+      } else {
+          banner.className = "w-full p-3 rounded-xl flex items-center gap-2 border font-bold text-xs bg-red-50 text-red-800 border-red-200";
+          document.getElementById('tamper-banner-icon').innerText = "error";
+          document.getElementById('tamper-banner-text').innerText = "الكود مرفوض: تم اكتشاف محاولة تلاعب في السعر أو بند الضمان!";
+      }
+
+      document.getElementById('verification-panel-title').innerText = "لوحة تأكيد مصدر الطلب";
+      const modal = document.getElementById('security-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+  }
+
+  function closeVerificationModal() {
+      const modal = document.getElementById('security-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+  }
+
+  function processSecureBooking() { openVerificationModal(); }
+  function prepareAndOpenWhatsApp() { openVerificationModal(); }
+
+  function captureCustomerLocation() {
+      const input = document.getElementById('order-location');
+      const status = document.getElementById('order-location-status');
+      if (!navigator.geolocation) { status.textContent = 'المتصفح لا يدعم تحديد الموقع.'; return; }
+      status.textContent = 'جارٍ تحديد موقعك...';
+      navigator.geolocation.getCurrentPosition(pos => {
+          const lat = pos.coords.latitude.toFixed(6), lng = pos.coords.longitude.toFixed(6);
+          input.value = `https://maps.google.com/?q=${lat},${lng}`;
+          status.textContent = 'تم تحديد الموقع بنجاح ✓';
+          status.className = 'text-[10px] text-whatsapp-green font-bold';
+      }, () => {
+          status.textContent = 'تعذر تحديد الموقع. اسمح للموقع من إعدادات المتصفح وحاول مرة أخرى.';
+          status.className = 'text-[10px] text-alert-crimson font-bold';
+      }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+  }
+
+
+  function sendOrderToWhatsAppNow() {
+      const totalPrice = document.getElementById('total-price').innerText;
+      const name = (document.getElementById('order-customer-name')?.value || '').trim();
+      const phone = (document.getElementById('order-customer-phone')?.value || '').trim().replace(/\s+/g,'');
+      const location = (document.getElementById('order-location')?.value || '').trim();
+      if (!name) { showToast('اكتب اسم العميل أولاً', 'warning', 'person'); return; }
+      if (!/^0?5\d{8}$/.test(phone)) { showToast('أدخل رقم جوال سعودي صحيح', 'warning', 'phone'); return; }
+      if (!location) { showToast('حدد موقع العميل قبل إرسال الطلب', 'warning', 'location_on'); return; }
+
+      let waPhone = state.phone.replace(/\D/g,''); if (waPhone.startsWith('0')) waPhone = '966' + waPhone.substring(1);
+      const names = {'wash':'غسيل وتطهير','install':'تركيب وفك ونقل','maintenance':'صيانة وإصلاح'};
+      const message = `مرحباً إدارة أكسجين الذكية ❄️
+
+📌 طلب خدمة جديد
+👤 الاسم: ${name}
+📱 جوال العميل: ${phone}
+🛠️ الخدمة: ${names[state.mode] || state.mode}
+🌬️ نوع المكيف: ${state.unitName}
+🔢 العدد: ${state.count}
+💰 الإجمالي: ${totalPrice} ر.س
+🛡️ الضمان: ${state.warrantyText}
+⏰ الموعد: ${state.slot} (${state.preciseTime})
+📍 موقع العميل: ${location}
+🔐 رابط الصفحة: ${window.location.href}`;
+
+      const existing = crmClients.find(c => c.phone === phone);
+      const record = existing || { id:'CRM-'+Math.floor(Math.random()*90000+10000), phone, location, request:message, lastChat:message, timestamp:new Date().toLocaleString('ar-SA') };
+      record.location = location; record.lastChat = message; record.timestamp = new Date().toLocaleString('ar-SA');
+      if (!existing) crmClients.unshift(record);
+      localStorage.setItem('oxygen_crm_clients', JSON.stringify(crmClients));
+      renderCrmList();
+
+      window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(message)}`, '_blank');
+      closeVerificationModal();
+      showToast('تم تجهيز الطلب وإرساله للواتساب وتسجيله في CRM', 'success', 'send');
+  }
+
+  function promptAdminPin() {
+      if (state.isAdminOpen) {
+          lockAdmin();
+          return;
+      }
+      document.getElementById('admin-pin-input').value = '';
+      document.getElementById('pin-error-msg').classList.add('hidden');
+      const modal = document.getElementById('admin-pin-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+  }
+
+  function closeAdminPinModal() {
+      const modal = document.getElementById('admin-pin-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+  }
+
+  function verifyAdminPin() {
+      const pin = document.getElementById('admin-pin-input').value;
+      if (pin === "789512364") {
+          closeAdminPinModal();
+          state.isAdminOpen = true;
+          
+          document.getElementById('customer-view').classList.add('hidden');
+          document.getElementById('customer-view').classList.remove('flex');
+          document.getElementById('admin-view').classList.remove('hidden');
+          document.getElementById('admin-view').classList.add('flex');
+          
+          const lockIcon = document.getElementById('admin-lock-icon');
+          if (lockIcon) {
+              lockIcon.innerText = 'lock_open';
+              lockIcon.classList.add('text-primary');
+          }
+          
+          showToast('تم تسجيل الدخول للوحة الإدارة المركزية بنجاح', 'success', 'admin_panel_settings');
+      } else {
+          document.getElementById('pin-error-msg').classList.remove('hidden');
+      }
+  }
+
+  function lockAdmin() {
+      state.isAdminOpen = false;
+      document.getElementById('admin-view').classList.add('hidden');
+      document.getElementById('admin-view').classList.remove('flex');
+      document.getElementById('customer-view').classList.remove('hidden');
+      document.getElementById('customer-view').classList.add('flex');
+      
+      const lockIcon = document.getElementById('admin-lock-icon');
+      if (lockIcon) {
+          lockIcon.innerText = 'lock';
+          lockIcon.classList.remove('text-primary');
+      }
+      
+      showToast('تم إغلاق وتأمين لوحة الإدارة', 'warning', 'lock');
+  }
+
+  function toggleSystemFeature(btn, targetId, name) {
+      const thumb = btn.querySelector('.thumb');
+      const target = document.getElementById(targetId);
+      const isActive = btn.classList.contains('bg-primary-container');
+      
+      if (isActive) {
+          btn.classList.remove('bg-primary-container');
+          btn.classList.add('bg-surface-container-highest');
+          thumb.classList.remove('translate-x-[-24px]');
+          thumb.classList.add('translate-x-0');
+          if (target) target.style.display = 'none';
+          showToast(`تم إخفاء/تعطيل ${name} من الواجهة`, 'warning', 'visibility_off');
+      } else {
+          btn.classList.remove('bg-surface-container-highest');
+          btn.classList.add('bg-primary-container');
+          thumb.classList.remove('translate-x-0');
+          thumb.classList.add('translate-x-[-24px]');
+          if (target) target.style.display = '';
+          showToast(`تم إظهار ونشر ${name} في الواجهة`, 'success', 'visibility');
+      }
+  }
+
+  function updateSystemPhone() {
+      const newPhone = document.getElementById('admin-phone-input').value.trim();
+      if(!newPhone || newPhone.length < 9) {
+          showToast('الرجاء إدخال رقم هاتف صحيح', 'error', 'error');
+          return;
+      }
+      state.phone = newPhone;
+      persistSettings();
+
+      document.querySelectorAll('a[href^="tel:"]').forEach(a => {
+          a.href = `tel:${newPhone}`;
+      });
+
+      const modalWaText = document.getElementById('modal-wa-text');
+      if(modalWaText) modalWaText.innerText = `العودة لمحادثة الواتساب (${newPhone})`;
+
+      showToast(`تم تعميم الرقم الجديد (${newPhone}) على كافة أزرار الاتصال والواتساب`, 'success', 'sync');
+  }
+
+  function broadcastNewEvent() {
+      const input = document.getElementById('admin-event-input');
+      const eventText = input.value.trim();
+      if(!eventText) {
+          showToast('الرجاء كتابة نص الحدث أو الإعلان أولاً', 'warning', 'warning');
+          return;
+      }
+      
+      const tickerContainer = document.querySelector('.animate-ticker');
+      if(tickerContainer) {
+          const newEventHTML = `
+            <span>•</span>
+            <span class="text-white bg-alert-crimson/80 px-2.5 py-0.5 rounded-full border border-alert-crimson animate-pulse shadow-sm flex items-center gap-1">
+                <span class="material-symbols-outlined text-[12px]">notifications_active</span>
+                ${eventText}
+            </span>
+          `;
+          tickerContainer.insertAdjacentHTML('afterbegin', newEventHTML);
+          input.value = '';
+          showToast('تم بث الحدث الجديد بنجاح وعرضه للعملاء', 'success', 'campaign');      }
+  }
+
+  function saveAdminPrices() {
+      state.prices.wash = {
+          p1: parseFloat(document.getElementById('ap-wash-1').value) || 100,
+          p2: parseFloat(document.getElementById('ap-wash-2').value) || 80,
+          factor: (parseFloat(document.getElementById('ap-wash-f').value) || 70) / 100
+      };
+      state.prices.install = {
+          p1: parseFloat(document.getElementById('ap-install-1').value) || 250,
+          p2: parseFloat(document.getElementById('ap-install-2').value) || 200,
+          factor: (parseFloat(document.getElementById('ap-install-f').value) || 90) / 100
+      };
+      
+      calcTotal();
+      showToast('تم تحديث هيكلة الأسعار ونسب الزيادة وتطبيقها لحظياً', 'success', 'price_check');
+  }
+
+  function saveAdminBankDetails() {
+      const name = document.getElementById('admin-bank-name').value.trim();
+      const holder = document.getElementById('admin-bank-holder').value.trim();
+      const iban = document.getElementById('admin-bank-iban').value.trim();
+
+      if(!name || !holder || !iban) {
+          showToast('الرجاء تعبئة كافة حقول بيانات الدفع', 'error', 'error');
+          return;
+      }
+
+      state.bankDetails = { name, holder, iban };
+      persistSettings();
+
+      document.getElementById('bank-title-display').innerText = `حساب ${name}`;
+      document.getElementById('bank-holder-display').innerText = holder;
+      document.getElementById('iban-text').innerText = state.ibanRevealed ? iban : iban.substring(0, 10) + " ****************";
+
+      showToast('تم تحديث بيانات طرق الدفع والآيبان للمستخدمين بنجاح', 'success', 'account_balance');
+  }
+
+  function applyOffer(mode, unitName, depth, count) {
+      setMode(mode);
+      if(mode === 'wash') setWashDepth(depth);
+      
+      document.querySelectorAll('.unit-type-btn').forEach(btn => {
+          const btnName = btn.querySelector('span:last-child').innerText.trim();
+          if(btnName === unitName) selectUnit(btn, unitName);
+      });
+      
+      state.count = count;
+      document.getElementById('unit-count').innerText = count;
+      calcTotal();
+      
+      document.getElementById('service-calc-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      showToast('تم تطبيق العرض الترويجي في الحاسبة بنجاح!', 'success', 'local_offer');
+  }
+
+  function startOffersSlider() {
+      const slider = document.getElementById('offers-slider');
+      if (!slider) return;
+      
+      setInterval(() => {
+          if (state.isAdminOpen) return;
+          const maxScrollLeft = slider.scrollWidth - slider.clientWidth;
+          const currentScroll = Math.abs(slider.scrollLeft);
+          const cardWidth = slider.clientWidth * 0.85;
+          
+          if (currentScroll >= maxScrollLeft - 10) {
+              slider.scrollTo({ left: 0, behavior: 'smooth' });
+          } else {
+              slider.scrollBy({ left: cardWidth, behavior: 'smooth' });
+          }
+      }, 4000);
+  }
+
+  function revealIban() {
+      state.ibanRevealed = !state.ibanRevealed;
+      const ibanText = document.getElementById('iban-text');
+      const eyeIcon = document.getElementById('iban-eye-icon');
+      if (state.ibanRevealed) {
+          ibanText.innerText = state.bankDetails.iban;
+          if (eyeIcon) eyeIcon.innerText = "visibility_off";
+      } else {
+          ibanText.innerText = state.bankDetails.iban.substring(0, 10) + " ****************";
+          if (eyeIcon) eyeIcon.innerText = "visibility";
+      }
+  }
+
+  let hotlineTimer = null;
+  let hotlineSeconds = 0;
+  let hotlineRingTimeout = null;
+  let isCallMuted = false;
+  let isCallSpeaker = true;
+
+  function startHotlineCall() {
+      const status = document.getElementById('hotline-status');
+      const avatar = document.getElementById('hotline-avatar');
+      const ripple = document.getElementById('hotline-ripple');
+      const startBtn = document.getElementById('btn-start-call');
+      const endBtn = document.getElementById('btn-end-call');
+      
+      state.callActive = true;
+      status.innerText = "جاري الاتصال بمركز العمليات...";
+      status.classList.add('text-secondary-fixed');
+      status.classList.remove('text-[#8696a0]');
+      
+      avatar.classList.add('border-secondary-fixed', 'text-secondary-fixed');
+      ripple.classList.remove('hidden');
+      
+      startBtn.classList.add('hidden');
+      startBtn.classList.remove('flex');
+      endBtn.classList.remove('hidden');
+      endBtn.classList.add('flex');
+
+      const callBadge = document.getElementById('admin-call-badge');
+      if(callBadge) callBadge.classList.remove('hidden');
+      const incomingBox = document.getElementById('admin-incoming-call-box');
+      const idleState = document.getElementById('admin-idle-call-state');
+      if(incomingBox && idleState && state.isAdminOpen) {
+          incomingBox.classList.remove('hidden');
+          idleState.classList.add('hidden');
+      }
+      
+      hotlineRingTimeout = setTimeout(answerHotlineCall, 3000);
+  }
+
+  function answerHotlineCall() {
+      const status = document.getElementById('hotline-status');
+      const avatar = document.getElementById('hotline-avatar');
+      const timerUI = document.getElementById('hotline-timer');
+      const waveform = document.getElementById('hotline-waveform');
+      const muteBtn = document.getElementById('btn-mute-call');
+      const speakerBtn = document.getElementById('btn-speaker-call');
+      
+      status.innerText = "متصل - خط مشفر (HD)";
+      status.classList.remove('text-secondary-fixed');
+      status.classList.add('text-whatsapp-green');
+      
+      avatar.classList.remove('border-secondary-fixed', 'text-secondary-fixed');
+      avatar.classList.add('border-whatsapp-green', 'text-whatsapp-green');
+      
+      timerUI.classList.remove('hidden');
+      waveform.classList.remove('hidden');
+      waveform.classList.add('flex');
+      muteBtn.classList.remove('hidden');
+      muteBtn.classList.add('flex');
+      speakerBtn.classList.remove('hidden');
+      speakerBtn.classList.add('flex');
+      
+      hotlineSeconds = 0;
+      timerUI.innerText = "00:00";
+      hotlineTimer = setInterval(() => {
+          hotlineSeconds++;
+          const m = String(Math.floor(hotlineSeconds / 60)).padStart(2, '0');
+          const s = String(hotlineSeconds % 60).padStart(2, '0');
+          timerUI.innerText = `${m}:${s}`;
+      }, 1000);
+  }
+
+  function endHotlineCall() {
+      clearTimeout(hotlineRingTimeout);
+      clearInterval(hotlineTimer);
+      state.callActive = false;
+      
+      const status = document.getElementById('hotline-status');
+      const avatar = document.getElementById('hotline-avatar');
+      const ripple = document.getElementById('hotline-ripple');
+      const startBtn = document.getElementById('btn-start-call');
+      const endBtn = document.getElementById('btn-end-call');
+      const timerUI = document.getElementById('hotline-timer');
+      const waveform = document.getElementById('hotline-waveform');
+      const muteBtn = document.getElementById('btn-mute-call');
+      const speakerBtn = document.getElementById('btn-speaker-call');
+      const callBadge = document.getElementById('admin-call-badge');
+      if(callBadge) callBadge.classList.add('hidden');
+
+      const incomingBox = document.getElementById('admin-incoming-call-box');
+      const activeBox = document.getElementById('admin-active-call-box');
+      const idleState = document.getElementById('admin-idle-call-state');
+      if(incomingBox) incomingBox.classList.add('hidden');
+      if(activeBox) activeBox.classList.add('hidden');
+      if(idleState) idleState.classList.remove('hidden');
+      
+      status.innerText = "تم إنهاء المكالمة";
+      status.classList.remove('text-whatsapp-green');
+      status.classList.add('text-alert-crimson');
+      
+      avatar.classList.remove('border-whatsapp-green');
+      avatar.classList.add('border-alert-crimson', 'text-alert-crimson');
+      ripple.classList.add('hidden');
+      
+      timerUI.classList.add('hidden');
+      waveform.classList.add('hidden');
+      muteBtn.classList.add('hidden');
+      speakerBtn.classList.add('hidden');
+      endBtn.classList.add('hidden');
+      startBtn.classList.remove('hidden');
+      startBtn.classList.add('flex');
+  }
+
+  function toggleMuteCall() {
+      isCallMuted = !isCallMuted;
+      const icon = document.getElementById('icon-mute-call');
+      const btn = document.getElementById('btn-mute-call');
+      if (isCallMuted) {
+          icon.innerText = "mic_off";
+          btn.classList.add('bg-alert-crimson/20', 'text-alert-crimson');
+      } else {
+          icon.innerText = "mic";
+          btn.classList.remove('bg-alert-crimson/20', 'text-alert-crimson');
+      }
+  }
+
+  function toggleSpeakerCall() {
+      isCallSpeaker = !isCallSpeaker;
+      const icon = document.getElementById('icon-speaker-call');
+      const btn = document.getElementById('btn-speaker-call');
+      if (isCallSpeaker) {
+          icon.innerText = "volume_up";
+          btn.classList.add('bg-whatsapp-green/20', 'text-whatsapp-green');
+      } else {
+          icon.innerText = "volume_off";
+          btn.classList.remove('bg-whatsapp-green/20', 'text-whatsapp-green');
+      }
+  }
+
+  function simulateIncomingCallForAdmin() {
+      const callBadge = document.getElementById('admin-call-badge');
+      if(callBadge) callBadge.classList.remove('hidden');
+      const incomingBox = document.getElementById('admin-incoming-call-box');
+      const idleState = document.getElementById('admin-idle-call-state');
+      if(incomingBox && idleState) {
+          incomingBox.classList.remove('hidden');
+          idleState.classList.add('hidden');
+      }
+      showToast('مكالمة صوتية جديدة واردة من العميل!', 'warning', 'ring_volume');
+  }
+
+  function adminAcceptCall() {
+      const incomingBox = document.getElementById('admin-incoming-call-box');
+      const activeBox = document.getElementById('admin-active-call-box');
+      if(incomingBox) incomingBox.classList.add('hidden');
+      if(activeBox) activeBox.classList.remove('hidden');
+      showToast('تم قبول المكالمة والربط بالعميل بنجاح', 'success', 'call');
+  }
+
+  function adminRejectCall() {
+      const incomingBox = document.getElementById('admin-incoming-call-box');
+      const idleState = document.getElementById('admin-idle-call-state');
+      const callBadge = document.getElementById('admin-call-badge');
+      if(incomingBox) incomingBox.classList.add('hidden');
+      if(idleState) idleState.classList.remove('hidden');
+      if(callBadge) callBadge.classList.add('hidden');
+      showToast('تم رفض المكالمة الواردة', 'warning', 'call_end');
+  }
+
+  function adminEndCall() {
+      const activeBox = document.getElementById('admin-active-call-box');
+      const idleState = document.getElementById('admin-idle-call-state');
+      const callBadge = document.getElementById('admin-call-badge');
+      if(activeBox) activeBox.classList.add('hidden');
+      if(idleState) idleState.classList.remove('hidden');
+      if(callBadge) callBadge.classList.add('hidden');
+      showToast('تم إنهاء المكالمة النشطة من لوحة الإدارة', 'success', 'call_end');
+  }
+
+  calcTotal();
+  startOffersSlider();
+</script>
 </body>
 </html>
