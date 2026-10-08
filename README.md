@@ -1,69 +1,21 @@
-# 🚀 Oxygen11
+# Oxygen 11 — WordPress + OpenAI
 
-## مرحباً بك في مشروع Oxygen11
+نسخة Oxygen AI مخصصة للعمل مع WordPress وHostinger.
 
-هذا مشروع ويب بسيط يعمل على Hostinger مع ربط مباشر من GitHub.
+## البنية
+- `index.html` — واجهة Oxygen AI.
+- `wordpress/oxygen-ai-endpoint.php` — جسر WordPress REST إلى OpenAI.
+- لا يتم وضع مفتاح OpenAI داخل HTML أو JavaScript أو GitHub.
 
-### ✨ الميزات
+## WordPress
+المسار المقترح:
+`/wp-json/oxygen-ai/v1/chat`
 
-- ✅ موقع ويب ديناميكي باستخدام Express.js
-- ✅ تحديثات تلقائية من GitHub
-- ✅ واجهة مستخدم جميلة وسهلة
-- ✅ يعمل على Hostinger بدون مشاكل
+## الدومين
+الهدف النهائي:
+`https://www.oxygen11.com`
 
-### 📁 هيكل المشروع
+يجب أن يكون DNS للدومين الرئيسي موجهاً إلى نفس حساب Hostinger الذي عليه WordPress، وبعد التأكد من DNS يمكن ضبط Site URL/Home في WordPress.
 
-```
-oxygen11/
-├── public/
-│   ├── index.html      # الصفحة الرئيسية
-│   ├── style.css       # التنسيقات
-│   └── script.js       # الوظائف
-├── server.js           # الخادم الرئيسي
-├── package.json        # المكتبات المطلوبة
-└── .gitignore          # الملفات المستثناة
-```
-
-### 🔧 كيفية التثبيت والتشغيل
-
-#### محلياً:
-```bash
-git clone https://github.com/alizizo888-code/-oxygen11.git
-cd -oxygen11
-npm install
-npm start
-```
-
-ثم افتح: `http://localhost:3000`
-
-### 📤 كيفية التحديث
-
-1. عدّل الملفات في Codespaces أو محلياً
-2. احفظ التغييرات
-3. ارفع لـ GitHub:
-```bash
-git add .
-git commit -m "وصف التحديث"
-git push origin main
-```
-4. Hostinger سينشّط التحديث تلقائياً! ✨
-
-### 🌐 الموقع المباشر
-
-
-### 📋 المتطلبات
-
-- Node.js 22.x أو أعلى
-- npm
-
-### 📝 الرخصة
-
-MIT License
-
-### 👨‍💻 المطور
-
-alizizo888-code
-
----
-
-**استمتع بمشروعك! 🎉**
+## OpenAI
+يُستخدم OpenAI Responses API من السيرفر، وليس من المتصفح. هذا يمنع كشف المفتاح في الصفحة أو GitHub.
